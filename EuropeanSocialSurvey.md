@@ -648,20 +648,20 @@ knitr::kable(happy_res$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Ireland        |  7.863|  7.331|  7.550|  -0.312|         0.071|         0.075| negligible |   0.000| \*\*\*   |   0.219|         0.071|         0.075| negligible |   0.000| \*\*\*   |
-| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.742|          |  -0.047|         0.079|         0.083| negligible |   0.430|          |
-| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.832|          |   0.045|         0.010|         0.014| negligible |   0.418|          |
-| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.538|          |  -0.016|        -0.014|        -0.010| negligible |   0.808|          |
-| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.410|          |   0.065|         0.365|         0.369| small      |   0.292|          |
-| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.040| \*       |   0.072|        -0.021|        -0.017| negligible |   0.100| +        |
-| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.066| +        |   0.084|        -0.043|        -0.039| negligible |   0.070| +        |
-| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.020| \*       |   0.080|        -0.039|        -0.035| negligible |   0.132|          |
-| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.028| \*       |
+| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.714|          |  -0.047|         0.079|         0.083| negligible |   0.402|          |
+| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.788|          |   0.045|         0.010|         0.014| negligible |   0.348|          |
+| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.512|          |  -0.016|        -0.014|        -0.010| negligible |   0.740|          |
+| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.408|          |   0.065|         0.365|         0.369| small      |   0.242|          |
+| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.022| \*       |   0.072|        -0.021|        -0.017| negligible |   0.078| +        |
+| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.050| \*       |   0.084|        -0.043|        -0.039| negligible |   0.076| +        |
+| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.010| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.114|          |
+| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.044| \*       |
 | Spain          |  7.457|  7.437|  7.747|   0.290|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |   0.310|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |
 | Portugal       |  6.953|  6.973|  7.437|   0.484|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |   0.465|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |
-| Germany        |  7.189|  7.586|  7.757|   0.568|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |   0.171|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |
+| Germany        |  7.189|  7.586|  7.757|   0.568|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |   0.171|        -0.077|        -0.074| negligible |   0.002| \*\*     |
 | Slovenia       |  6.906|  7.116|  7.477|   0.571|        -0.230|        -0.225| small      |   0.000| \*\*\*   |   0.361|        -0.230|        -0.225| small      |   0.000| \*\*\*   |
 | Hungary        |  6.325|  6.384|  6.901|   0.577|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |   0.518|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |
-| Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.002| \*\*     |
+| Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.004| \*\*     |
 
 ``` r
 MyPrintInteractive(happy_res$plot, create_interactive_plot) 
@@ -877,8 +877,6 @@ CreateEuroMap(mymap=mymap,
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-22-2.png)
-
-TODO: rephrase!!
 
 Given that the effect size as calculated by Cohen's d has been mostly "insignificant", interpretation of the charts is a bit clouded.
 
@@ -2521,10 +2519,10 @@ trstep_res <- GetComparisonBoxPlot(indval_name =  "trstep",
                                   skip_plot = FALSE)
 
 tab.4_cap <- table_nums(name="tab_4",
-                        caption = "TRust in European Parliament 2002-2016 - 'impcntr' p-values for significance of the change")
+                        caption = "TRust in European Parliament 2002-2016 - 'trstep' p-values for significance of the change")
 ```
 
-Tab. 3: TRust in European Parliament 2002-2016 - 'impcntr' p-values for significance of the change
+Tab. 3: TRust in European Parliament 2002-2016 - 'trstep' p-values for significance of the change
 
 ``` r
 #knitr::kable(impcntr_res$table, digits = 3)
@@ -2535,20 +2533,20 @@ knitr::kable(trstep_res$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.625|  4.867|  4.367|  -1.258|         0.523|         0.528| medium     |   0.000| \*\*\*   |  -0.501|         0.523|         0.528| medium     |   0.000| \*\*\*   |
-| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.000| \*\*\*   |
+| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.002| \*\*     |
 | Portugal       |  4.835|  3.501|  4.103|  -0.733|         0.145|         0.150| negligible |   0.000| \*\*\*   |   0.601|         0.145|         0.150| negligible |   0.000| \*\*\*   |
 | Slovenia       |  4.620|  3.389|  3.944|  -0.676|         0.248|         0.253| small      |   0.000| \*\*\*   |   0.555|         0.248|         0.253| small      |   0.000| \*\*\*   |
-| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.088| +        |
+| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.078| +        |
 | Spain          |  4.767|  3.886|  4.245|  -0.522|         0.177|         0.182| negligible |   0.000| \*\*\*   |   0.359|         0.177|         0.182| negligible |   0.000| \*\*\*   |
-| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.802|          |
-| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.008| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.006| \*\*     |
-| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.074| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
-| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.038| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
-| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.110|          |   0.188|         0.033|         0.038| negligible |   0.012| \*       |
-| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.256|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
+| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.762|          |
+| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.010| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.004| \*\*     |
+| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.086| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
+| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.034| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
+| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.140|          |   0.188|         0.033|         0.038| negligible |   0.002| \*\*     |
+| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.292|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
 | Finland        |  4.878|  4.673|  5.173|   0.295|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |   0.501|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |
-| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.080| +        |
-| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.344|          |
+| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.072| +        |
+| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.332|          |
 
 As can be seen above, the big positive changes in UK and Portugal as well as Finland and Slovenia from 2014 to 2016 were significant as per weighted t-test.
 
@@ -2672,15 +2670,15 @@ knitr::kable(impcntr_res$table, digits = 3,
 | Spain          |  2.402|  2.379|  2.112|  -0.291|         0.212|         0.217| small      |   0.000| \*\*\*   |  -0.268|         0.212|         0.217| small      |   0.000| \*\*\*   |
 | United Kingdom |  2.575|  2.685|  2.304|  -0.271|         0.525|         0.529| medium     |   0.000| \*\*\*   |  -0.381|         0.525|         0.529| medium     |   0.000| \*\*\*   |
 | Norway         |  2.304|  2.181|  2.036|  -0.268|         0.233|         0.237| small      |   0.000| \*\*\*   |  -0.144|         0.233|         0.237| small      |   0.000| \*\*\*   |
-| Germany        |  2.390|  2.233|  2.162|  -0.228|         0.171|         0.174| negligible |   0.000| \*\*\*   |  -0.071|         0.171|         0.174| negligible |   0.004| \*\*     |
+| Germany        |  2.390|  2.233|  2.162|  -0.228|         0.171|         0.174| negligible |   0.000| \*\*\*   |  -0.071|         0.171|         0.174| negligible |   0.000| \*\*\*   |
 | France         |  2.559|  2.594|  2.357|  -0.202|         0.121|         0.125| negligible |   0.000| \*\*\*   |  -0.236|         0.121|         0.125| negligible |   0.000| \*\*\*   |
 | Belgium        |  2.482|  2.580|  2.293|  -0.189|         0.136|         0.140| negligible |   0.000| \*\*\*   |  -0.286|         0.136|         0.140| negligible |   0.000| \*\*\*   |
 | Netherlands    |  2.467|  2.505|  2.323|  -0.144|         0.095|         0.099| negligible |   0.000| \*\*\*   |  -0.182|         0.095|         0.099| negligible |   0.000| \*\*\*   |
 | Finland        |  2.603|  2.697|  2.511|  -0.092|         0.093|         0.097| negligible |   0.000| \*\*\*   |  -0.186|         0.093|         0.097| negligible |   0.000| \*\*\*   |
-| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.000| \*\*\*   |   0.039|         0.120|         0.124| negligible |   0.102|          |
-| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.450|          |  -0.041|        -0.025|        -0.020| negligible |   0.240|          |
-| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.150|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
-| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.014| \*       |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
+| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.002| \*\*     |   0.039|         0.120|         0.124| negligible |   0.142|          |
+| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.424|          |  -0.041|        -0.025|        -0.020| negligible |   0.260|          |
+| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.114|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
+| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.008| \*\*     |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
 | Poland         |  2.409|  2.455|  2.591|   0.182|        -0.218|        -0.213| small      |   0.000| \*\*\*   |   0.135|        -0.218|        -0.213| small      |   0.000| \*\*\*   |
 | Hungary        |  3.101|  3.318|  3.558|   0.457|        -0.210|        -0.205| small      |   0.000| \*\*\*   |   0.240|        -0.210|        -0.205| small      |   0.000| \*\*\*   |
 
@@ -3136,7 +3134,6 @@ ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
 ``` r
 # compare the indicators between classes
 
-
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
          group_by(indicator) %>%
@@ -3156,14 +3153,50 @@ ggplot(data=ds_ss_avg %>%
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-3.png)
 
+``` r
+ggplot(data=ds_ss_avg %>% 
+         filter(indicator %in% (indicator_table %>%
+                                  filter(indicator %in% pct_indicators,
+                                         source=="WB"))$indicator) %>%
+         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+       aes(x=indicator, y=value, fill=cluster)) +
+  geom_boxplot() + 
+  xlab("") + ylab("") +
+  labs(title="Differences between groups of countries",
+       subtitle="WB Variables ") +
+  coord_flip()
+```
+
+    ## Warning: Column `cntry_name` joining character vector and factor, coercing
+    ## into character vector
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-4.png)
+
+``` r
+ggplot(data=ds_ss_avg %>% 
+         filter(indicator %in% (indicator_table %>% 
+                                  filter(indicator %in% pct_indicators,
+                                         source=="UNHCR"))$indicator,
+                !is.na(value)) %>%
+         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+       aes(x=indicator, y=value+1, fill=cluster)) +
+  geom_boxplot() + 
+  scale_y_log10() +
+  xlab("") + ylab("") +
+  labs(title="Differences between groups of countries",
+       subtitle="UNHCR Variables on logarithmic scale (offset +1%)") +
+  coord_flip()
+```
+
+    ## Warning: Column `cntry_name` joining character vector and factor, coercing
+    ## into character vector
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-5.png)
+
 Summary
 -------
 
 Let's plot happiness against trust in European Parliament to have a good look on the main indicators in this study.
-
-Over the surveys happiness vs trust markers has gradually evolved from a negative correlation of ~0.4 to positive ~0.4 at p=0.1 level. And that seems to have mainly been driven mainly by a few countries dropping their relative trust in the lower happiness end of the chart.
-
-But that needs to be investigated a bit more in due course.
 
 ------------------------------------------------------------------------
 

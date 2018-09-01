@@ -1,58 +1,94 @@
 ---
 title: "Happiness and European Parliament - Adventures in European Social Survey Data"
 output:
-  html_document:
-    df_print: paged
+  github_document:
+    toc: yes
 ---
-
-This is an exercise in getting some insights from open data - this time 
-using European Social Survey from 2002 to 2016.
-Starting from subjective happiness and ending up - through a couple of more or less 
-logical steps of correlation and association - in equally subjective trust 
-in European Parliament.
-
-And please be reminded that this is more a technical exercise in 
-the use of certain technical tools and techniques than a learned 
-investigation of patterns in European sociology or politics.
-
-With those qualifiers stated, main insights
-
-* there appears to be a border of happiness running diagonally across Europe,
-where the countries on the north and west have consistently higher scores in 
-the happiness indicator than those on the other side of that border
-* in 2002 when the survey was conducted for the first time there was a negative correlation 
-between
-happiness and trust in European Parliament: countries with higher happiness score tended to
-have lower score in trust in European Parliament than those with lower happiness
-* by 2016 the correlation had changed to positive
-* from 2014 to 2016 trust in European Parliament in United Kingdom made significant rise,
-which may perhaps be linked to second thoughts after the Brexit vote (fieldwork in the UK
-was conducted after the vote 01.09.16-20.03.17)
-
-ESS data contains a wide variety of indicators and it would be 
-interesting to go deeper - even to the more polarized topics - and 
-link to additional data elsewhere.
-
-Perhaps some other time.
-This has become too long already.
 
 * * *
 
-**And then the tl;dr part...**
+This workbook is used to create content for the completely revised and rewritten
+blog post on investigation of European Social Study.
 
-Broad outline of the steps coming
+* * * 
 
-* Introduction
-* Description of data
-* Subjective happiness
-* Indicators possibly associated with happiness
-* Trust in European Parliament (rose out from the indicators)
-* Happiness and trust together
+Europe is going through interesting time since turn of the century:
+Brexit, refugee crisis, rise of populism, economic worries, rising tensions 
+between the West and Russia - and a lot  more 
+[Timeline of 21st century](https://en.wikipedia.org/wiki/Timeline_of_the_21st_century)
+
+European Social Study has been collecting data on people in most countries 
+in Europe every two years since 2002.
+
+The purpose of this study is look into the recent history of Europe mainly 
+with the help of ESS data.
+
+As additional data we will use World Bank Development indicator set and 
+a data set from UNHCR to provide some reference to ESS indicators.
+
+We started by looking into subjective happiness, how it has changed over time
+and investigated what factors in ESS data are associated with it by using
+linear modeling.
+
+From that we continued looking into a few other indicators which either were 
+significantly impacting subjective happiness or otherwise were seen as 
+interesting and important items in the context of present day Europe:
+
+* how helpful other people are perceived, 
+* trust in United Nations, 
+* trust in European Parliament,
+* views in immigration from poor areas outside of Europe
+
+Finally, we used Primary Component Analysis and k-means clustering
+to find best number of country clusters based on their similarity 
+in the selected ESS variables.
+
+Key findings
+
+* subjective happiness
+    * there is a border of subjective happiness levels running across Europe
+    diagonally from South West corner of Portugal to Eastern border of Finland, 
+    likely more resulting from cultural biases and values of countries than 
+    from genuine differences in "true absolute" happiness
+    * for both Poland and Slovenia the change in happiness from 2002 to 2016 
+    and from 2014 to 2016 was statistically significant but not very 
+    meaningful (effect size was classified as  'small')
+    * changes for other countries had the effect size "neglible" or no 
+    statistical significance
+* trust in European Parliament
+    * for a few countries especially, trust in European Parliament has fluctuated widely, 
+    Hungary, Greece, Ukraine
+    * from 2014 to 2016 trust in European Parliament in United Kingdom made statistically 
+    significant - but small - rise, which may perhaps be linked to some second thoughts 
+    after the Brexit vote (fieldwork in the UK was conducted after the vote 
+    01.09.16-20.03.17)
+* other findings
+    * view on the integration of EU has shifted towards "not more"
+    * acceptance of immigration from poor countries outside of Europe
+    is significantly lower in HUngary than most other countries
+* grouping of the countries using PCA and k-means clustering
+    * Nordic countries + Benelux + Ireland + Swizerland + Austria 
+    * the rest
+    * clear difference in the variables as hown in the box plot
+* reflections of significant evennts in Europe
+    * Greece crisis - the data set ends in 2010 when the support package was agreed, 
+    trust in European Parliament plummeted
+    * Ukraine - the data does not go into the timeframe of Criomean annexation, but
+    may reflect the ups and downs of the country in the first decade of 2000's
+    * United Kingdom - as pointed out, aftermath of the Brexit vote may be reflected
+    in trust
+
+The data set has several interesting features which may be source of some future
+blog posts, especially 
+
+* correlating UNHCR and WB data with ESS
+* identifying discussion topics in European Parliament over the changes in some indicators
+
+* * *
 
 ## European Social Survey
 
-The survey covers whole Europe, but all countries are not participating each time.
-It is described in the abstract of its eighth round (conducted 2016-2017) as
+As described in the abstract of its eighth round (conducted 2016-2017)
 
 >The European Social Survey (ESS) is an academically-driven multi-country survey, which has been administered in over 30 countries to date. Its three aims are, firstly – to monitor and interpret changing public attitudes and values within Europe and to investigate how they interact with Europe's changing institutions, secondly - to advance and consolidate improved methods of cross-national survey measurement in Europe and beyond, and thirdly - to develop a series of European social indicators, including attitudinal indicators. 
 >
@@ -60,31 +96,24 @@ It is described in the abstract of its eighth round (conducted 2016-2017) as
 >
 >The survey involves strict random probability sampling, a minimum target response rate of 70% and rigorous translation protocols. The hour-long face-to-face interview includes questions on a variety of core topics repeated from previous rounds of the survey and also two modules developed for Round 8 covering Public Attitudes to Climate Change, Energy Security, and Energy Preferences and Welfare Attitudes in a Changing Europe (the latter is a partial repeat of a module from Round 4).
 
-There are over 500 indicators. However, all of them are not collected in all surveys, countries or 
+In total there are over 500 indicators. 
+However, all of them are not collected in all surveys, countries or 
 in each interview.
 
 Use of dataset is free for use as stated in ESS codebook
 
 > The data are available without restrictions, for not-for-profit purposes
 
-
-Starting point for this investigation is the question
+Starting point for this investigation is the question on subjective happiness
 
 > Taking all things together, how happy would you say you are?
 
 resulting in the indicator `happy` with range from zero (Extremely unhappy) 
 to ten (Extremely happy).
 
-## Data
+* * *
 
-The dataset used in this investigation covers the period 2002-2016.
-It was created by merging a 2002-2014 dataset created with 
-{ESS Cumulative Data Wizard](http://www.europeansocialsurvey.org/downloadwizard/) 
-and
-a [separately downloaded 2016 set](http://nesstar.ess.nsd.uib.no/webview/) 
-since the latter was not in the wizard at the time of writing.
-
-**Raw Data**
+**Setup**
 
 ```{r, message=FALSE}
 # load key libraries
@@ -98,48 +127,53 @@ library(corrplot)
 library(countrycode)
 library(ggrepel)
 library(GGally)
+library(ggiraph)       # Interactive plot versions for ggplot2
+library(viridis)       # red-green colour blind compatible palettes
+
+
+# must set false for github_markup 
+create_interactive_plot <- FALSE
+
+source("ess_subs.r")
+
+my_data_folder = "C:\\Users\\Juha\\Documents\\MyData\\"
+
+# reference p-value for statistics
+
+p_val = 0.05
+
 ```
+
+## ESS Data
+
+Main dataset used in this investigation covers the period 2002-2016.
+It was created merging a 2002-2014 dataset created with 
+{ESS Cumulative Data Wizard](http://www.europeansocialsurvey.org/downloadwizard/) 
+and
+a [separately downloaded 2016 set](http://nesstar.ess.nsd.uib.no/webview/) 
+since the latter was not in the wizard at the time.
+
+### Raw Data
 
 Reading and merging ESS survey data from the two downloaded sets and keeping only those 
 indicators which are in both.
 
 ```{r}
-data_folder <- "C:\\Users\\Juha\\Documents\\MyData\\"
-use_rds <- TRUE
-if (!use_rds){
-  # merge a subset from surveys 1-7 (excluded most country specific indicators at download phase)
-  # and full set from survey 8 into one common set - survey 8 was not yet available in the 
-  # same wizard as earlier ones
-  essfile_0107 <- paste0(data_folder, "ESS\\ESS1-7e01.csv")
-  essdata_0107 <- read.csv(essfile_0107)
-  essfile_08 <- paste0(data_folder, "ESS\\ESS8e02.0_F1.csv")
-  essdata_08 <- read.csv(essfile_08)
-  common_indicators <- intersect(colnames(essdata_08), colnames(essdata_0107))
-  dataset <- rbind(essdata_0107[,common_indicators], essdata_08[,common_indicators])
-  # for convenience, turning the survey ids into years when conducted
-  dataset$ess_year <- 2000 + 2*dataset$essround
-  # english country names 
-  dataset$cntry_name <- countrycode(dataset$cntry, "iso2c", "country.name")
-  # save for faster iteration later on
-  saveRDS(dataset, paste0(data_folder, "ESS\\ess.rds"))
-  rm(essdata_0107, essdata_08)
-} else {
-  dataset <- readRDS(paste0(data_folder, "ESS\\ess.rds"))
-}
-# check dimensions  of the set
+dataset = GetData(data_folder = my_data_folder, use_rds = TRUE)
 dim(dataset)
+names(dataset)
 
 ```
 
 So, the dataset contains at this point over 376 000 rows and almost 230 columns.
+Variable details available in ESS codebook.
 
-**Participation in Surveys**
+### Survey coverage
 
-We know from ESS portal already that all countries have not been in all surveys, 
-but let's get some numbers.
+We know from ESS portal already that all countries have not been in all surveys
 
-```{r}
-# calculating basics of survey coverage
+```{r, warning=FALSE}
+# survey coverage
 ds_participations <- dataset %>% 
   group_by(cntry_name, ess_year) %>%
   summarise(n=n()) %>%
@@ -148,93 +182,65 @@ ds_participations <- dataset %>%
          last_year = max(ess_year),
          n_surveys = n()) %>% 
   spread(ess_year, n)
-```
 
-Maps will be needed later on as well.
+# map setup
+mymap <- SetupMyMap(data_folder = my_data_folder, 
+                    ds_participations = ds_participations)
 
-```{r, warning=FALSE, message=FALSE}
-# setting up choropleth map plumbing for subsequent use  
-library(rgeos)
-library(maptools)
+# On geographic map
+p <- CreateEuroMap(mymap=mymap, 
+                   ds = ds_participations, 
+                   ind_name = "n_surveys",
+                   txt_title = "Participation in surveys",
+                   txt_subtitle = "Number of surveys a country has participated in",
+                   txt_caption = "ESS surveys 2002-2016")
 
-# using geographic data downloaded from http://www.naturalearthdata.com/downloads/10m-cultural-vectors/
-mymapdata <- paste0(data_folder, "NaturalEarthWorld\\ne_10m_admin_0_countries.shp")
-# when using readShapeSpatial getting notifications to change to some other function
-# todo later in some other project as it works still..
-mymap <- readShapeSpatial(mymapdata)
-
-# checking that all our countries can be found in map data
-idx <- which(!(ds_participations$cntry_name %in% mymap@data$ADMIN))
-if (length(idx)>0)stop("Missing countries!!")
-
-# good - using country names from the column ADMIN
-mymap <- fortify(mymap, region = "ADMIN")
-
-# setting limits of interest in geography
-geo_limits_lat <- c(31,71)
-geo_limits_lon <- c(-25,45)
-
-# country outlines
-outline_layer <- geom_polygon(
-  aes(long, lat, group = group),
-  fill = NA, col = "gray", size = 0.1)
-```
-
-And finally, illustrating ESS coverage on map.
-
-```{r}
-# participation on map
-ggplot(mymap) + 
-  coord_quickmap() +
-  geom_map(data = ds_participations,
-           aes(map_id = cntry_name, fill = n_surveys), 
-           map = mymap) + 
-  outline_layer + 
-  expand_limits(x = mymap$long, y = mymap$lat) +
-  xlim(geo_limits_lon) + 
-  ylim(geo_limits_lat) + 
-  scale_fill_distiller(palette = "Spectral", na.value = "white") +
-  theme(axis.title=element_blank(),
-        axis.text=element_blank(),
-        axis.ticks=element_blank()) +
-  ggtitle("Number of surveys countries have participated")
-
+# TODO: interactive mode ggiraph crashes for the map - could be a bug in the way
+# I use it with map. Will have to investigate more at a later date. But now set
+# interactive mode to FALSE
+MyPrintInteractive(p, FALSE) 
+        
 ```
 
 So, there is a band of countries starting from Finland in the north eastern corner of Europe,
 stretching all the way to Spain and Portugal in the far south western corner,
 which have been in all or nearly all surveys.
-And then there is Israel as an exception.
-They have been in almost all surveys.
-
-And the same in numbers with some additional details.
 
 ```{r}
-# and as table
-knitr::kable(ds_participations, 
-  caption = "Summary of countries participating the survey, including count of responses each year",
-  digits = 0)
+ggplot(data=ds_participations, aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
+  geom_bar(stat="identity", fill="grey") +
+  labs(
+    title="Participation in surveys",
+    subtitle="Number of surveys a country has participated in",
+    caption="ESS surveys 2002-2016") + 
+  xlab("") + ylab("")+
+  theme(plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0)) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+
+# creating a caption for table so that it can be referenced in the text later on
+# ref https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/
+
+tab.1_cap <- table_nums(name = "tab_1", 
+             caption = "Summary of countries participating the survey, including count of responses each year")
 
 ```
+`r table_nums('tab_1')`
+```{r table1, fig.cap=tab.1_cap}
+knitr::kable(ds_participations,
+             digits = 0,
+             col.names = gsub("_", " ", colnames(ds_participations)))
+```
 
-Response counts are large enough each year that we can quite safely assume 
-that they meet typical requirements of statistical analysis.
-Especially when we apply proper weights in analysis - as required by ESS.
+### Weights
 
-For any trends we will only use the countries which have been 
-in all surveys.
-Need to try to limit the length of this blog post somehow.
-
-**Weights**
-
-The need to use weights is very visibly highlighted in ESS material
+Data has to be weighted for analysis as pointed out in ESS material
 
 > Note In general, you must weight tables before quoting percentages from them. To apply weights, select the Weight icon and choose one or more weight variables to use. The Design weights (DWEIGHT) adjust for different selection probabilities, while the Post-stratification weights (PSPWGHT) adjust for sampling error and non-response bias as well as different selection probabilities. Either DWEIGHT or PSPWGHT must always be used. In addition, the Population size weights (PWEIGHT) should be applied if you are looking at aggregates or averages for two or more countries combined. Please see the guide Weighting European Social Survey Data for fuller details about how to use the weights.
 
-And we will follow that guidance as we move on and use `pspwght`
+We will use `pspwght`
 post stratification weighting which
 attempts to take into account varying response rates in different population groups.
-And other factors of that nature.
 
 The weights do vary quite a bit, from almost zero all the way up to close to
 seven, meaning that a response can essentially vote on behalf of almost seven
@@ -242,316 +248,315 @@ persons and another practically none, as illustrated in the following
 graph.
 
 ```{r}
-ggplot(data=dataset, aes(pspwght)) +
-  geom_histogram(bins = 200) +
-  geom_vline(xintercept = quantile(dataset$pspwght), linetype="dashed", color="gray") +
-  annotate("label", label=names(quantile(dataset$pspwght)), 
-           x=quantile(dataset$pspwght), y=19000, size=2) +
-  ggtitle("Distribution of 'pspwght' across all surveys, with quantiles") +
+ggplot(data = dataset, aes(pspwght)) +
+  geom_histogram(bins = 200, fill = 'gray') +
+  geom_vline(
+    xintercept = quantile(dataset$pspwght),
+    linetype = "dashed",
+    color = "black") +
+  annotate(
+    "label",
+    label = names(quantile(dataset$pspwght)),
+    x = quantile(dataset$pspwght),
+    y = 19000,           # fixed by experimentation
+    size = 2) +
+  labs(
+    title = "Weighting of survey data",
+    subtitle = "Distribution of 'pspwght' across all surveys, highlighting quantiles",
+    caption = "ESS surveys 2002-2016") +
+  theme(plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
+
 ```
 
-**Pre-processing**
+* * *
 
-First indicator we are interested in is subjective happiness, `happy`
+## Subjective Happiness
+
+First indicator we are interested in is subjective happiness, `happy` 
+and will consider other indicators later on
+
+Questions
+
+* how has subjective happiness evolved over the time
+* are there significant changes differences between countries
+
+### Pre-processing
+
+Checking data
 
 ```{r}
-
 summary(dataset$happy)
-
 ```
 
-But as seen above the indicator needs some clean-up as the expected 
+Some pre-processing needed since valid
 range is 0-10.
 
 In ESS data - as described in their codebook - missing responses, refusal to 
 answer, etc are  encoded using numbers outside of the normal range of an indicator.
+And these vary depending on indicator.
 
 So, for `happy` we will filter out responses with higher than 10 score since
+they are not relevant for this study
 
 * 77 - Refusal
 * 88 - Don't know
 * 99 - No answer
 
-These will be filtered out in the pre-processing step below before 
-calculation of weighted average for each country in each survey.
+We replace the higher than 10 values for happy with NA
 
 ```{r}
 
-ds_happy <- dataset %>% 
-  filter(happy <= 10) %>%
+dataset$happy[dataset$happy > 10] <- NA
+
+# creating new dataset for by country and by survey average of happy 
+# by excluding missing data and calculating weighted means
+ds_happy_ave <- dataset %>% 
+  filter(!is.na(happy)) %>%
   group_by(ess_year, cntry_name) %>% 
-  summarise(var_ave = wtd.mean(happy, pspwght),
+  summarise(var_ave = Hmisc::wtd.mean(happy, pspwght),
             n=sum(pspwght))
 
 ```
 
-Making a diagnostic plot to verify that the weighted scores land into the expected range of `happy`.
+Making a diagnostic plot to verify that the weighted scores land 
+into the expected range of `happy`.
 
 ```{r}
 
-ggplot(data=ds_happy, aes(var_ave)) +
-  geom_histogram(bins = 20) +
-  geom_vline(xintercept = quantile(ds_happy$var_ave), linetype="dashed", color="gray") +
-  annotate("label", label=names(quantile(ds_happy$var_ave)), 
-           x=quantile(ds_happy$var_ave), y=2, size=2) +
-  ggtitle("Distribution of by country and by survey average of 'happy'\nAll surveys, highlighting quantiles") +
+# get skewness of the distribution 
+happy_skew <- moments::skewness(ds_happy_ave$var_ave)
+
+ggplot(data=ds_happy_ave, aes(var_ave)) +
+  geom_histogram(bins = 15, fill='gray') +
+  geom_vline(xintercept = quantile(ds_happy_ave$var_ave), linetype="dashed", color="black") +
+  annotate("label", label=names(quantile(ds_happy_ave$var_ave)), 
+           x=quantile(ds_happy_ave$var_ave), y=2, size=2) +
+  labs(
+    title="Subjective happiness",
+    subtitle="Weighted by survey/country scores",
+    caption="ESS surveys 2002-2016") +
+  theme(plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
 
-summary(ds_happy$var_ave)
+summary(ds_happy_ave$var_ave)
 
 ```
 
-And that indeed is the case.
+And that indeed is the case, producing a clearly left skewed 
+distribution (`r round(happy_skew,3)`).
 
-## Changes Over Time
+Some countries have been in all 
+surveys and some in only two.
+So there are no big conclusions to be drawn at this stage.
 
-Next we will have a look on average of `happy` by country and by survey.
+### How is happiness distributed in Europe
+
+Next we investigate the average scores by country on geographic map to 
+see if there are any patterns.
 
 ```{r}
-# making a function out of the plotting steps 
-# since this will be used later as well
 
-MakeIndicatorHeatSet <- function(ds, value_term, txt_name){
-  colnames(ds)[colnames(ds)==value_term] <- "value_term"
-  # add averages by country
-  dsx1 <- ds %>% 
-    group_by(cntry_name) %>% 
-    summarise(value_term = mean(value_term, na.rm = TRUE)) %>%
-    mutate(ess_year="Mean") %>%
-    bind_rows(ds %>% 
-                ungroup() %>% 
-                mutate(ess_year=as.character(ess_year)))
-  # add averages by ess_year  
-  dsx <- dsx1 %>% 
-    group_by(ess_year) %>% 
-    summarise(value_term = mean(value_term, na.rm = TRUE)) %>%
-    mutate(cntry_name="Mean") %>%
-    bind_rows(dsx1)
-  # set countries into order 
-  cntry_list <- (dsx %>% 
-                   filter(ess_year=="Mean", cntry_name != "Mean") %>% 
-                   arrange(value_term))$cntry_name
-  dsx$cntry_name <- factor(dsx$cntry_name, c("Mean", cntry_list))
-  # get the plot
-  p <- ggplot(dsx, aes(ess_year, cntry_name )) +
-    geom_tile(aes(fill = value_term), color = "white") +
-      scale_fill_distiller(palette = "Spectral", na.value = "white") +
-    geom_text(aes(label = round(value_term, 1)), size = 2) +
-    ggtitle(txt_name) +
-    ylab(" ") +
-    xlab("") +
-    theme(legend.title = element_text(size = 10),
-          legend.text = element_text(size = 12),
-          plot.title = element_text(size=16),
-          axis.title=element_text(size=14,face="bold")
-          #axis.text.x = element_text(angle = 90, hjust = 1)
-          ) +
-    labs(fill = "Mean")
-  # convert from function internal to external name 
-  colnames(dsx)[colnames(dsx)=="value_term"] <- value_term
-  return(list("data"=dsx, "plot"=p))
-}
+ds_happy_avgsum <- MakeAverageSummary(ds = ds_happy_ave, value_term = "var_ave")
+
+p <- CreateEuroMap(mymap=mymap, 
+                   ds = ds_happy_avgsum %>%
+                     filter(cntry_name != "Mean"), 
+                   ind_name = "var_ave",
+                   txt_title = "Subjective happiness 2002-2016",
+                   txt_subtitle = "Average score of 'happy', scale 0-10",
+                   txt_caption = "ESS surveys 2002-2016")
+MyPrintInteractive(p, FALSE) 
 
 ```
 
-We will show the averages as a heatmap ordered by decreasing average happiness (calculated
-over all surveys a country has participated).
+Europe seems to be divided into two areas and a border zone running
+diagonally from South West to North East.
+With Portugal and Israel exceptions to that pattern.
+
+This divide might be a result of different cultural traditions and norms 
+refleced in how people score personal happiness. 
+Therefore, comparing absolute scores between the countries might 
+actually be misleading.
+
+An alternative would be to compare each country by itself, i.e. has the 
+personal assesment of happiness improved or not compared to past in that 
+same country.
+
+### Changes of happiness by country and survey
+
+Next we will show average of `happy` by country for each survey
+as a heatmap ordered by decreasing average happiness (calculated
+over all surveys a country has participated in).
 
 ```{r, warning=FALSE}
 
-ds_happy_average <- MakeIndicatorHeatSet(
-  ds = ds_happy, 
-  value_term = "var_ave", 
-  txt_name = "'happy' - Happiness - Average")
+p_happy <- MakeIndicatorHeatSet(
+   ds = ds_happy_avgsum, 
+   value_term = "var_ave", 
+   txt_name = "Subjective happiness",
+   txt_subtitle = "Average score of 'happy', scale 0-10",
+   txt_caption = "ESS surveys 2002-2016")
 
-ds_happy_average$plot
+MyPrintInteractive(p_happy, create_interactive_plot) 
 
 ```
 
-Note that mean above, across columns and rows, is a simple average over the 
-by country and by survey scores.
-Each survey and each country having equal weight in that calculation.
+Note that mean across columns and rows is a simple average over the 
+scores shown on the table.
 
-## Map of Happiness
+Since each ESS survey often has had different number of countries the averages over columns
+cannot be used for any meaningful trend evaluation.
 
-Plotting the average scores by country on geographic map to 
-see if there are any patterns popping up.
+Especially as the lowest means seem to correspond to surveys where Turkey, Ukraine and Bulgaria 
+were participating.
+And these countries are clearly in the overall lower end of subjective happiness spectrum
+in ESS.
+
+### Trends in happiness
+
+Subsequent expoloration / analysis will be conducted with the countries whih have been in at least 
+four of the surveys because that allows inclusion of certain - in the light of recent European 
+history - very interesting countries like Greece, Italy, Russia and Ukraine.
+Iceland, Croatia, Turkey and LUxembourg are excluded as they have been in three or two surveys only.
+
+This will mean that there can be some additional level of error in the results.
+So, the mean drawn in the following chart has some limitations.
+
+```{r, warning=FALSE}
+
+# Countries in 4 or more of the surveys
+
+cntry_in_50pct <- (ds_participations %>% 
+                     filter(n_surveys>=4) %>% 
+                     select(cntry_name))$cntry_name
+
+trends_happy_50  <- MakeIndicatorCountryPlot(
+    ds = ds_happy_ave %>% 
+      filter(cntry_name %in% cntry_in_50pct), 
+    id_term = "var_ave",
+    cntry_term = "cntry_name",
+    year_term = "ess_year",
+    txt_head = "Subjective happiness",
+    txt_subhead = "Countries in 50% of surveys or more",
+    txt_caption = "ESS surveys 2002-2016",
+    show_summary = TRUE,
+    plevel = p_val)
+
+MyPrintInteractive(trends_happy_50$ci, create_interactive_plot, 
+                   hover_css = "stroke-width:3px;") 
+
+
+```
+
+For comparison we show the graph where all included countries have been in all surveys.
+In this case the average line is a bit more meaningful - but we miss quite 
+a few interesting countries.
+
+```{r, warning=FALSE}
+
+# countries in all surveys
+
+cntry_in_100pct <- (ds_participations %>% 
+                     filter(n_surveys==8) %>% 
+                     select(cntry_name))$cntry_name
+
+trends_happy_100  <- MakeIndicatorCountryPlot(
+  ds = ds_happy_ave %>% 
+    filter(cntry_name %in% cntry_in_100pct), 
+    id_term = "var_ave",
+    cntry_term = "cntry_name",
+    year_term = "ess_year",
+    txt_head = "Subjective happiness",
+    txt_subhead = "Countries in all surveys",
+    txt_caption = "ESS surveys 2002-2016",
+    show_summary = TRUE,
+    plevel = p_val)
+
+MyPrintInteractive(trends_happy_100$ci, create_interactive_plot, 
+                   hover_css = "stroke-width:3px;") 
+
+```
+
+There are quite varied happiness histories on display.
+In one end countries like Finland, Swizerland, Norway and Denmark
+are almost monotonically in the high end of the scale.
+
+And then there are countries like Hungary, 
+Poland, Ireland and Portugal where happiness has taken big swiup and down.
+
+Unfortunately the data from most recent but very interestig time is completely 
+missing for some, 
+e.g. Greece (the debt crisis, refugees after 2010) and Ukraine (annexation of Crimea 2014).
+
+### Variations
+
+Heatmap and line graph above indicate some variation of scores between surveys.
+That is more visible in the plot below where we include all countries
 
 ```{r}
-ggplot(mymap) + 
-  coord_quickmap() +
-  geom_map(data = ds_happy_average$data %>% 
-             filter(ess_year=="Mean", cntry_name != "Mean") %>% 
-             select(-ess_year), 
-           aes(map_id = cntry_name, fill = var_ave), 
-           map = mymap) + 
-  outline_layer + 
-  expand_limits(x = mymap$long, y = mymap$lat) +
-  xlim(geo_limits_lon) + 
-  ylim(geo_limits_lat) + 
-  scale_fill_distiller(palette = "Spectral", na.value = "white") +
-  # the dividing line hand fitted on the map
-  geom_line(data=data.frame(x=c(-5,40),y=c(31,71)), 
-            aes(x=x, y=y), color="gray", size=3, linetype = "dashed", alpha=0.6) +
+
+p <- ggplot(data = ds_happy_avgsum %>% filter(ess_year=="Mean", cntry_name != "Mean"),
+            aes(x=reorder(cntry_name, var_ave))) +
+  geom_point_interactive(data=ds_happy_ave, 
+                         aes(y=var_ave, color=as.factor(ess_year),
+                             tooltip = paste0(cntry_name, " ", ess_year, 
+                                              "\nScore: ", round(var_ave,2)))) +
+  geom_point_interactive(aes(y=var_ave,
+                             tooltip = paste0(cntry_name, 
+                                              "\nMean: ", round(var_ave,2))), 
+                         color="black", pch=5) +
+  labs(title="Subjective happiness scores",
+       subtitle="All countries in order of decreasing mean (black diamond)",
+       caption = "ESS surveys 2002-2016") +
+  scale_color_viridis(discrete=TRUE) +
   theme(axis.title=element_blank(),
-        axis.text=element_blank(),
-        axis.ticks=element_blank()) +
-  ggtitle("'happy' - Happiness - average 2002-2016")
+        plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0)) +
+  labs(color="ESS Year") +
+  coord_flip()
+
+MyPrintInteractive(p, create_interactive_plot) 
 
 ```
 
-There appears to be a geographic arrangement 
-With a few exceptions like Israel and perhaps Portugal being on the "wrong" side of 
-the divide running diagonally through Europe.
-
-## Trends of Happiness
-
-In the heatmap we can see that average of 'happy' took a dive 
-around 2008-2010 when Turkey, Ukraine and Bulgaria participated.
-And Russians.
-
-Getting meaningful trends would become unnecessarily complicated 
-for the period 2002 to 2016 if these countries were included.
-And the same complication would apply to the extra `happy` countries 
-Denmark and Iceland.
-
-Therefore we will only include the countries which have been in all surveys.
+For some countries there is quite wide variation in the scores between surveys.
+But in general it looks like those on the high end of happiness have had less 
+variation than those on the lower end.
 
 ```{r}
-# we will make more than one trend plot so it makes sense to wrap this into a function
-MakeTrendPlots <- function(ds, id_term, txt_head, plevel=0.05){
-  colnames(ds)[colnames(ds)==id_term] <- "id_term"
-  # calculate simple overall mean, median and confidence intervals 
-  # from sets of already calculated by country/by survey scores
-  ds_ci <- ds %>%
-    group_by(ess_year) %>%
-    summarise(term_ave = mean(id_term),
-              term_sd = sd(id_term),
-              term_sem = sd(id_term)/sqrt(n()),
-              term_med = median(id_term),
-              n=n()) %>%
-    mutate(term_lwr.ci = term_ave - qt(1 - (plevel / 2), n - 1) * term_sem,
-           term_upr.ci = term_ave + qt(1 - (plevel / 2), n - 1) * term_sem,
-           cntry_label = NA)
-  
-  # for the label
-  ci_pct <- round((1-plevel)*100,0)
-  
-  first_year <- min(ds$ess_year)
-  last_year <- max(ds$ess_year)
-  ds$cntry_label <- ifelse(ds$ess_year < last_year, NA, ds$cntry_name)
-  
-  # plot with confidence intervals, mean and median, data points and loess fit
-  p_ci <- ggplot(data=ds, aes(x=ess_year, label=cntry_label)) +
-    # individual country scores linked with line
-    geom_point(aes(y=id_term, color=cntry_name), alpha=0.5) +
-    geom_line(aes(y=id_term, color=cntry_name), alpha=0.5, size=0.1) +
-    geom_text_repel(aes(y=id_term), size=3, 
-                    force = 10, 
-                    xlim = c(last_year, NA), 
-                    color="gray30") +
-    # loess fit for the average
-    geom_smooth(method = "loess", aes(y=id_term), alpha=0.25, se = FALSE) +
-    # median and mean with error bars
-    geom_point(data=ds_ci, aes(y=term_med), pch=18, color="red", cex=4) +
-    geom_point(data=ds_ci, aes(y=term_ave)) +
-    geom_errorbar(data=ds_ci, aes(ymin=term_lwr.ci, ymax=term_upr.ci), width=0.25) +
-    # need room for the country names 
-    xlim(c(first_year, first_year+1.2*(last_year-first_year))) +
-    labs(title=paste0( txt_head, " (", ci_pct, "% CI)"),
-         subtitle=paste0("Average = black dot, Median = red diamond, loess fit = blue line")) +
-    xlab("") + ylab("") +
-    theme(legend.position="None")
+ds_happy_sd <- ds_happy_ave %>% 
+  group_by(cntry_name) %>% 
+  dplyr::summarize(sd = sd(var_ave), n=n()) %>% 
+  mutate(cntry_name2 = paste0(cntry_name, " (",n,")")) %>%
+  arrange(desc(sd))
 
-  return(list("ci"=p_ci, "ds_ci"=ds_ci))
-}
+p <- ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd, fill=n)) +
+  geom_bar_interactive(aes(tooltip=paste0(cntry_name, "\nSurveys: ", n, "\nSD: ", round(sd,2))),stat = "identity") + 
+  coord_flip() +
+  labs(title="Standard deviation of 'happy'",
+       subtitle="All countries, number of surveys in parenthesis",
+       caption="ESS surveys 2002-2016") +
+  scale_color_viridis(discrete=TRUE) +
+  theme(axis.title=element_blank(),
+        plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0)) 
+
+MyPrintInteractive(p, create_interactive_plot) 
 
 ```
 
-So, we will check with countries which were in all surveys to
-get a more even data set
 
-```{r, warning=FALSE}
-cntry_in_all_surveys <- (ds_participations %>% 
-                         filter(n_surveys==8) %>% 
-                         select(cntry_name))$cntry_name
+### Significance and meaning of changes
 
-p_val = 0.1
+There is a visual suggestion that subjective happiness may have improved
+for several countries over the past
+couple of surveys.
 
-trends_happy <- MakeTrendPlots(
-  ds_happy %>% 
-    filter(cntry_name %in% cntry_in_all_surveys), 
-  id_term = "var_ave",
-  "Happy - only countries which participated all surveys", 
-  plevel = p_val)
-
-trends_happy$ci
-
-```
-
-Confidence limits get narrower and there appears to be an upswing.
-Most of the countries are improving over the past few years.
-
-Checking the change from 2002 to 2016 and from 2014 to 2016 for individual countries.
-And using weighted t-test to check significance of the change.
-
-```{r, message=FALSE, warning=FALSE}
-
-# once again, a set of steps we need to do again later so better wrap into function
-# which would require some refactoring - but that needs to wait for another day
-
-CreateComparisonTable <-function(ds_averages, ds_raw){
-  library(weights)
-  ret_changes <- ds_averages  %>% 
-  filter(cntry_name %in% cntry_in_all_surveys,
-         ess_year %in% c(2002, 2014,2016)) %>%
-  reshape2::dcast(cntry_name~ess_year, fun.aggregate = mean, value.var="var_ave") %>%
-  mutate(d0216 = `2016`-`2002`,
-         d1416 = `2016`-`2014`) %>%
-  arrange(d0216) %>%
-  left_join(
-    do.call(
-      rbind, 
-      lapply(
-        cntry_in_all_surveys, 
-        function(aname, ds = ds_raw %>% 
-                   select(ess_year, cntry_name, indval, pspwght)){
-          set_2002 <- (ds %>% filter(cntry_name==aname, ess_year==2002))$indval
-          set_2002w <- (ds %>% filter(cntry_name==aname, ess_year==2002))$pspwght
-          
-          set_2014 <- (ds %>% filter(cntry_name==aname, ess_year==2014))$indval
-          set_2014w <- (ds %>% filter(cntry_name==aname, ess_year==2014))$pspwght
-          
-          set_2016 <- (ds %>% filter(cntry_name==aname, ess_year==2016))$indval
-          set_2016w <- (ds %>% filter(cntry_name==aname, ess_year==2016))$pspwght
-          
-          wtp_2002_2016 <- wtd.t.test(x=set_2002, y=set_2016, 
-                                      weight=set_2002w, weighty=set_2016w, 
-                                      bootse=TRUE, alternative="two.tailed")
-          wtp_2014_2016 <- wtd.t.test(x=set_2014, y=set_2016, 
-                                      weight=set_2014w, weighty=set_2016w, 
-                                      bootse=TRUE, alternative="two.tailed")
-          GetSigSymbol <- function(x){
-            sig <- symnum(
-              x, corr = FALSE, na = FALSE,
-              cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
-              symbols = c("***", "**", "*", ".", " ")
-              )
-          }                  
-          return(data.frame(
-            p_0216 = wtp_2002_2016$coefficients["p.value"],
-            sig_0216 = GetSigSymbol(wtp_2002_2016$coefficients["p.value"]),
-            p_1416 = wtp_2014_2016$coefficients["p.value"],
-            sig_1416 = GetSigSymbol(wtp_2014_2016$coefficients["p.value"]),
-            cntry_name = aname))
-          }))
-    ) 
-  return(ret_changes)
-}
-
-
-```
+So, we will check the significance of the change from 2002 to 2016 as well as from  
+2014 to 2016 using weighted t-test for each country separately.
 
 Note the significance levels coded in symbols
 
@@ -560,209 +565,428 @@ Note the significance levels coded in symbols
 |   ***  | 0.001 |
 |   **   | 0.01  |
 |   *    | 0.05  |
-|   .    | 0.1   |
+|   +    | 0.1   |
 |        | 1     |
 
+And we will check if the change was meaningful - having a meaningful effect - using
+Cohen's d metric.
 
 ```{r, message=FALSE, warning=FALSE}
-# changes between selected surveys
-happy_changes <- CreateComparisonTable(
-  ds_happy_average$data, 
-  dataset %>% filter(happy <= 10) %>% mutate(indval = happy))
-knitr::kable(happy_changes, digits = 3)
+happy_res <- GetComparisonBoxPlot(indval_name =  "happy", 
+                                  ds_avg = ds_happy_avgsum, 
+                                  ds = dataset %>% filter(!is.na(happy)),
+                                  cntry_list = cntry_in_100pct,
+                                  skip_plot = FALSE)
+
+tab.2_cap <- table_nums(name="tab_2",
+                        caption = "Changes of subjective happiness 2002 vs 2016 and 2014 vs 2016 with p-values for significance of the change, Cohen's d values for effect size")
+```
+`r table_nums("tab_2")`
+```{r table2, fig.cap=tab.2_cap}
+knitr::kable(happy_res$table, digits = 3,
+             col.names = gsub("_", " ", colnames(happy_res$table)))
+
+MyPrintInteractive(happy_res$plot, create_interactive_plot) 
 
 ```
 
+The box-plots are in line with t-test results shown in table `r f.ref("tab_2")`.
+But only a couple of the changes was meaningful according to COhen's d measure, and even the
+the effect was only small.
 
-## Variable Happiness
+But perhaps that is acceptable in a survey like this.
+The situation would be quite different if we were looking for an impact coming from a 
+controlled experiment.
 
-Heatmap above indicate some variation of scores between surveys.
-That is more visible in the plot below where we include all countries
+Next we check a few individual cases to get better understanding of data.
 
 ```{r}
 
-ggplot(data = ds_happy_average$data %>% filter(ess_year=="Mean", cntry_name != "Mean"),
-       aes(x=reorder(cntry_name, var_ave))) +
-  geom_point(data=ds_happy, aes(y=var_ave, color=as.factor(ess_year))) +
-  geom_point(aes(y=var_ave), color="black", pch=5) +
-  labs(title="Bi-annual happiness scores",
-       subtitle="Mean as black diamond") +
-  xlab("") + ylab("")  +
-  labs(color="ESS Year") +
-  coord_flip()
+cowplot::plot_grid(
+  PlotIndicatorHistogram(dataset, "Finland", 2002, "happy"),
+  PlotIndicatorHistogram(dataset, "Finland", 2012, "happy"), 
+  PlotIndicatorHistogram(dataset, "Finland", 2016, "happy"), 
+  PlotIndicatorHistogram(dataset, "Switzerland", 2016, "happy"), 
+  ncol = 2)
+
+cowplot::plot_grid(
+  PlotIndicatorHistogram(dataset, "Poland", 2012, "happy"),
+  PlotIndicatorHistogram(dataset, "France", 2002, "happy"),
+  PlotIndicatorHistogram(dataset, "France", 2012, "happy"), 
+  PlotIndicatorHistogram(dataset, "France", 2014, "happy"), 
+  ncol = 2)
+
 ```
 
-The above plot covers all countries regardless of number of participations and 
-for some countries there is quite wide variation in the scores between surveys.
+Skew can be strong, as can be seen in the histograms above.. 
+
+However, the sample counts used in t-tests are quite large, as shown in 
+`r f.ref("tab_1")`, so the results should be fairly accurate.
+
+
+### Trends on standardized scale
+
+Previous calculation was made using the weighted absolute values reported.
+It is possible that there are cultural biases between countries in using 
+the scale from zero to ten.
+
+So, perhaps a better question is: How much has subjective happiness in a country 
+changed when measured with respect to its own variation history.
+
+As we have seen that the distribution of `happy` is strongly left skewed, we will make
+a few transformations to better handle the situation and
+
+* reflect the scores to get from left skewed to right skewed distributions
+* apply log transformation to dampen or remove the strong skew
+* scale scores of each country
+
+#### Reflect and log transform
+
+First, we check what do a few reflected and log 
+transformed distributions look like in histograms.
+These are the same samples used above.
 
 ```{r}
-ds_happy_sd <- ds_happy %>% 
-  group_by(cntry_name) %>% 
-  dplyr::summarize(sd = sd(var_ave), n=n()) %>% 
-  mutate(cntry_name2 = paste0(cntry_name, " (",n,")")) %>%
-  arrange(desc(sd))
 
-ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  ggtitle("Countries in order of standard deviation in 'happy'") +
-  xlab("Country and number of surveys participated")
+cowplot::plot_grid(
+  PlotIndicatorHistogram(dataset, "Finland", 2002, "happy", 
+                         use_transform = "ReflectLn"),
+  PlotIndicatorHistogram(dataset, "Finland", 2012, "happy", 
+                         use_transform = "ReflectLn"), 
+  PlotIndicatorHistogram(dataset, "Finland", 2016, "happy", 
+                         use_transform = "ReflectLn"), 
+  PlotIndicatorHistogram(dataset, "Switzerland", 2016, "happy", 
+                         use_transform = "ReflectLn"), 
+  ncol = 2)
+
+cowplot::plot_grid(
+  PlotIndicatorHistogram(dataset, "Poland", 2012, "happy", 
+                         use_transform = "ReflectLn"), 
+  PlotIndicatorHistogram(dataset, "France", 2002, "happy", 
+                         use_transform = "ReflectLn"), 
+  PlotIndicatorHistogram(dataset, "France", 2012, "happy", 
+                         use_transform = "ReflectLn"), 
+  PlotIndicatorHistogram(dataset, "France", 2014, "happy", 
+                         use_transform = "ReflectLn"), 
+  ncol = 2)
 
 ```
 
-Turkey participated only twice so it perhaps is not surprising that it is in the top of the list.
-But happiness has been changing for several other countries with far 
-longer track record on the survey as well.
+It is clear that the distributions are more normal-like and skew 
+reduced.
 
-Speculating about the factors behind volatility would be interesting since a lot has been
-going on in Europe over the recent years  - but is largely beyond the scope here.
+Therefore, we will transform and normalize the responses by country to 
+be able to compare changes in a comparable scale.
+The assumption is that some countries may naturally wider and some smaller
+variations, perhaps due to cultural reasons.
+In essence we amplify changes in countries with narrow variation range and
+decrease those with wide.
 
-For an in depth analysis by seasoned ESS academics, please check the link in references in the end.
+```{r}
 
-Having said that..
 
-## Associations with Happiness`
+# convert to "inverted ln" 
+dataset$happy_invln <- NA
+idx <- which(!is.na(dataset$happy))
+dataset$happy_invln[idx] <- ReflectLnTransform(dataset$happy[idx])
+summary(dataset[dataset$happy <=10 , c("happy_invln", "happy")])
 
-Trying to bring more context into the subjective happiness indicator by 
-picking up a few additional indicators which - quite subjectively - would seem like they 
-could be associated with feeling of happiness.
+```
+
+#### Scale
+
+Next we scale the transformed scores and multiply by -1 to get back to 
+the original meaning of the metric where smaller number means less happy 
+and larger more.
+
+```{r}
+
+# scale and change positive to mean increase in the original sense
+dataset_scaled <- dataset %>%
+  filter(!is.na(happy_invln)) %>%
+  group_by(cntry_name) %>%
+  mutate(happy_std = -scale(happy_invln)) %>%
+  ungroup()
+
+
+```
+
+Sample of the scaled distributions
+
+```{r}
+# some samples
+cowplot::plot_grid(
+  PlotIndicatorHistogram(dataset_scaled, "Finland", 2002, "happy_std"),
+  PlotIndicatorHistogram(dataset_scaled, "Finland", 2012, "happy_std"), 
+  PlotIndicatorHistogram(dataset_scaled, "Finland", 2016, "happy_std"), 
+  PlotIndicatorHistogram(dataset_scaled, "Switzerland", 2016, "happy_std"), 
+  ncol = 2)
+
+
+```
+
+#### Trends of transformed and scaled happiness
+
+Calculate the results from the scaled data
+
+```{r}
+# filtering and weighting to get by year and by country scores
+ds_happy_scaled <- dataset_scaled %>% 
+  group_by(ess_year, cntry_name) %>% 
+  summarise(var_ave = Hmisc::wtd.mean(happy_std, pspwght),
+            n=sum(pspwght))
+
+# plot trends
+trends_happy_50_scaled  <- MakeIndicatorCountryPlot(
+    ds = ds_happy_scaled %>% 
+      filter(cntry_name %in% cntry_in_50pct), 
+    id_term = "var_ave",
+    cntry_term = "cntry_name",
+    year_term = "ess_year",
+    txt_head = "Subjective happiness",
+    txt_subhead = "Scaled and normalized - Countries in 50% of surveys or more",
+    txt_caption = "ESS surveys 2002-2016",
+    show_summary = TRUE,
+    plevel = p_val)
+
+MyPrintInteractive(trends_happy_50_scaled$ci, create_interactive_plot, 
+                   hover_css = "stroke-width:3px;") 
+
+
+```
+
+Some notes
+
+* in the beginning and in the end the scorea are widely spread
+* there may region of smaller variation somewhere in 2008-2012
+* Portugal seems skyrocketing in the final ESS survey
+
+Next showing changes using scaled range for the countries with 
+significant changes according to `r f.ref("tab_2")`
+
+```{r}
+
+# get averages annually
+ds_happy_average_scaled <- MakeAverageSummary(ds = ds_happy_scaled, value_term = "var_ave")
+
+happy_res_scaled <- GetComparisonBoxPlot(indval_name =  "happy_std", 
+                                         ds_avg = ds_happy_average_scaled, 
+                                         ds = dataset_scaled %>% 
+                                           filter(!is.na(happy_invln)),
+                                         cntry_list = cntry_in_100pct,
+                                         skip_plot = TRUE)
+
+CreateEuroMap(mymap=mymap, 
+              ds = happy_res_scaled$table %>%
+                filter(cntry_name %in% (happy_res$table %>%
+                                          filter(p_0216 <= p_val))$cntry_name), 
+              ind_name = "d0216",
+              txt_title = "Significant change in subjective happiness",
+              txt_subtitle = "2002 vs 2016, countries in all surveys, standardized, p=0.05",
+              txt_caption = "ESS 2002-2016")
+
+CreateEuroMap(mymap=mymap, 
+              ds = happy_res_scaled$table %>%
+                filter(cntry_name %in% (happy_res$table %>%
+                                          filter(p_1416 <= p_val))$cntry_name), 
+              ind_name = "d1416",
+              txt_title = "Significant change in subjective happiness",
+              txt_subtitle = "2014 vs 2016, countries in all surveys, standardized, p=0.05",
+              txt_caption = "ESS 2002-2016")
+
+```
+
+Given that the effect size as calculated by Cohen's d has been mostly "insignificant",
+interpretation of the charts is a bit clouded.
+
+Thwen again, this is not a controlled study where we try to judge if treatment A was 
+more effective than treatment B for selecting which drug to invest in..
+
+So, the chages are there in their level of significance as per frequentist way of work.
+
+### Wrapup and what next
+
+So, there are changes that are statistically significant even if their 
+effect is small or even neglible.
+
+We have a few hundred additional indicators in ESS dataset.
+Do we have anything there which has association or correlation with 
+subjective happiness?
+
+* * *
+
+## Happiness and associations
+
+Subjective happiness varies and has trends - sort of at least.
+
+The next question is: are there significant associations with 
+subjective happiness and othedr ESS variabkes
+
+We pick a few additional indicators which - quite subjectively - seem 
+like they could be associated with feeling of happiness.
 In a way or another.
+
+Additional indicators mainly for context taken from 
+
+* World Bank Development Indicators
+* UNHCR population data on refugees and asylum seekers
+* European Union - dates of joining
+
+These might be used in a more formal as part of analysis way later.
+
+Scoping to the countries which have been in 50% or more of the surveys 
+(four or more out of the eight surveys).
+
 And just as a reminder, it is about associations and correlations only.
 Not possible to go into honest discussion about causality based on the data available.
 
-And comparing the situation in the first survey year and in the last to see if 
-there were meaningful correlations between the indicators in 2002 or in 2016.
-And if there was a meaningful change between these two years.
+```{r}
 
-**Taking indicators out of a hat**
+ds_subset_50 <- dataset %>% 
+  filter(cntry_name %in% cntry_in_50pct)
+
+```
+
+### ESS indicators
 
 Granted, whole ESS dataset contains many more and the selection made here and now 
-has no scientific basis.
+has no hard scientific basis.
+However, they seem intuitively such which might be related to 
+subjective happiness.
 
 The indicators chosen
 
-* `ppltsrt` - Most people can be trusted or you can't be too careful - All rounds: Using this card, generally speaking, would you say that most people can be trusted, or that you can't be too careful in dealing with people? Please tell me on a score of 0 to 10, where 0 means you can't be too careful and 10 means that most people can be trusted.
-* `pplfair`	- Most people try to take advantage of you, or try to be fair	- All rounds: Using this card, do you think that most people would try to take advantage of you if they got the chance, or would they try to be fair?
-* `pplhlp` - Most of the time people helpful or mostly looking out for themselves	- All rounds: Would you say that most of the time people try to be helpful or that they are mostly looking out for themselves?
-* `polintr` - How interested in politics - All rounds: How interested would you say you are in politics – are you…
-* `trstprl` - Trust in country's parliament - All rounds: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... [country]'s parliament?
-* `trstlgl` - Trust in the legal system - All rounds: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... the legal system?
-* `trstplc` - Trust in the police - All rounds: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... the police?
-* `trstplt` - Trust in politicians - All rounds: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... politicians?
-* `trstprt` - Trust in political parties - ESS2, ESS3, ESS4, ESS5, ESS6, ESS7: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... political parties?
-* `trstep` - Trust in the European Parliament - All rounds: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... the European Parliament?
-* `trstun` - Trust in the United Nations - All rounds: Using this card, please tell me on a score of 0-10 how much you personally trust each of the institutions I read out. 0 means you do not trust an institution at all, and 10 means you have complete trust. Firstly... ... the United Nations?
-* `stflife` - How satisfied with life as a whole - All rounds: All things considered, how satisfied are you with your life as a whole nowadays? Please answer using this card, where 0 means extremely dissatisfied and 10 means extremely satisfied.
-* `stfeco` - How satisfied with present state of economy in country - All rounds: On the whole how satisfied are you with the present state of the economy in [country]?
-* `stfgov` - How satisfied with the national government - All rounds: Now thinking about the [country] government, how satisfied are you with the way it is doing its job?
-* `stfdem` - How satisfied with the way democracy works in country - All rounds: And on the whole, how satisfied are you with the way democracy works in [country]?
-* `stfedu` - State of education in country nowadays - All rounds: Now, using this card, please say what you think overall about the state of education in [country] nowadays?
-* `stfhlth` - State of health services in country nowadays - All rounds: Still using this card, please say what you think overall about the state of health services in [country] nowadays?
-* `eisced` - Highest level of education, ES - ISCED - All rounds: Generated variable: Highest level of education, ES - ISCED
-* `health` - Subjective general health - All rounds: How is your health in general? Would you say it is ...
-
-For further details, please refer to ESS codebook (and code below)
-
 ```{r}
-ds_subset <- dataset %>% 
-  select(cntry_name,
-         ess_year,    # year for the survey
-         idno,        # not used, but good to have
-         pspwght,     # post-startification weight
-         happy,       # 0-10 (Extremely unhappy - Extremely happy)
-         ppltrst,     # 0-10 (You can't be too careful - Most people can be trusted)
-         pplfair,     # 0-10 (Most people try to take advantage of me - Most people try to be fair)
-         pplhlp,      # 0-10 (People mostly look out for themselves - People mostly try to be helpful)
-         polintr,     # 1-4  (Very interested - Not at all interested)
-         trstprl,     # 0-10 (No trust at all - Complete trust)
-         trstlgl,     # 0-10
-         trstplc,     # 0-10
-         trstplt,     # 0-10
-         trstep,      # 0-10
-         trstun,      # 0-10
-         stflife,     # 0-10 (extremely dissatisfied - extermely satisfied)
-         stfeco,      # 0-10 
-         stfgov,      # 0-10 
-         stfdem,      # 0-10 
-         stfedu,      # 0-10 (extremely bad - extermely good)
-         stfhlth,     # 0-10 
-         eisced,      # 1-7  (less than lower secondary -- higher tertiary education, >= MA level)
-         health       # 1-5  (very good -- very bad)
-)
+# get indicators and their descriptions from a file which is easier to maintain than
+# writing the same into R-code
 
+metadata_columns <- c("cntry_name","ess_year", "idno", "pspwght")
+indicator_table <- readxl::read_excel("codemap.xlsx")
+ess_indicators <- union(metadata_columns, 
+                        as.character((indicator_table %>% filter(source=="ESS"))$indicator))
+knitr::kable(indicator_table, caption = "ESS indicators along with their ranges")
 
 ```
 
-**Countries included**
+The following might be candidates at later stage, but we will start with those above
 
-Selecting the countries which were both in the first and last survey.
+* `brncntr`	Born in country	All rounds: Were you born in [country]?
+* `gndr` - Gender	All rounds: CODE SEX, respondent
+* `yrbrn`	- Year of birth	All rounds: And in what year were you born?
+* `agea` - Age of respondent, calculated	All rounds: Age of respondent, calculated
 
 ```{r}
-# include only countries that were in first and last 
-check_ess_years <- c(min(dataset$ess_year), max(dataset$ess_year))
-countries_ess_first <- (ds_subset %>% filter(ess_year==check_ess_years[1]) %>% select(cntry_name) %>% filter(!duplicated(cntry_name)))$cntry_name
-countries_ess_last <- (ds_subset %>% filter(ess_year==check_ess_years[2]) %>% select(cntry_name) %>% filter(!duplicated(cntry_name)))$cntry_name
-ds_subset <- ds_subset %>% 
-  filter(cntry_name %in% intersect(countries_ess_first, countries_ess_last)) 
 
-print(intersect(countries_ess_first, countries_ess_last))
+ds_subset_50 <- ds_subset_50 %>%
+  select(which(colnames(dataset) %in% ess_indicators))
+print(dim(ds_subset_50))
 
 ```
 
-**Pre-processing**
+#### Pre-processing
 
 As with `happy` earlier, there is the need to make some adjustments 
 to get a better usable set of data for analysis.
-But the rules are a bit different now as some ranges are different.
+Using min/max rules from the definition file.
 
 ```{r}
+
 # marking excluded data as NA
-ds_subset$health <- ifelse(ds_subset$health > 5 | ds_subset$health <1, NA, ds_subset$health)
-ds_subset$eisced <- ifelse(ds_subset$eisced > 7 | ds_subset$eisced <1, NA, ds_subset$eisced)
-ds_subset$polintr <- ifelse(ds_subset$polintr > 7 | ds_subset$polintr <1, NA, ds_subset$polintr)
-for (aname in colnames(ds_subset)[-c(1:4)])
-  ds_subset[,aname] <- ifelse(ds_subset[,aname] > 10 , NA, ds_subset[,aname])
+
+print("Before")
+
+summary(ds_subset_50[, indicator_table$indicator])
+
+for (i in 1:nrow(indicator_table)){
+  an_ind <- indicator_table[i,]
+  #print(an_ind$indicator)
+  # print(head(ds_subset_50[,indicator_table$indicator[i]]))
+  ds_subset_50[,an_ind$indicator] <- ifelse(
+    ds_subset_50[,an_ind$indicator] > an_ind$max
+    | ds_subset_50[,an_ind$indicator] < an_ind$min, 
+    NA, 
+    ds_subset_50[,an_ind$indicator])
+}
+
+print("After")
+summary(ds_subset_50[, indicator_table$indicator])
 
 ```
 
-To help - at least me - in juggling with correlation meaning in my mind, let's 
-create some new indicators and drop original ones.
-Idea is to consistently have "more" / "better" shown with larger numbers.
+### Shape of distributions
+
+Showing the shape of all indicators, excluding metadata columns 
+to help understand the data better.
 
 ```{r}
-# turning a few indicators 'upside down' in order to use same mental scale as most others, 
-# i.e. lower number is less/worse than higher number
-ds_subset$health2 = max(ds_subset$health,na.rm = TRUE) - ds_subset$health
-ds_subset$polintr2 = max(ds_subset$polintr,na.rm = TRUE) -ds_subset$polintr
-ds_subset <- ds_subset %>% select(-polintr, -health)
+
+GetMinMaxLabel <- function(ind_name, indicator_table){
+  this_ind <- indicator_table %>% filter(indicator==ind_name)
+  if (!is.na(this_ind$lblmin)){
+    minmax_label <- paste(this_ind$lblmin, this_ind$min, 
+                         '<-->', 
+                         this_ind$lblmax, this_ind$max)
+  }else {
+    minmax_label <- ""
+  }
+  #print(minmax_label)
+  return(minmax_label)
+}
+
+ind_plots <- lapply(
+  setdiff(colnames(ds_subset_50), metadata_columns), 
+  function(x, ds){
+    ds$tmp_filter <- ds[,x]
+    PlotIndicatorHistogram(ds %>% 
+                             filter(!is.na(tmp_filter)), 
+                           "", 
+                           NA, 
+                           x, 
+                           n_bins = as.integer(max(ds$tmp_filter, na.rm = TRUE)))
+  }, 
+  ds=ds_subset_50)
+
+for (i in 1:length(ind_plots))
+  MyPrintInteractive(ind_plots[[i]], FALSE)
 
 ```
 
-**Weights**
+Mostly the distributions at this level do not seem significantly skewed.
+
+### Weights
 
 Next we apply proper weights for the selected indicators to get meaningful averages.
 
 ```{r}
-ds_subset_averages <- reshape2::melt(ds_subset, id.vars = 1:4) %>% 
+
+ds_subset_50_ave <- ds_subset_50 %>%
+  gather(indicator, value, indicator_table$indicator) %>%
   filter(!is.na(value)) %>%
-  group_by(cntry_name, ess_year, variable) %>% 
-  summarise(ave = wtd.mean(value, pspwght)) %>%
-  reshape2::dcast(cntry_name+ess_year~variable, fun.aggregate = mean, value.var="ave") %>%
-  mutate(ess_year = as.factor(ess_year))
+  group_by(cntry_name, ess_year, indicator) %>% 
+  summarise(ave = Hmisc::wtd.mean(value, pspwght)) %>%
+  spread(indicator, ave) %>%
+  ungroup()
 
 ```
 
-**Missing values**
+### *Missing values
 
-Checking the indicators for the surveys we are interested in.
+Checking the indicators.
 
 ```{r}
 
-summary(ds_subset_averages %>% filter(ess_year %in% check_ess_years) %>% select(-cntry_name, -ess_year))
+summary(ds_subset_50_ave %>% select(-cntry_name, -ess_year))
+
+NA_columns <- ds_subset_50_ave %>% 
+  select_if(function(x) any(is.na(x))) %>% 
+  summarise_all(funs(sum(is.na(.)))) 
+knitr::kable(NA_columns, caption = "Columns with NA entries")
+
+txt_NA <- paste(colnames(NA_columns), collapse=", ")
 
 ```
 
-Two indicators `stfgov` and `eisced` have some missing values.
+Indicators `r txt_NA` have some missing values.
 We will create new indicators where we fill in missing values by 
 interpolation and/or use the first / last real value for missing 
 beginning / end values.
@@ -770,350 +994,859 @@ beginning / end values.
 Naturally, these are not the real thing anymore and need to be taken as such.
 
 ```{r}
+# special case for Greece which has only one entry for eisced
+
+Greece_eisced2 <- ds_subset_50_ave %>% 
+  filter(cntry_name == "Greece", !is.na(eisced)) %>% 
+  select(eisced)
+if (nrow(Greece_eisced2) != 1) stop("Greece eisced assumption not valid")
+
 # using zoo package to fill in missing values
-ds_subset_averages <- ds_subset_averages %>% 
+
+ds_subset_50_ave <- ds_subset_50_ave %>% 
   group_by(cntry_name) %>% 
-  mutate(eisced2 = zoo::na.fill(eisced, "extend"),
-         stfgov2 = zoo::na.fill(stfgov, "extend")) %>% 
+  mutate(
+    eisced2 = ifelse(cntry_name == "Greece",
+                     as.numeric(Greece_eisced2$eisced[1]),
+                     zoo::na.fill(eisced, "extend")),
+    trstprt2 = zoo::na.fill(trstprt, "extend"),
+    stfgov2 = zoo::na.fill(stfgov, "extend"),
+    euftf2 = zoo::na.fill(euftf, "extend")) %>% 
   ungroup()
 
+
+cntry_imputed <- (ds_subset_50_ave %>% 
+                    filter(!complete.cases(.)) %>% 
+                    select(cntry_name) %>% 
+                    filter(!duplicated(cntry_name)))$cntry_name
+
+
+# Diagnostic, the table is fairly long..
+# 
+# knitr::kable(ds_subset_50_ave %>% 
+#                filter(cntry_name %in% cntry_imputed) %>%
+#                select(cntry_name, ess_year, eisced, eisced2, trstprt, trstprt2, 
+#                       stfgov, stfgov2, euftf, euftf2),
+#              digits = 3,
+#              caption = "Table of original and imputed values")
+
+# removing the originals from the dataframe for simplicity
+
+ds_subset_50_ave <- ds_subset_50_ave %>%
+  select(-eisced, -trstprt, -stfgov, -euftf)
+  
+
 ```
 
-**Correlations**
+#### Get rid of collinear variables
 
-Defining a helper function to make correlation matrix easy to reproduce.
+Since we intend to come up with a model we must remove indicators that are essentially the same,
+i.e. indicators which have too high correlation and would really not add to the model.
 
 ```{r}
 
-PlotOneYear <- function(ds, this_year, sig_level = 0.1){
-  ds2 <- ds %>% 
-    filter(ess_year==this_year) %>% 
-    select(-ess_year, -cntry_name)
-  cormat <-rcorr(as.matrix(ds2))
-  corrplot(cormat$r, type="upper", order="hclust", 
-           p.mat = cormat$P, 
-           sig.level = sig_level, 
-           insig = "blank")
-}
+coll_cutoff <- 0.9
+print(paste("Cutoff level for too good correlation", coll_cutoff))
+
+# exclude metadata indicators
+
+df1 = ds_subset_50_ave %>% 
+  select(-ess_year, -cntry_name)
+df2 = cor(df1)
+
+# findCorrelation searches through a correlation matrix and returns a vector of 
+# integers corresponding to columns to remove to reduce pair-wise correlations.
+
+hc = caret::findCorrelation(
+  df2, 
+  cutoff=coll_cutoff, 
+  verbose = TRUE,     # verbose helps to understand better what happens
+  names = FALSE)
+hc = sort(hc)
+
+# from abbreviation to long name
+indicator_list <- indicator_table$name
+names(indicator_list) <- indicator_table$indicator
+
+# summary
+keep_table <- data.frame(
+  rownr = 1:dim(df1)[2], 
+  indicator = colnames(df1),
+  keep = ifelse((1:dim(df1)[2]) %in% hc, 
+                "drop", 
+                "keep"),
+  name = indicator_list[colnames(df1)]
+)
+knitr::kable(keep_table, caption = "Features")
+
+# the reduced data
+reduced_Data = df1[,-c(hc)]
+
+colnames_keep <- union(colnames(reduced_Data),c("ess_year","cntry_name"))
+ds_subset_50_ave <- ds_subset_50_ave %>% select(colnames_keep)
 
 ```
 
-The first and the last year for the selected indicators. 
-A missing ball means that the correlation is not significant.
+#### Reshape
+
+Turn dataset into narrow format for flexibility
 
 ```{r}
 
-for (yr in check_ess_years) {
-  print(yr)
-  PlotOneYear(ds_subset_averages, yr, sig_level = p_val)
+ds_ss_avg  <- ds_subset_50_ave %>% 
+  gather(indicator, value, which(colnames(ds_subset_50_ave) %in% colnames(reduced_Data)))
+print(dim(ds_ss_avg))
+
+
+```
+
+### World Bank
+
+World Bank Development Indices provide a good backdrop and context for ESS.
+
+Selecting a few which appear like they could be relevant in this context,
+which suggests indicators related to migration, refugees and economical situation.
+
+Again, this is fairly subjective selection and something important may be
+missing.
+
+Since the countries differ in size - and therefore the indicators as well - we 
+use percentages and ratios when possible.
+
+```{r, warning=FALSE}
+
+wb_data <- GetPreProcessWbData(
+  read_rds = TRUE, 
+  inc_countries = unique(ds_ss_avg$cntry_name), 
+  min_year = min(dataset$ess_year), 
+  max_year = max(dataset$ess_year))
+
+# merge 
+
+ds_ss_avg <- ds_ss_avg %>%
+  bind_rows(wb_data$data %>% 
+              select(ess_year, cntry_name, indicator, value))
+
+# add definitions
+indicator_table <- indicator_table %>%
+  bind_rows(wb_data$indicators)
+
+knitr::kable(indicator_table %>% filter(source=="WB"), digits = 3)
+
+```
+
+For clarity 
+
+* International migrant stock above means people who have been born in another country
+* Refugees are different group of people than e.g. asylum seekers, which are not in World Bank dataset at all
+
+For asylum seekers we need to turn to UNHCR
+
+### UNHCR
+
+Given that refugees and asylum seekers have been an important factor in the 
+2000s Europe we need to get more data, which is available at UNHCR at 
+[UNHCR Population Statistics - time series](http://popstats.unhcr.org/en/time_series)
+
+Since World Bank and UNHCR data are not necessarily in full synch the numbers on 
+refugees, which is available from both sources, is expected to be not exactly
+the same.
+
+Therefore we take refugees from World Bank and other "people of concern" groups 
+from UNHCR
+
+But first, we check what is in that UNHCR people of concern classification and how it has 
+changed over 2000s.
+
+```{r}
+
+# take data from beginning of ess surveys
+
+ds_unhcr <- GetUnhcrData(
+  data_folder = my_data_folder, 
+  inc_countries = unique(ds_ss_avg$cntry_name), 
+  min_year = min(dataset$ess_year), 
+  max_year = max(dataset$ess_year), 
+  read_rds = TRUE)
+
+ggplot(data= ds_unhcr, aes(x=ess_year, y=value, fill=pop_type)) +
+  geom_bar(stat="identity") +
+  labs(title="People of concern in Europe",
+       subtitle="Countries participating in ESS",
+       caption="UNHCR") +
+  xlab("") + ylab("")
+
+```
+So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
+
+Some insigt - perhaps - from two snapshots, i.e. 2013 and 2016.
+
+```{r}
+ggplot(data= ds_unhcr %>% filter(ess_year==2013), 
+       aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
+  geom_bar(stat="identity") +
+  labs(title="People of concern in Europe 2013",
+       subtitle="Countries participating in ESS",
+       caption="UNHCR") +
+  xlab("") + ylab("") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+
+ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
+       aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
+  geom_bar(stat="identity") +
+  labs(title="People of concern in Europe 2016",
+       subtitle="Countries participating in ESS",
+       caption="UNHCR") +
+  xlab("") + ylab("") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+
+```
+
+Huge increase in "internally displaced persons" in Ukraine - yes, there was and still is 
+that crisis regarding Crimea
+
+Trying log10 scaler for y-axiz to get better view.
+
+```{r}
+
+
+ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
+       aes(x=reorder(cntry_name, -value), y=(value+1), fill=pop_type)) +
+  geom_bar(stat="identity") +
+  labs(title="People of concern in Europe 2016",
+       subtitle="Countries participating in ESS - log10 scale",
+       caption="UNHCR") +
+  xlab("") + ylab("") + 
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+
+```
+
+
+
+```{r}
+
+# top 4 and all others
+
+top_pop_types <- as.character((ds_unhcr %>% 
+  group_by(pop_type) %>% 
+  summarise(n = sum(value)) %>% 
+  arrange(-n))$pop_type)
+
+pop_type_major <- top_pop_types[1:4]
+pop_type_other <- setdiff(top_pop_types, pop_type_major)
+
+GetPplOfConcernSubset <- function(ds_unhr, wb_data, pop_set, new_indicator, new_name) {
+  
+  the_indicator <- paste0(
+      "UNHCR.",
+      ifelse(new_indicator=="", substr(pop_set[1], 1, 7), new_indicator),
+      ".PCT")
+  the_name = paste0(
+      ifelse(new_name == "", pop_set[1], new_name), 
+             "(% of population) - calculated")
+  
+  print(pop_set)
+  print(the_indicator)
+  print(the_name)
+  
+  ds <- GetPreProcessUnhcrData(
+    ds_unhcr = ds_unhcr %>%
+      filter(pop_type %in% pop_set) %>%
+      group_by(indicator, name, source, ess_year, cntry_name) %>%
+      summarise(value = sum(value)) %>%
+      ungroup(),
+    ds_wb = wb_data$data,
+    new_indicator = the_indicator,
+    new_name = the_name)
+  return(ds)  
+}
+
+unhcr_data <- NULL
+unhcr_indicator_table <- NULL
+
+for (pop_type in pop_type_major){
+  ds_pop <- GetPplOfConcernSubset(ds_unhr, wb_data, pop_type, new_indicator="", new_name="")
+  unhcr_data <- unhcr_data %>% bind_rows(ds_pop$data)
+  unhcr_indicator_table <- unhcr_indicator_table %>% bind_rows(ds_pop$indicators)
+}
+
+ds_pop <- GetPplOfConcernSubset(ds_unhr, wb_data, pop_type_other, 
+                                new_indicator="Other", 
+                                new_name="Other population types together")
+unhcr_data <- unhcr_data %>%
+  bind_rows(ds_pop$data)
+unhcr_indicator_table <- unhcr_indicator_table %>%
+  bind_rows(ds_pop$indicators)
+
+
+ggplot(data=unhcr_data %>% filter(ess_year==2016), 
+       aes(x=reorder(cntry_name, -value), y=value+1, fill=indicator)) +
+  geom_bar(stat="identity") +
+  labs(title="People of concern in Europe 2016",
+       subtitle="% of population, log10 scale yaxis showing 1% more than real",
+       caption="UNHCR") +
+  xlab("") + ylab("") + 
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+
+# merge data
+ds_ss_avg <- ds_ss_avg %>%
+  bind_rows(unhcr_data %>% 
+              select(ess_year, cntry_name, indicator, value))
+
+# merge definitions
+indicator_table <- indicator_table %>%
+  bind_rows(unhcr_indicator_table)
+
+knitr::kable(indicator_table %>% filter(source=="UNHCR"), digits = 3)
+
+```
+
+Cross check with World Bank data
+
+```{r}
+
+# check WB vs UNHCR data
+
+ggplot(data = ds_ss_avg %>% 
+         filter(indicator %in% c("UNHCR.Refugee.PCT","REFG.PCT"),
+                ess_year==2016),
+       aes(x=reorder(cntry_name, -value), y=value, fill=indicator)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25)) + 
+  xlab("") + ylab("")
+  
+```
+
+Looks good and reassuring.
+
+### Pct indicators
+
+There are big variations in the sizes of countries included.
+Therefore looking into percentages is often more 
+informative than absolute figures.
+
+The following are indicators on percentages in World Bankand UNHCR data - or derived from them.  
+
+```{r}
+
+idx_pct <- grepl("%", indicator_table$name, fixed =TRUE)
+pct_indicators <- indicator_table$indicator[idx_pct]
+knitr::kable(indicator_table[idx_pct,], digits = 3)
+
+```
+
+## Explore Extended Data
+
+Investiating and learning the extended ESS data set spiced up with World Bank and UNHCR data.
+
+### By indicator
+
+Checking first what we can learn from by indicator view, i.e.
+how different are the trajectories of countries.
+Are there any curious outliers?
+
+```{r, warning=FALSE}
+
+create_static_plot <- TRUE
+
+# By indicator
+
+ds_ss_avg_cntry_ind <- ds_ss_avg %>% 
+  spread(indicator, value)
+
+for (indicator_short in unique(ds_ss_avg$indicator)){
+  
+  # getting the right long description out
+  
+  last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
+  indicator_short_old <- ifelse(last_char=="2", 
+                                substr(indicator_short, 1, nchar(indicator_short)-1),
+                                indicator_short)
+  
+  this_ind <- indicator_table %>% 
+    filter(indicator == indicator_short_old)
+  
+  # the plot
+  
+  p  <- MakeIndicatorCountryPlot(
+    ds = ds_ss_avg_cntry_ind,
+    id_term = indicator_short,
+    cntry_term = "cntry_name",
+    year_term = "ess_year",
+    txt_head = as.character(this_ind$name),
+    txt_subhead = indicator_short,
+    txt_caption = paste(as.character(this_ind$source), "2002-2016"),
+    show_summary = TRUE,
+    plevel = p_val)
+
+  if (!is.na(this_ind$lblmin)){
+    p$ci <- p$ci +
+      ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+      theme(axis.title.y = element_text(size = 9))
+  }
+  MyPrintInteractive(p$ci, create_interactive_plot, 
+                   hover_css = "stroke-width:3px;") 
 }
 
 ```
 
-And here we get a linkage to trust in European Parliament.
+### By country
 
-* 2002 `happy` has significant negative correlation against `trstep`.
-* 2016 that has turned into positive correlation.
+```{r, warning=FALSE, results='asis'}
 
-Other observations
+lbl_coef <- 1
+pct_max_split <- 30
 
-* most of the indicators have positive correlation (or no correlation of significance 
-at all) with `happy`, which is perhaps not surprising
-* in 2002 `trstep` has negative correlation against education level `eisced`,
-which is probably due to skewed data (missing scores from a few countries which
-most likely had fairly high scores as seen in `eisced2`score) 
-* `polintr2` is negatively correlated in 2002 meaning that the more one is interested in 
-politics the less she or he trusts European Parliament. In 2016 this has become positive.
+ds_ss_avg_ind_cntry <- ds_ss_avg %>% 
+  spread(cntry_name, value)
 
-So, looking into correlations between `trustep`, `polintr2` and `happy` looks
-worth doing
-
-## Drilling in 
-
-Looking in more detail of these particular indicators
-
-```{r, warning=FALSE}
-
-
-# need use this logic more than once and wrapping it into a function as it was
-# a bit more complicated than anticipated.. I really think that GGally::ggpairs 
-# should come with this tailoring built in - or I failed to find it.. Sigh..
-
-CheckCorrelations <- function(ds, yr, plot_lm = FALSE){
-
-  # a couple of helpers 
+for (cntry in unique(ds_ss_avg$cntry_name)){
   
-  # 1) adaptation of https://github.com/ggobi/ggally/issues/139 to get significance 
-  # levels shown by ggpairs
-  my_custom_cor <- function(data, mapping, color = I("grey50"), sizeRange = c(1, 5), ...) {
-
-    # get the x and y data to use the other code
-    x <- eval(mapping$x, data)
-    y <- eval(mapping$y, data)
+  cat(paste0("\n\n#### ",cntry, '\n\n'))
   
-    ct <- cor.test(x,y)
-    sig <- symnum(
-      ct$p.value, corr = FALSE, na = FALSE,
-      cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
-      symbols = c("***", "**", "*", ".", " ")
-    )
+  p_ess  <- MakeIndicatorCountryPlot(
+    ds = ds_ss_avg_ind_cntry %>% 
+      filter(indicator %in% (indicator_table %>% 
+                               filter(source=="ESS"))$indicator),
+    id_term = cntry,
+    cntry_term = "indicator",
+    year_term = "ess_year",
+    txt_head = cntry,
+    txt_subhead = "ESS survey indicators",
+    txt_caption = "ESS 2002-2016",
+    show_summary = FALSE,
+    label_size_coef = lbl_coef,
+    plevel = p_val)
   
-    r <- unname(ct$estimate)
-    rt <- format(r, digits=2)[1]
+  p_wb_a  <- MakeIndicatorCountryPlot(
+    ds = ds_ss_avg_ind_cntry %>% 
+      filter(indicator %in% (indicator_table[idx_pct,] %>% 
+                               filter(max > pct_max_split))$indicator),
+    id_term = cntry,
+    cntry_term = "indicator",
+    year_term = "ess_year",
+    txt_head = cntry,
+    txt_subhead = "World Bank Development Indices & UNHCR",
+    txt_caption = "World Bank & UNHCR 2002-16",
+    show_summary = FALSE,
+    label_size_coef = lbl_coef,
+    plevel = p_val)
   
-    # helper function to calculate a useable size
-    percent_of_range <- function(percent, range) {
-      percent * diff(range) + min(range, na.rm = TRUE)
-    }
+  p_wb_b  <- MakeIndicatorCountryPlot(
+    ds = ds_ss_avg_ind_cntry %>% 
+      filter(indicator %in% (indicator_table[idx_pct,] %>% 
+                               filter(max <= pct_max_split))$indicator),
+    id_term = cntry,
+    cntry_term = "indicator",
+    year_term = "ess_year",
+    txt_head = cntry,
+    txt_subhead = "World Bank Development Indices & UNHCR",
+    txt_caption = "World Bank & UNHCR 2002-16",
+    show_summary = FALSE,
+    label_size_coef = lbl_coef,
+    plevel = p_val)
   
-    # plot the cor value
-    ggally_text(
-      label = as.character(rt), 
-      mapping = aes(),
-      xP = 0.5, yP = 0.5, 
-      color = color,
-      ...
-    ) + 
-      # add the sig stars
-      geom_text(
-        aes_string(
-          x = 0.8,
-          y = 0.8
-        ),
-        label = sig,
-        size = 5, # I(cex),
-        color = color,
-        ...
-      ) + 
-      # add the sig stars
-      geom_text(
-        aes_string(
-          x = 0.2,
-          y = 0.2
-        ),
-        label = paste0("p=",round(ct$p.value,3)),
-        size = 2.5, # I(cex),
-        color = color,
-        ...
-      ) +
-      # remove all the background stuff and wrap it with a dashed line
-      theme_classic() + 
-      theme(
-        panel.background = element_rect(
-          color = color, 
-          linetype = "longdash"
-        ), 
-        axis.line = element_blank(), 
-        axis.ticks = element_blank(), 
-        axis.text.y = element_blank(), 
-        axis.text.x = element_blank()
-      )
-  }
-
-  # 2) helper to get characteristics of liear easily into the plot subtitle
-  GetFitCharacteristics <- function(thefit, the_member) {
-    p_val <- summary(thefit)$coefficients[the_member,"Pr(>|t|)"]
-    std_err <- summary(thefit)$coefficients[the_member,"Std. Error"]
-    adj_rsq <- summary(thefit)$adj.r.squared
-    return(paste("p", round(p_val,3), 
-                 "stderr", round(std_err,3), 
-                 "adj rsq", round(adj_rsq,3)))
-  }
-
-  # and the real processing    
-
-  # select the indicators  
-  ds <- ds %>% 
-    filter(ess_year==yr) %>% 
-    select(happy, trstep, polintr2, eisced, eisced2, cntry_name)
-  rownames(ds) <- ds$cntry_name
-  ds <- ds %>% select(-cntry_name)
-  
-  # cross correlation matrix - spiced up by adapting
-  # https://github.com/ggobi/ggally/issues/139
-  # as seen above as well
-  p_pairs <- ggpairs(
-    ds,
-    upper = list(continuous = my_custom_cor), 
-    lower = list(continuous = 'smooth')
-    )
-  
-  # deep dive: trstep - happy
-  lm_trstep_happy <- lm(trstep~happy, data=ds)
-  p_fit_trstep_happy <- ggplot(ds, aes(happy, y=trstep, label=rownames(ds), color=rownames(ds)))+
-    geom_point() +
-    geom_line(aes(y=predict(lm_trstep_happy, ds), ds$happy), col=2) +
-    geom_text_repel() +
-    labs(title=paste("Linear fit trstep~happy", yr),
-         subtitle=GetFitCharacteristics(lm_trstep_happy, "happy")) +
-    theme(legend.position="None")
-  
-  # deep dive: trstep - polintr2
-  lm_trstep_polintr2 <- lm(trstep~polintr2, data=ds)
-  p_fit_trstep_polintr2 <- ggplot(ds, aes(polintr2, y=trstep, label=rownames(ds), color=rownames(ds)))+
-    geom_point()+
-    geom_line(aes(y=predict(lm_trstep_polintr2, ds), ds$polintr2), col=2) +
-    geom_text_repel() +
-    labs(title=paste("Linear fit trstep~polintr2", yr),
-         subtitle=GetFitCharacteristics(lm_trstep_polintr2, "polintr2")) +
-    theme(legend.position="None")
-  
-  return(list("pairs"=p_pairs, 
-              "p_fit1"=p_fit_trstep_happy, 
-              "lm1"=lm_trstep_happy, 
-              "p_fit2"=p_fit_trstep_polintr2, 
-              "lm2"=lm_trstep_polintr2))
+  MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = "stroke-width:3px;") 
+  MyPrintInteractive(p_wb_a$ci, create_interactive_plot,hover_css = "stroke-width:3px;") 
+  MyPrintInteractive(p_wb_b$ci, create_interactive_plot,hover_css = "stroke-width:3px;") 
 }
 
 ```
 
-**In the year 2002**
 
-```{r, warning=FALSE}
+## Linear Modeling
 
-fit2002 <- CheckCorrelations(ds_subset_averages, 2002)
-fit2002$pairs
+We create a multiple linear regression model to get insight into associations 
+between dependent and independent variables in our data.
+
+As data we use the average scores of the indicators by country and by ESS survey.
+We check the performance of the model with the results of the 2016 survey.
+
+In creating the model we will not use the year of a survey as an element.
+In other words, we assume that the relationship is independent of time.
+
+At least for the time being.
+
+### Assumptions
+
+Using multivariate linear model which assumes
+http://www.statisticssolutions.com/assumptions-of-multiple-linear-regression/
+
+* linearity - linear relationship between dependent and independent variables
+* multivariate normality - residuals are normally distributed
+* no multicollinearity - independent variables are not highly correlated with each other
+* homoskedasticity  - variance of error terms similar across the values of independent variables
+
+The following pairwise correlation graph gives a view into some of the above.
+And the diagnostic graphs produced in the model give more. 
+
+```{r}
+
+p_pairs <- ggpairs(
+  ds_subset_50_ave %>% 
+    select(-cntry_name, -ess_year),
+  lower = list(
+    continuous = wrap("points", alpha = 0.3,    size=0.1)
+    ),
+  upper = list(
+    continuous = wrap("cor", size = 1.5, alignPercent = 1)
+  )) +
+  theme(strip.text.x = element_text(size = 5),
+        strip.text.y = element_text(size = 4),
+        panel.grid.major = element_blank(), 
+        axis.text = element_text(size = 2.5))
+
+print(p_pairs)
+
+the_correlations <- rcorr(as.matrix(ds_subset_50_ave %>% 
+    select(-cntry_name, -ess_year)))
+
+# knitr::kable(the_correlations$r, digits = 3, caption = "Cross correlations")
+# knitr::kable(the_correlations$P, digits = 3, caption = "p-values of the correlations")
+
+diag(the_correlations$r) <- NA
+print(paste("Highest correlation coefficient", round(max(abs(the_correlations$r), na.rm = TRUE),3)))
+
+# save space and compress correlation and p into the same matrix
+CreateCorrPvalMatrix <- function(the_correlations) {
+  the_correlations$r * lower.tri(the_correlations$r) +
+    the_correlations$P * upper.tri(the_correlations$P)
+}
+
+knitr::kable(CreateCorrPvalMatrix(the_correlations),
+             digits = 3, 
+             caption = "Lower triangle: Correlation coefficients, upper triangle: p-values")
 
 ```
 
-As can be seen, significance of correlation between education level and 
-trust in European Parliament drops from 0.056 to 0.191 when the missing 
-values are approximated.
+### The model
 
-Having a deeper view to some highlighted correlations
-
-```{r, warning=FALSE}
-
-fit2002$p_fit1
-
-```
-
-Without going into more detailed analysis it looks like the Hungary, Italy - and to some 
-extent United Kingdom and Sweden - may have had biggest influence into the negative 
-correlation
-between trust in European Parliament and happiness in 2002.
+Basically, we start with a linear model with all variables and 
+let 2-way stepAIC in MASS library to make the selection of the final variables.
 
 ```{r, warning=FALSE}
 
-fit2002$p_fit2
+library(ggfortify)
+
+MakeModel <- function(indata, response_var) {
+  # create the model
+  ds <- na.omit(indata)
+  n_filtered <- nrow(indata) - nrow(ds)
+  print(paste0("Linear modeling with 2-way stepAIC: Using ", nrow(ds), 
+               ", removed ", n_filtered, " rows with NA"))
+  # country name and year used as rownames to get informative model diagnostics text
+  rownames(ds) <- paste(ds$cntry_name, ds$ess_year)
+  ds <- ds %>% select(-cntry_name, -ess_year)
+  # use 'response_var' as the name of the predicted / dependent variable internally
+  # in the model
+  colnames(ds)[colnames(ds)==response_var] <- "response_var"
+  # initial model and refinement with stepAIC
+  mymodel <- lm(formula = response_var~., data=ds)
+  mymodel_final <- MASS::stepAIC(mymodel, direction = "both", trace = 0)
+  return(mymodel_final)
+}
+
+PredictWithModel <- function(ds, mod, response_var, pred_level=0.95){
+  # make prediction
+  colnames(ds)[colnames(ds)==response_var] <- "response_var"
+  y_pred <- predict(mod, newdata=ds, interval="predict",level = pred_level)
+  return(list("y_pred"=y_pred[,1], "pred_int"=y_pred[,c(2,3)]))
+}
+
+CheckModel <- function(labels, ds, pred_val, response_var, k, txt_head=""){
+  # show performance of the model
+  colnames(ds)[colnames(ds)==response_var] <- "response_var"
+  rsq <- r_squared(ds$response_var, pred_val$y_pred)
+  rsqa <- r_squared_a(ds$response_var, pred_val$y_pred, k)
+  
+  # https://stackoverflow.com/questions/39811656/r-calculate-test-mse-given-a-trained-model-from-a-training-set-and-a-test-set
+  MSPE <- mean((ds$response_var - pred_val$y_pred) ^ 2)
+  
+  print(paste0("For ", response_var))
+  print(paste0("Mean squared prediction error: ", round(MSPE, 3)))
+  print(paste0("                    R-squared: ", round(rsq, 3)))
+  print(paste0("           Adjusted R-squared: ", round(rsqa, 3)))
+
+  ds_result <- data.frame(country = labels,
+                          true = ds$response_var,
+                          predict = pred_val$y_pred,
+                          lower = pred_val$pred_int[,1],
+                          upper = pred_val$pred_int[,2])
+  
+  knitr::kable(ds_result,
+               caption = paste("True and predicted", response_var, 
+                               "with 95% prediction intervals"),
+               digits = 3)
+
+  # visualize the same  
+  p <- ggplot(data=ds_result, aes(x=reorder(country,predict))) +
+    geom_point(aes(y=predict), color="blue") +
+    geom_errorbar(aes(ymin=lower, ymax=upper), color="blue", width=0.5) + 
+    geom_point(aes(y=true), color="red", shape=4, size=3) +
+    labs(title=paste(response_var, txt_head),
+         subtitle="True scores (red), predicted with 95% prediction interval (blue) ") +
+    xlab("") + ylab("") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          plot.title = element_text(hjust = 0),
+          plot.subtitle = element_text(hjust = 0))
+  print(p)
+}
+
+ShowModelCoeffs <- function(the_mod, pred_name){
+  # show the coefficients in descending absolute order
+  the_set <- summary(the_mod)$coefficients[-1,]
+  df_set <- data.frame(variable = rownames(the_set),
+                       coefficient = the_set[,1],
+                       std_err = the_set[,2],
+                       t_val = the_set[,3],
+                       p_val = the_set[,4])
+  p <- ggplot(data = df_set, 
+              aes(x=reorder(variable, -abs(coefficient)), 
+                  y=coefficient, fill=p_val)) +
+    geom_bar(stat = "identity") +
+    xlab("") + ylab("") +
+    labs(title=paste(pred_name, "linear model coefficients"),
+         subtitle="Note that the variables have been normalized") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  print(p)
+}
+
+PredAndCheck <- function(predict_this, ds_train, ds_test, txt_head){
+  # wrap the whole creating, predicting and illustrating into one function 
+  print(paste("Predicted indicator =", predict_this))
+  mod <- MakeModel(ds_train, predict_this)
+  print(summary(mod))
+  p <- autoplot(mod, label.size=3) + 
+    labs(subtitle = predict_this)
+  print(p)
+  pred <- PredictWithModel(ds_test, mod, predict_this)
+  CheckModel(ds_test$cntry_name, ds_test, pred, predict_this, mod$rank, txt_head)
+  ShowModelCoeffs(mod, predict_this)
+  return(mod)
+}
+
 
 ```
 
-United Kingdom and Sweden together with Israel seem to have some influence in 
-making this correlation negative but making a true judgement would require 
-going in detail through the diagnostics of the fit.
+### Scale the data
 
-So, the more one was interested in politics the less the person trusted European Union.
-As seen through country wide weighted average.
-It would be quite interesting to understand what could have been the cause for it.
-Provided that there was a cause.
+This makes interpreting the results easier since the variables have different numeric ranges, e.g. impcntrl is from 1 to 4 and trstep between zero and 10.
 
-**And then 2016**
+In all fairness this is not a big deal as the scale used by ESS is somewhat arbitrary 
+to begin with.
+
+We use the countries which were in 50% or more of the surveys.
+
+```{r}
+
+ds_subset_50_ave_s <- ds_subset_50_ave %>%
+  gather(indicator, value, setdiff(colnames(ds_subset_50_ave), metadata_columns)) %>%
+  filter(!is.na(value)) %>%
+  group_by(indicator) %>% 
+  mutate(scaled_ave = scale(value)) %>%
+  select(-value) %>%
+  spread(indicator, scaled_ave) %>%
+  ungroup()
+
+summary(ds_subset_50_ave_s)
+
+test_year <- 2016
+
+```
+
+### Training and testing data
+
+We reserve the scores from `r test_year` for testing the model.
+All other data used for training.
+
+And for testing only the countries with non imputed data for that year are used.
+
+```{r}
+
+ds_train <- ds_subset_50_ave_s  %>% filter(ess_year < test_year)
+dim(ds_train)
+
+# Test data - only use data we really have, not imputed stuff
+test_countries <- ds_participations %>% 
+  filter(last_year==test_year) %>% 
+  select(cntry_name)
+ds_test  <- ds_subset_50_ave_s %>% 
+  filter(ess_year == test_year, 
+         cntry_name %in% test_countries$cntry_name)
+print(paste("Countries used as test data in",
+            test_year,
+            ":",
+            paste0(unique(ds_test$cntry_name), collapse=", ")))
+```
+
+## Models and facts
+
+### Subjective Happiness
+
+Investigating how the selected ESS variables are correlating with subjective happiness.
 
 ```{r, warning=FALSE}
 
-fit2016 <- CheckCorrelations(ds_subset_averages, 2016)
-
-fit2016$pairs
-fit2016$p_fit1
-fit2016$p_fit2
+the_mod <- PredAndCheck("happy", ds_train, ds_test, "- train 2002-2014, test 2016")
+the_mod_sum <- summary(the_mod)
 
 ```
 
-In 2016 we can find no significant negative correlations anymore. 
-Most are positive or are not significant.
+The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
 
-In the deeper views regarding trust in European Parliament we can find 
-Israel consistently at the bottom and Finland at the top.
+Top coefficients impacting into positive direction
 
-But as this indicator on European Parliament has risen through cross correlations 
-with `happy`, it is then worth having a deeper look directly into that indicator.
+* pplhlp _Most of the time people helpful or mostly looking out for themselves_: people 
+usually trying to be helpful is a positive factor
+* stfhlth _State of health services in country nowadays_: health services are 
+naturally close to each and every person
+* stfedu _State of education in country nowadays_
+* stfeco _How satisfied with present state of economy in country_
+* imueclt _Country's cultural life undermined or enriched by immigrants_
 
-## Trust in EU Parliament
+Top coefficients into negative direction
+
+* trstun _Trust in the United Nations_
+* eisced2 _Highest level of education, ES - ISCED_
+* impcntr _Allow many/few immigrants from poorer countries outside Europe_: Note that 
+lower values of this indicator mean favoring more immigration and higher values less.
+In other words, favoring more immigration is associated with higher happiness and 
+"closing the borders" associated with lower level of happiness
+* imbgeco _Immigration bad or good for country's economy_: This factor seems to be in
+some kind of conflict with impcntr as the view of immigration being good for 
+country's economy is associated with lower level of happiness.
+
+But perhaps one should not assume that each and all of the factors has a separate message.
+
+### Helpful People 
+
+Investigating the highest factor in happy model - and excluding `happy` from the model as
+I do not think it can be an independent variable at all.
+
+```{r, warning=FALSE}
+
+the_mod <- PredAndCheck("pplhlp", 
+                        ds_train %>% select(-happy), 
+                        ds_test%>% select(-happy), 
+                        "- train 2002-2014, test 2016")
+the_mod_sum <- summary(the_mod)
+
+```
+
+The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
+
+Looks like here `happy` and `trstun` are major positive factors. 
+`trstun` was seen as a major factor in `happy` as well.
+The third biggest positive factor 
+is  `imwbcnt` _Immigrants make country worse or better place to live_.
+
+Interestingly, this is negatively correlated with the `euftf` _European Union: European unification go further or gone too far_.
+And there is a negative correlation with `imueclt` _Country's cultural life undermined or enriched by immigrants_.
+
+### Trust in United Nations
+
+Trust in the UN seems to be an important factor, so let's drill deeper.
+
+```{r}
+the_mod <- PredAndCheck("trstun", 
+                        ds_train %>% select(-happy), 
+                        ds_test%>% select(-happy), 
+                        "- train 2002-2014, test 2016")
+the_mod_sum <- summary(the_mod)
+
+```
+
+The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
+
+Top positive factors
+
+* trstlgl
+* pplhlp
+* trstep
+
+Top negative factors
+
+* impcntrl
+* happy
+* strfecu
+
+### Trust in European Parliament
+
+
+#### Observations
+
+```{r}
+
+
+summary(dataset$trstep)
+
+# # need weighted averages for trstep
+ds_trstep <- dataset %>%
+  filter(!is.na(trstep), trstep <=10) %>%
+  group_by(ess_year, cntry_name) %>%
+  summarise(var_ave = Hmisc::wtd.mean(trstep, pspwght),
+            n=sum(pspwght))
+
+ds_trstep_averages <- MakeAverageSummary(
+  ds = ds_trstep,
+  value_term = "var_ave")
+
+CreateEuroMap(mymap=mymap, 
+              ds = ds_trstep_averages %>%
+                filter(ess_year=="Mean", cntry_name != "Mean"), 
+              ind_name = "var_ave",
+              txt_title = "Trust in European Parliament 2002-2016 - 'trstep'",
+              txt_subtitle = "Average score of the indicator, scale 0-10",
+              txt_caption = "ESS 2002-2016")
+
+
+```
+
+It might not be a big surprise to see which countries are having lowest trust levels.
+
+#### Heatmap
 
 First a view to the changes through a heatmap.
 
 ```{r, warning=FALSE}
-# need weighted averages for trstep
-ds_trstep <- dataset %>% 
-  filter(trstep <= 10) %>%
-  group_by(ess_year, cntry_name) %>% 
-  summarise(var_ave = wtd.mean(trstep, pspwght),
-            n=sum(pspwght)) 
-
 # and the heatmap
-ds_trstep_averages <- MakeIndicatorHeatSet(
-  ds = ds_trstep, 
-  value_term = "var_ave", 
-  txt_name = "'trstep' - Trust in EU Parliament - Average")
-ds_trstep_averages$plot
+plot_trstep <- MakeIndicatorHeatSet(
+  ds = ds_trstep_averages,
+  value_term = "var_ave",
+  txt_name = "Trust in EU Parliament - 'trstep'",
+  txt_subtitle = "Average score of the indicator, scale 0-10",
+  txt_caption = "ESS surveys 2002-2016")
+
+MyPrintInteractive(plot_trstep, create_interactive_plot) 
 
 ```
 
 Levels of trust are at a much lower level than for happiness.
 But perhaps that applies to politicians and political institutions in general.
 
-## Trust on map
-
-Looking the situation on the map of Europe.
-
-```{r}
-
-ggplot(mymap) + 
-  coord_quickmap() +
-  geom_map(data = ds_trstep_averages$data %>% 
-             filter(ess_year=="Mean", cntry_name != "Mean") %>% 
-             select(-ess_year), 
-           aes(map_id = cntry_name, fill = var_ave), 
-           map = mymap) + 
-  outline_layer + 
-  expand_limits(x = mymap$long, y = mymap$lat) +
-  xlim(geo_limits_lon) + 
-  ylim(geo_limits_lat) + 
-  scale_fill_distiller(palette = "Spectral", na.value = "white") +
-  theme(axis.title=element_blank(),
-        axis.text=element_blank(),
-        axis.ticks=element_blank()) +
-  ggtitle("'trstep' averaged over all surveys by country")
-
-```
-
-It might not be a big surprise to see which countries are having lowest trust levels.
-
-## Trends in Trust
-
-And finally, investigating the trends for the countries which were in all surveys
-
-```{r, warning=FALSE}
-
-trends_trstep <- MakeTrendPlots(
-  ds_trstep %>% 
-    filter(cntry_name %in% cntry_in_all_surveys), 
-  id_term = "var_ave", 
-  "trstep - only countries which participated all surveys", 
-  plevel = p_val)
-trends_trstep$ci
-
-```
-
-Finland seems to have consistently trusted European Parliament while
-United Kingdom has had lowest trust in European Parliament in almost all surveys.
-Portugal had once a lower score (2012).
-
-From 2014 to 2016 the score for almost all countries went up,
-including United Kingdom
-As the field work in teh UK was conducted after the Brexit vote 01.09.16-20.03.17 there
-could be an element of second thoughts.
-But that is pure speculation in the context of this study.
+#### Significance
 
 ```{r, warning=FALSE, message=FALSE}
 
-trstep_changes <- CreateComparisonTable(
-  ds_trstep_averages$data, 
-  dataset %>% filter(trstep <= 10) %>% mutate(indval = trstep))
-knitr::kable(trstep_changes, digits = 3)
+trstep_res <- GetComparisonBoxPlot(indval_name =  "trstep", 
+                                  ds_avg = ds_trstep_averages, 
+                                  ds = dataset %>% filter(!is.na(trstep), trstep <=10),
+                                  cntry_list = cntry_in_100pct,
+                                  skip_plot = FALSE)
+
+tab.4_cap <- table_nums(name="tab_4",
+                        caption = "TRust in European Parliament 2002-2016 - 'trstep' p-values for significance of the change")
+```
+`r table_nums("tab_4")`
+```{r table4, fig.cap=tab.4_cap}
+#knitr::kable(impcntr_res$table, digits = 3)
+knitr::kable(trstep_res$table, digits = 3, 
+             col.names = gsub("_", " ", colnames(trstep_res$table)))
 
 ```
+
 
 As can be seen above, the big positive changes in UK and Portugal as well as 
 Finland and Slovenia from 2014 to
@@ -1125,6 +1858,335 @@ With more investigation one might find some interesting correlations between tho
 and other indicators in ESS data and elsewhere.
 But that adventure is beyond the scope of this post.
 
+
+#### Run the model
+
+```{r}
+
+the_mod <- PredAndCheck("trstep", 
+                        ds_train %>% select(-happy), 
+                        ds_test%>% select(-happy), 
+                        "- train 2002-2014, test 2016")
+the_mod_sum <- summary(the_mod)
+
+```
+
+The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
+
+#### Findings
+
+xxx
+
+### Immigrants from poorer countries outside Europe
+
+#### Observations
+
+```{r}
+
+ds_impcntr <- dataset %>%
+  filter(!is.na(impcntr), impcntr <=4) %>%
+  group_by(ess_year, cntry_name) %>%
+  summarise(var_ave = Hmisc::wtd.mean(impcntr, pspwght),
+            n=sum(pspwght))
+
+ds_impcntr_averages <- MakeAverageSummary(
+  ds = ds_impcntr,
+  value_term = "var_ave")
+
+CreateEuroMap(mymap=mymap, 
+              ds = ds_impcntr_averages %>%
+                filter(ess_year=="Mean", cntry_name != "Mean"), 
+              ind_name = "var_ave",
+              txt_title = "Immigrants from poorer countries outside Europe 2002-2016 - 'impcntr'",
+              txt_subtitle = "Average score of the indicator, scale 1-4",
+              txt_caption = "ESS 2002-2016")
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+impcntr_res <- GetComparisonBoxPlot(indval_name =  "impcntr", 
+                                  ds_avg = ds_impcntr_averages, 
+                                  ds = dataset %>% filter(!is.na(impcntr), impcntr <=4),
+                                  cntry_list = cntry_in_100pct,
+                                  skip_plot = FALSE)
+
+tab.3_cap <- table_nums(name="tab_3",
+                        caption = "Immigrants from poorer countries outside Europe 2002-2016 - 'impcntr' p-values for significance of the change")
+```
+`r table_nums("tab_3")`
+```{r table3, fig.cap=tab.3_cap}
+#knitr::kable(impcntr_res$table, digits = 3)
+knitr::kable(impcntr_res$table, digits = 3, 
+             col.names = gsub("_", " ", colnames(impcntr_res$table)))
+
+```
+
+#### Run the model
+
+```{r, warning=FALSE}
+
+the_mod <- PredAndCheck("impcntr", 
+                        ds_train %>% select(-happy), 
+                        ds_test%>% select(-happy), 
+                        "- train 2002-2014, test 2016")
+the_mod_sum <- summary(the_mod)
+
+```
+
+The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
+
+#### Findings
+
+xxx
+
+## Clustering the countries
+
+We investigate if there are any clusters of countries in the data using as clusterig elements
+observations identified by country name and year of ess survey where all selected ess indicators 
+ane available (rows with any NA values are excluded).
+
+Generally following the script outlined at article
+https://datascienceplus.com/finding-optimal-number-of-clusters/
+
+### Preprocess
+
+```{r}
+
+# create subset with ESS indicators only
+drop_cols <- which(colnames(ds_ss_avg_cntry_ind) %in% c((indicator_table %>% 
+  filter(source %in% c("WB", "UNHCR")))$indicator))
+mydata <- ds_ss_avg_cntry_ind[,-drop_cols]
+dim(mydata)
+summary(mydata)
+
+# remove records with NAs
+myDataClean = na.omit(mydata)
+dim(myDataClean)
+summary(myDataClean)
+
+#remove metadata fields and scale the rest
+scaled_data = as.matrix(scale(myDataClean[,-which(colnames(myDataClean) %in% metadata_columns)]))
+rownames(scaled_data) <- paste(myDataClean$cntry_name, myDataClean$ess_year)
+
+```
+
+### PCA
+
+Reducing dimensionality using Primary Component Analysis
+
+```{r}
+# PCA
+pc <- prcomp(scaled_data)
+PoV <- pc$sdev^2/sum(pc$sdev^2) # proportion of variance
+CumPoV <- cumsum(PoV)
+n_CumPoV_085 <- length(which(CumPoV <=0.85))
+print(paste(n_CumPoV_085, "principal components explain 85% of variance"))
+p_var <- ggplot(data=data.frame(PoV=PoV, CumPoV=CumPoV, n=1:length(CumPoV)), aes(x=n)) +
+  geom_bar(aes(y=PoV), fill="red", stat="identity") +
+  geom_line(aes(y=CumPoV), color="black") +
+  geom_hline(yintercept = 0.85, linetype="dashed") +
+  geom_vline(xintercept = n_CumPoV_085, linetype="dashed") +
+  labs(title="Principal Componen Analysis - Proportion of Variance",
+       subtitle="Individual and cumulative variance explained (using 'prcomp')") + 
+  xlab("Principal Component")
+
+MyPrintInteractive(p_var, create_interactive_plot) 
+
+knitr::kable(pc$rotation, digits = 2, caption = "Primary componets vs indicators")
+
+# plot two first PCs
+library(ggfortify)
+# autoplot(pc)
+
+# Take the principal components needed for 85%
+comp <- data.frame(pc$x[,1:n_CumPoV_085])
+
+# Plot
+ggpairs(data=comp) +
+  labs(title="Correlations between Primary Components",
+       subtitle="Very low correlations - as expected in PCA")
+
+
+# library(rgl)
+# # Multi 3D plot
+# plot3d(comp$PC1, comp$PC2, comp$PC3)
+# plot3d(comp$PC1, comp$PC3, comp$PC4)
+
+
+```
+
+
+### K-means clustering
+
+Identifying potential clusters in country / ess year indicator rows.
+
+```{r}
+
+# Use the data in PCA space for k-means clustering
+
+kmeans_data <- comp
+
+# fix randomization
+set.seed(123)
+
+# find clusters, set max value to be count of countries in the dataset
+k.max <- length(unique(myDataClean$cntry_name))
+print(paste("Set upper bound to clusters the count of countries in the dataset", k.max))
+
+# Elbow Method for visually finding the optimal number of clusters
+wss <- sapply(1:k.max, 
+              function(k){
+                kmeans(kmeans_data, k, nstart=50,iter.max = 15)$tot.withinss
+              })
+ggplot(data = data.frame(n=1:k.max, wss=wss), aes(x=n, y=wss)) +
+  geom_line() +
+  geom_point() +
+  labs(title="Elbow method",
+       substitle="Visually identify an 'elbow' in the plot") +
+  xlab("Number of clusters K") +
+  ylab("Total within-clusters sum of squares")
+
+# NbClust - vote on kmeans ==> use this as the outcome
+library(NbClust)
+nb <- NbClust(kmeans_data, 
+              diss=NULL, 
+              distance = "euclidean", 
+              min.nc=2, 
+              max.nc=k.max, 
+              method = "kmeans", 
+              index = "all", 
+              alphaBeale = 0.1)
+
+print(sort((nb$Best.nc[1,])))
+
+ggplot(data=data.frame(n=nb$Best.nc[1,]), aes(n)) +
+  geom_histogram(binwidth = 1) +
+  labs(title="cluster count using several methods",
+       subtitle="As majority vote determined by 'NbClust' function")
+
+n_clusters <- length(unique(nb$Best.partition))
+print(paste("Majority vote decision:", n_clusters, "clusters"))
+
+```
+
+### Visualize groups in PCA space
+
+Annoyingly, the two plots do not use the same colours for clusters. 
+
+```{r}
+# wrap results into a dataset
+ds_clusters <- data.frame(cluster = as.factor(nb$Best.partition),
+                          cntry_name = myDataClean$cntry_name,
+                          ess_year = myDataClean$ess_year) 
+
+# show in PCA space
+
+library(cluster)
+pam_obj <- pam(scaled_data, n_clusters)
+autoplot(pam_obj, frame.type = 'norm', label=TRUE, label.size=2.5, label.alpha=0.6) +
+  labs(title="Countries classified by ESS survey",
+       subtitle="Each classification identified")
+
+autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster', 
+         loadings = TRUE, loadings.colour = 'blue',
+         loadings.label = TRUE, 
+         loadings.label.size = 3) +
+  labs(title="Countries classified by ESS survey",
+       subtitle="Eigenvectors of original indicators shown")
+
+```
+
+### Countries split to classes
+
+The Nordic countries are in the same class, which is not that surprising
+given their relatively common values and ways in their respective societies.
+
+Other participants in that group are perhaps not as clear or obvious.
+
+And then there is the rest of Europe in the other basket.
+
+```{r}
+
+# classify countries based on clusters they have most often been in
+
+clustered_countries <- ds_clusters %>% 
+  group_by(cntry_name, cluster) %>% 
+  summarise(n=n()) %>% 
+  arrange(desc(n)) %>%
+  filter(!duplicated(cntry_name)) %>%
+  arrange(cluster)
+
+p <- CreateEuroMap(mymap=mymap, 
+                   ds = clustered_countries, 
+                   ind_name = "cluster",
+                   txt_title = "Countries clustered by indicators",
+                   txt_subtitle = "Based on the cluster a country most often has been in",
+                   txt_caption = "ESS surveys 2002-2016")
+MyPrintInteractive(p, FALSE) 
+
+# how does clustering changed annually
+
+clustered_years <- ds_clusters %>% 
+  group_by(ess_year, cluster) %>% 
+  summarise(n=n())
+
+ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
+  geom_bar(stat = "identity", position = "fill") +
+  geom_hline(yintercept = c(0.25, 0.5, 0.75), linetype="dashed") + 
+  labs(title="Relative size of groups",
+       subtitle = "As countries assigned in each survey") 
+
+
+# compare the indicators between classes
+
+ggplot(data=ds_ss_avg %>% 
+         filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
+         group_by(indicator) %>%
+         mutate(value_s = scale(value)) %>%
+         ungroup() %>%
+         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+       aes(x=indicator, y=value_s, fill=cluster)) +
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("") + ylab("") +
+  labs(title="Differences between groups of countries",
+       subtitle="Variables scaled to same range")
+
+
+ggplot(data=ds_ss_avg %>% 
+         filter(indicator %in% (indicator_table %>%
+                                  filter(indicator %in% pct_indicators,
+                                         source=="WB"))$indicator) %>%
+         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+       aes(x=indicator, y=value, fill=cluster)) +
+  geom_boxplot() + 
+  xlab("") + ylab("") +
+  labs(title="Differences between groups of countries",
+       subtitle="WB Variables ") +
+  coord_flip()
+
+
+ggplot(data=ds_ss_avg %>% 
+         filter(indicator %in% (indicator_table %>% 
+                                  filter(indicator %in% pct_indicators,
+                                         source=="UNHCR"))$indicator,
+                !is.na(value)) %>%
+         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+       aes(x=indicator, y=value+1, fill=cluster)) +
+  geom_boxplot() + 
+  scale_y_log10() +
+  xlab("") + ylab("") +
+  labs(title="Differences between groups of countries",
+       subtitle="UNHCR Variables on logarithmic scale (offset +1%)") +
+  coord_flip()
+
+
+```
+
+
+
+
+
 ## Summary
 
 Let's plot happiness against trust in European Parliament to have a good look on the
@@ -1132,42 +2194,9 @@ main indicators in this study.
 
 ```{r}
 
-# these contain only tose countries participating all surveys
-ds_happy_trstep <- data.frame(
-  ess_year =  as.factor(trends_happy$ds_ci$ess_year),
-  happy_ave = trends_happy$ds_ci$term_ave,
-  happy_lwr = trends_happy$ds_ci$term_lwr.ci,
-  happy_upr = trends_happy$ds_ci$term_upr.ci,
-  trstep_ave = trends_trstep$ds_ci$term_ave,
-  trstep_lwr = trends_trstep$ds_ci$term_lwr.ci,
-  trstep_upr = trends_trstep$ds_ci$term_upr.ci,
-  mygrp = "Mean"
-)
-
-ds_happy_trstep2 <- ds_happy %>%
-  mutate(happy_ave=var_ave) %>%
-  select(happy_ave, ess_year,cntry_name) %>%
-  inner_join(ds_trstep %>% 
-               mutate(trstep_ave=var_ave) %>% 
-               select(trstep_ave, ess_year,cntry_name),
-             by = c("ess_year", "cntry_name")) %>% 
-  ungroup() %>%
-  mutate(ess_year = as.factor(ess_year)) %>%
-  filter(cntry_name %in% cntry_in_all_surveys)
-
-ggplot(ds_happy_trstep2, aes(happy_ave, trstep_ave, color = ess_year)) +
-  geom_point() +
-  stat_ellipse(level = 0.9) +
-  geom_path(data=ds_happy_trstep, aes(y=trstep_ave, x=happy_ave, group=mygrp)) +
-  geom_point(data=ds_happy_trstep, aes(y=trstep_ave, x=happy_ave), size=4, alpha=0.3) +
-  ggtitle("Average trust in European Parliament vs. subjective happiness")
 
 ```
 
-Over the surveys a constellation of positive correlation between 
-average happiness and trust in European Parliament has taken place.
-
-I think that - as an association - is a good thing.
 
 * * *
 
@@ -1203,5 +2232,8 @@ ESS: essdata@nsd.no
 ESS: www.europeansocialsurvey.org   
 
 
+## Technical notes
 
+Caption and figure numbering is produced as described by Norbert Köhler in 
+his blog post ["R Markdown: How to number and reference tables"](https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/)
 
