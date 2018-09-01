@@ -3196,7 +3196,7 @@ ggplot(data=ds_ss_avg %>%
 Summary
 -------
 
-Let's plot happiness against trust in European Parliament to have a good look on the main indicators in this study.
+TBD
 
 ------------------------------------------------------------------------
 
