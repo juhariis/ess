@@ -2738,9 +2738,6 @@ the_mod_sum <- summary(the_mod)
 
 The model explains 74.5% of variation.
 
-#### Findings
-
-xxx
 
 Clustering the countries
 ------------------------
