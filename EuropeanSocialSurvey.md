@@ -2615,9 +2615,6 @@ the_mod_sum <- summary(the_mod)
 
 The model explains 73.9% of variation.
 
-#### Findings
-
-xxx
 
 ### Immigrants from poorer countries outside Europe
 
@@ -3196,7 +3193,18 @@ ggplot(data=ds_ss_avg %>%
 Summary
 -------
 
-TBD
+ESS data is an interesting source for getting insights into the recent history and ongoing present of Europe from data.
+
+In this post perhaps the most interesting – but perhaps not surprising – findings were
+
+-   Europe can be split into two groups of countries, apparently with different views on life in general and on immigration and refugees
+-   major explaining factors for subjective happiness were willingness of people to help other (positive, not surprising) and trust in United Nations (negative, somewhat strange, indirectly linked to trust in European Parliament as it is the main positive factor in trust in United Nations)
+-   major explaining factors for trust in European Parliament were trust in United Nations (positive), satisfaction in government (positive), further integration of European Union (positive), which all were perhaps not surprising
+-   views on immigration and refugees are polarized and it appears that those countries where immigration is seen positively impacting economy tend to be those which are more open to immigration from poor countries outside of Europe
+
+Linking between ESS and other data may give further insights and I will probably return to this topic later.
+
+
 
 ------------------------------------------------------------------------
 
@@ -3208,6 +3216,8 @@ A real serious study on the topic (I've yet to read myself):
 -   Europeans’ Personal and Social Wellbeing, Topline Results from Round 6 of the European Social Survey
 -   link: <http://www.europeansocialsurvey.org/docs/findings/ESS6_toplines_issue_5_personal_and_social_wellbeing.pdf>
 
+### ESS
+
 Citation of data:
 
 -   European Social Survey Cumulative File, ESS 1-7 (2016). Data file edition 1.0. NSD - Norwegian Centre for Research Data, Norway - Data Archive and distributor of ESS data for ESS REIC.
@@ -3218,7 +3228,7 @@ Citation of documentation:
 -   European Social Survey (2016). ESS 1-7, European Social Survey Cumulative File, Study Description. Bergen: NSD - Norwegian Centre for Research Data for ESS ERIC.
 -   European Social Survey (2016): ESS8- 2016 Documentation Report. Edition 2.0. Bergen, European Social Survey Data Archive, NSD - Norwegian Centre for Research Data for ESS ERIC
 
-**Distributor of Data**
+Distributor of Data
 
 NSD - Norwegian Centre for Research Data,
 Harald Hårfagresgt. 29 N-5007 Bergen, Norway.
@@ -3229,6 +3239,23 @@ Web: <http://www.nsd.no/english>
 
 ESS: <essdata@nsd.no>
 ESS: www.europeansocialsurvey.org
+
+###  World Bank
+
+World Development Indicators https://data.worldbank.org/products/wdi
+
+"The primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates."
+
+Excel file was downloaded and used
+
+### UNHCR
+
+Population Statistics / Time Series http://popstats.unhcr.org/en/time_series
+
+"On this page, each row of data represents the information about UNHCR’s populations of concern for a given year and country of residence and/or origin. Data is presented as a yearly time series across the page. In the 2017 data, figures between 1 and 4 have been replaced with an asterisk (*). These represent situations where the figures are being kept confidential to protect the anonymity of individuals. Such figures are not included in any totals”"
+
+Csv extract of all data was used.
+
 
 Technical notes
 ---------------
