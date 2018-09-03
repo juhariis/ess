@@ -62,6 +62,10 @@ Findings
     in the aftermath of the Brexit vote (fieldwork in the UK was 
     conducted after the vote 01.09.16-20.03.17)
 * other findings
+    * poor subjective happiness scores seem to be somewhat correlated 
+    with countries with low scores on question willingness of people to help others
+    (no correlation study was done, but visually on maps there seems to be
+    rough correspondence)
     * overall feedback on further integration of EU seem to have shifted 
     towards "not more"
     * acceptance of immigration from poor countries outside of Europe
