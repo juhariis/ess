@@ -1,5 +1,7 @@
 Happiness and European Parliament - Adventures in European Social Survey Data
 ================
+Juha Riissanen - <juhariis@gmail.com>
+2018-09-03
 
 -   [European Social Survey](#european-social-survey)
 -   [ESS Data](#ess-data)
@@ -19,7 +21,7 @@ Happiness and European Parliament - Adventures in European Social Survey Data
     -   [ESS indicators](#ess-indicators)
     -   [Shape of distributions](#shape-of-distributions)
     -   [Weights](#weights-1)
-    -   [\*Missing values](#missing-values)
+    -   [Missing values](#missing-values)
     -   [World Bank](#world-bank)
     -   [UNHCR](#unhcr)
     -   [Pct indicators](#pct-indicators)
@@ -31,7 +33,7 @@ Happiness and European Parliament - Adventures in European Social Survey Data
     -   [The model](#the-model)
     -   [Scale the data](#scale-the-data)
     -   [Training and testing data](#training-and-testing-data)
--   [Models and facts](#models-and-facts)
+-   [Models and observations](#models-and-observations)
     -   [Subjective Happiness](#subjective-happiness-1)
     -   [Helpful People](#helpful-people)
     -   [Trust in United Nations](#trust-in-united-nations)
@@ -45,6 +47,9 @@ Happiness and European Parliament - Adventures in European Social Survey Data
     -   [Countries split to classes](#countries-split-to-classes)
 -   [Summary](#summary)
 -   [References](#references)
+    -   [ESS](#ess)
+    -   [World Bank](#world-bank-1)
+    -   [UNHCR](#unhcr-1)
 -   [Technical notes](#technical-notes)
 
 ------------------------------------------------------------------------
@@ -55,15 +60,11 @@ This workbook is used to create content for the completely revised and rewritten
 
 Europe is going through interesting time since turn of the century: Brexit, refugee crisis, rise of populism, economic worries, rising tensions between the West and Russia - and a lot more [Timeline of 21st century](https://en.wikipedia.org/wiki/Timeline_of_the_21st_century)
 
-European Social Study has been collecting data on people in most countries in Europe every two years since 2002.
-
-The purpose of this study is look into the recent history of Europe mainly with the help of ESS data.
-
-As additional data we will use World Bank Development indicator set and a data set from UNHCR to provide some reference to ESS indicators.
+European Social Study has been collecting data on people in most countries in Europe every two years since 2002. The purpose of this study is look into the recent history of Europe mainlywith the help of ESS data. As additional data we will use World Bank Development indicator set and a data set from UNHCR to provide some reference to ESS indicators.
 
 We started by looking into subjective happiness, how it has changed over time and investigated what factors in ESS data are associated with it by using linear modeling.
 
-From that we continued looking into a few other indicators which either were significantly impacting subjective happiness or otherwise were seen as interesting and important items in the context of present day Europe:
+From that we continued looking into other indicators which either were significantly associated with subjective happiness or otherwise were seen as interesting and important items for this study
 
 -   how helpful other people are perceived,
 -   trust in United Nations,
@@ -72,28 +73,32 @@ From that we continued looking into a few other indicators which either were sig
 
 Finally, we used Primary Component Analysis and k-means clustering to find best number of country clusters based on their similarity in the selected ESS variables.
 
-Key findings
+Findings
 
 -   subjective happiness
     -   there is a border of subjective happiness levels running across Europe diagonally from South West corner of Portugal to Eastern border of Finland, likely more resulting from cultural biases and values of countries than from genuine differences in "true absolute" happiness
-    -   for both Poland and Slovenia the change in happiness from 2002 to 2016 and from 2014 to 2016 was statistically significant but not very meaningful (effect size was classified as 'small')
-    -   changes for other countries had the effect size "neglible" or no statistical significance
+    -   for Poland and Slovenia the change in happiness from 2002 to 2016 and from 2014 to 2016 was statistically significant but not very meaningful (effect size according to Cohen's d was 'small')
+    -   changes for other countries had the effect size "neglible" or had no statistical significance
 -   trust in European Parliament
-    -   for a few countries especially, trust in European Parliament has fluctuated widely, Hungary, Greece, Ukraine
-    -   from 2014 to 2016 trust in European Parliament in United Kingdom made statistically significant - but small - rise, which may perhaps be linked to some second thoughts after the Brexit vote (fieldwork in the UK was conducted after the vote 01.09.16-20.03.17)
+    -   Hungary, Greece, Ukraine, have seen trust fluctuating strongly
+    -   United Kingdom had statistically significant rise from 2014 to 2016, which could be linked to some second thoughts in the aftermath of the Brexit vote (fieldwork in the UK was conducted after the vote 01.09.16-20.03.17)
 -   other findings
-    -   view on the integration of EU has shifted towards "not more"
-    -   acceptance of immigration from poor countries outside of Europe is significantly lower in HUngary than most other countries
--   grouping of the countries using PCA and k-means clustering
-    -   Nordic countries + Benelux + Ireland + Swizerland + Austria
-    -   the rest
-    -   clear difference in the variables as hown in the box plot
--   reflections of significant evennts in Europe
-    -   Greece crisis - the data set ends in 2010 when the support package was agreed, trust in European Parliament plummeted
-    -   Ukraine - the data does not go into the timeframe of Criomean annexation, but may reflect the ups and downs of the country in the first decade of 2000's
-    -   United Kingdom - as pointed out, aftermath of the Brexit vote may be reflected in trust
+    -   overall feedback on further integration of EU seem to have shifted towards "not more"
+    -   acceptance of immigration from poor countries outside of Europe is significantly lower in Hungary than most other countries (even though Cyprus and Greece are not that far from it, their latest scores are several years old)
+    -   and significantly higher in Sweden that in other countries..
+-   participating countries were clustered into two groups using PCA and k-means
+    -   Nordic countries + Benelux + Ireland + Swizerland + Austria vs. the rest
+    -   the clustering seems justified when comparing individual ESS indicator scores by the groups
 
-The data set has several interesting features which may be source of some future blog posts, especially
+Several historic events can be see in the data
+
+-   Greece crisis - the data set ends in 2010 when the support package was agreed, trust in European Parliament plummeted
+-   Ukraine - the data does not go into the timeframe of Criomean annexation, but may reflect the ups and downs of the country in the first decade of 2000's
+-   United Kingdom - aftermath of the Brexit vote might somehow be reflected in the increased trust on European Parliament
+-   Hungary having high expectations in European Parliament before joining EU, trust dropped significantly by end of the survey period
+-   Worldwide economic crisis in 2008
+
+Combined data set has several interesting features which may be source of some future blog posts, especially
 
 -   correlating UNHCR and WB data with ESS
 -   identifying discussion topics in European Parliament over the changes in some indicators
@@ -158,7 +163,7 @@ p_val = 0.05
 ESS Data
 --------
 
-Main dataset used in this investigation covers the period 2002-2016. It was created merging a 2002-2014 dataset created with {ESS Cumulative Data Wizard\](<http://www.europeansocialsurvey.org/downloadwizard/>) and a [separately downloaded 2016 set](http://nesstar.ess.nsd.uib.no/webview/) since the latter was not in the wizard at the time.
+Main dataset used in this investigation covers the period 2002-2016. It was created merging a 2002-2014 dataset created with [ESS Cumulative Data Wizard](http://www.europeansocialsurvey.org/downloadwizard/) and a [separately downloaded 2016 set](http://nesstar.ess.nsd.uib.no/webview/) since the latter was not in the wizard at the time.
 
 ### Raw Data
 
@@ -629,9 +634,12 @@ And we will check if the change was meaningful - having a meaningful effect - us
 
 ``` r
 happy_res <- GetComparisonBoxPlot(indval_name =  "happy", 
-                                  ds_avg = ds_happy_avgsum, 
+                                  ds_avg = ds_happy_avgsum %>% select(-n), 
                                   ds = dataset %>% filter(!is.na(happy)),
                                   cntry_list = cntry_in_100pct,
+                                  txt_name = "Subjective happiness", 
+                                  txt_subtitle= "", 
+                                  txt_caption="ESS 2002-2016",
                                   skip_plot = FALSE)
 
 tab.2_cap <- table_nums(name="tab_2",
@@ -648,17 +656,17 @@ knitr::kable(happy_res$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Ireland        |  7.863|  7.331|  7.550|  -0.312|         0.071|         0.075| negligible |   0.000| \*\*\*   |   0.219|         0.071|         0.075| negligible |   0.000| \*\*\*   |
-| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.714|          |  -0.047|         0.079|         0.083| negligible |   0.402|          |
-| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.788|          |   0.045|         0.010|         0.014| negligible |   0.348|          |
-| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.512|          |  -0.016|        -0.014|        -0.010| negligible |   0.740|          |
-| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.408|          |   0.065|         0.365|         0.369| small      |   0.242|          |
-| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.022| \*       |   0.072|        -0.021|        -0.017| negligible |   0.078| +        |
-| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.050| \*       |   0.084|        -0.043|        -0.039| negligible |   0.076| +        |
-| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.010| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.114|          |
-| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.044| \*       |
+| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.682|          |  -0.047|         0.079|         0.083| negligible |   0.362|          |
+| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.774|          |   0.045|         0.010|         0.014| negligible |   0.410|          |
+| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.522|          |  -0.016|        -0.014|        -0.010| negligible |   0.758|          |
+| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.428|          |   0.065|         0.365|         0.369| small      |   0.244|          |
+| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.018| \*       |   0.072|        -0.021|        -0.017| negligible |   0.108|          |
+| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.062| +        |   0.084|        -0.043|        -0.039| negligible |   0.050| \*       |
+| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.006| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.120|          |
+| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.026| \*       |
 | Spain          |  7.457|  7.437|  7.747|   0.290|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |   0.310|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |
 | Portugal       |  6.953|  6.973|  7.437|   0.484|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |   0.465|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |
-| Germany        |  7.189|  7.586|  7.757|   0.568|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |   0.171|        -0.077|        -0.074| negligible |   0.002| \*\*     |
+| Germany        |  7.189|  7.586|  7.757|   0.568|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |   0.171|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |
 | Slovenia       |  6.906|  7.116|  7.477|   0.571|        -0.230|        -0.225| small      |   0.000| \*\*\*   |   0.361|        -0.230|        -0.225| small      |   0.000| \*\*\*   |
 | Hungary        |  6.325|  6.384|  6.901|   0.577|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |   0.518|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |
 | Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.004| \*\*     |
@@ -836,15 +844,17 @@ Some notes
 Next showing changes using scaled range for the countries with significant changes according to Tab. 2
 
 ``` r
-# get averages annually
-ds_happy_average_scaled <- MakeAverageSummary(ds = ds_happy_scaled, value_term = "var_ave")
+ds_happy_average_scaled <- MakeAverageSummary(
+  ds = ds_happy_scaled, 
+  value_term = "var_ave")
 
-happy_res_scaled <- GetComparisonBoxPlot(indval_name =  "happy_std", 
-                                         ds_avg = ds_happy_average_scaled, 
-                                         ds = dataset_scaled %>% 
-                                           filter(!is.na(happy_invln)),
-                                         cntry_list = cntry_in_100pct,
-                                         skip_plot = TRUE)
+happy_res_scaled <- GetComparisonBoxPlot(
+  indval_name =  "happy_std", 
+  ds_avg = ds_happy_average_scaled %>% select(-n), 
+  ds = dataset_scaled %>% 
+    filter(!is.na(happy_invln)),
+  cntry_list = cntry_in_100pct,
+  skip_plot = TRUE)
 ```
 
     ## Joining, by = "cntry_name"
@@ -1168,9 +1178,11 @@ for (i in 1:length(ind_plots))
 
 Mostly the distributions at this level do not seem significantly skewed.
 
+Concern: This could be an effect from averaging over all data and could hide potential time-dependent or country-dependent skew impacting later analysis. However, at this stage we will assume that there are no issues that would require making elaborate transformations like what we experimented with in the first analysis of `happy` earlier. Perhaps later.
+
 ### Weights
 
-Next we apply proper weights for the selected indicators to get meaningful averages.
+Next we apply post stratification weights for the selected indicators to get meaningful averages.
 
 ``` r
 ds_subset_50_ave <- ds_subset_50 %>%
@@ -1182,7 +1194,7 @@ ds_subset_50_ave <- ds_subset_50 %>%
   ungroup()
 ```
 
-### \*Missing values
+### Missing values
 
 Checking the indicators.
 
@@ -1264,17 +1276,17 @@ txt_NA <- paste(colnames(NA_columns), collapse=", ")
 
 Indicators eisced, euftf, stfgov, trstprt have some missing values. We will create new indicators where we fill in missing values by interpolation and/or use the first / last real value for missing beginning / end values.
 
-Naturally, these are not the real thing anymore and need to be taken as such.
+Naturally, these are not the real thing anymore but should be close enough for this analysis.
 
 ``` r
-# special case for Greece which has only one entry for eisced
+# special case for Greece which has only one entry for eisced (education level)
 
 Greece_eisced2 <- ds_subset_50_ave %>% 
   filter(cntry_name == "Greece", !is.na(eisced)) %>% 
   select(eisced)
 if (nrow(Greece_eisced2) != 1) stop("Greece eisced assumption not valid")
 
-# using zoo package to fill in missing values
+# using zoo package to impute missing values
 
 ds_subset_50_ave <- ds_subset_50_ave %>% 
   group_by(cntry_name) %>% 
@@ -1287,15 +1299,13 @@ ds_subset_50_ave <- ds_subset_50_ave %>%
     euftf2 = zoo::na.fill(euftf, "extend")) %>% 
   ungroup()
 
-
-cntry_imputed <- (ds_subset_50_ave %>% 
-                    filter(!complete.cases(.)) %>% 
-                    select(cntry_name) %>% 
-                    filter(!duplicated(cntry_name)))$cntry_name
-
-
-# Diagnostic, the table is fairly long..
+# Diagnostic to show what values were before/after imputation
+# but as the table is fairly long, commented out now
 # 
+# cntry_imputed <- (ds_subset_50_ave %>% 
+#                     filter(!complete.cases(.)) %>% 
+#                     select(cntry_name) %>% 
+#                     filter(!duplicated(cntry_name)))$cntry_name
 # knitr::kable(ds_subset_50_ave %>% 
 #                filter(cntry_name %in% cntry_imputed) %>%
 #                select(cntry_name, ess_year, eisced, eisced2, trstprt, trstprt2, 
@@ -1303,7 +1313,8 @@ cntry_imputed <- (ds_subset_50_ave %>%
 #              digits = 3,
 #              caption = "Table of original and imputed values")
 
-# removing the originals from the dataframe for simplicity
+# removing the originals from the dataframe as they are not needed in the 
+# subsequent work
 
 ds_subset_50_ave <- ds_subset_50_ave %>%
   select(-eisced, -trstprt, -stfgov, -euftf)
@@ -1311,20 +1322,19 @@ ds_subset_50_ave <- ds_subset_50_ave %>%
 
 #### Get rid of collinear variables
 
-Since we intend to come up with a model we must remove indicators that are essentially the same, i.e. indicators which have too high correlation and would really not add to the model.
+Since we intend to come up with a model we must remove indicators that are essentially the same, i.e. indicators which have too high correlation and would really not add to the model and would be in conflict with the requirements of linear modeling we aim to do.
 
 ``` r
 coll_cutoff <- 0.9
-print(paste("Cutoff level for too good correlation", coll_cutoff))
+print(paste("Cutoff level for correlation", coll_cutoff))
 ```
 
-    ## [1] "Cutoff level for too good correlation 0.9"
+    ## [1] "Cutoff level for correlation 0.9"
 
 ``` r
 # exclude metadata indicators
 
-df1 = ds_subset_50_ave %>% 
-  select(-ess_year, -cntry_name)
+df1 = ds_subset_50_ave %>% select(-ess_year, -cntry_name)
 df2 = cor(df1)
 
 # findCorrelation searches through a correlation matrix and returns a vector of 
@@ -1356,10 +1366,6 @@ hc = caret::findCorrelation(
 ``` r
 hc = sort(hc)
 
-# from abbreviation to long name
-indicator_list <- indicator_table$name
-names(indicator_list) <- indicator_table$indicator
-
 # summary
 keep_table <- data.frame(
   rownr = 1:dim(df1)[2], 
@@ -1367,38 +1373,39 @@ keep_table <- data.frame(
   keep = ifelse((1:dim(df1)[2]) %in% hc, 
                 "drop", 
                 "keep"),
-  name = indicator_list[colnames(df1)]
+  name = sapply(colnames(df1), function(x) GetIndicator(x, indicator_table)$name)
 )
+
 knitr::kable(keep_table, caption = "Features")
 ```
 
-|  rownr| indicator | keep | name                                                                 |
-|------:|:----------|:-----|:---------------------------------------------------------------------|
-|      1| happy     | keep | Taking all things together, how happy would you say you are          |
-|      2| health    | keep | Subjective general health                                            |
-|      3| imbgeco   | keep | Immigration bad or good for country's economy                        |
-|      4| impcntr   | keep | Allow many/few immigrants from poorer countries outside Europe       |
-|      5| imueclt   | keep | Country's cultural life undermined or enriched by immigrants         |
-|      6| imwbcnt   | keep | Immigrants make country worse or better place to live                |
-|      7| polintr   | keep | How interested in politics                                           |
-|      8| pplfair   | drop | Most people try to take advantage of you, or try to be fair          |
-|      9| pplhlp    | keep | Most of the time people helpful or mostly looking out for themselves |
-|     10| ppltrst   | drop | Most people can be trusted or you can't be too careful               |
-|     11| stfdem    | drop | How satisfied with the way democracy works in country                |
-|     12| stfeco    | keep | How satisfied with present state of economy in country               |
-|     13| stfedu    | keep | State of education in country nowadays                               |
-|     14| stfhlth   | keep | State of health services in country nowadays                         |
-|     15| stflife   | drop | How satisfied with life as a whole                                   |
-|     16| trstep    | keep | Trust in the European Parliament                                     |
-|     17| trstlgl   | keep | Trust in the legal system                                            |
-|     18| trstplc   | keep | Trust in the police                                                  |
-|     19| trstplt   | drop | Trust in politicians                                                 |
-|     20| trstprl   | drop | Trust in country's parliament                                        |
-|     21| trstun    | keep | Trust in the United Nations                                          |
-|     22| eisced2   | keep | NA                                                                   |
-|     23| trstprt2  | drop | NA                                                                   |
-|     24| stfgov2   | keep | NA                                                                   |
-|     25| euftf2    | keep | NA                                                                   |
+|          |  rownr| indicator | keep | name                                                                 |
+|----------|------:|:----------|:-----|:---------------------------------------------------------------------|
+| happy    |      1| happy     | keep | Taking all things together, how happy would you say you are          |
+| health   |      2| health    | keep | Subjective general health                                            |
+| imbgeco  |      3| imbgeco   | keep | Immigration bad or good for country's economy                        |
+| impcntr  |      4| impcntr   | keep | Allow many/few immigrants from poorer countries outside Europe       |
+| imueclt  |      5| imueclt   | keep | Country's cultural life undermined or enriched by immigrants         |
+| imwbcnt  |      6| imwbcnt   | keep | Immigrants make country worse or better place to live                |
+| polintr  |      7| polintr   | keep | How interested in politics                                           |
+| pplfair  |      8| pplfair   | drop | Most people try to take advantage of you, or try to be fair          |
+| pplhlp   |      9| pplhlp    | keep | Most of the time people helpful or mostly looking out for themselves |
+| ppltrst  |     10| ppltrst   | drop | Most people can be trusted or you can't be too careful               |
+| stfdem   |     11| stfdem    | drop | How satisfied with the way democracy works in country                |
+| stfeco   |     12| stfeco    | keep | How satisfied with present state of economy in country               |
+| stfedu   |     13| stfedu    | keep | State of education in country nowadays                               |
+| stfhlth  |     14| stfhlth   | keep | State of health services in country nowadays                         |
+| stflife  |     15| stflife   | drop | How satisfied with life as a whole                                   |
+| trstep   |     16| trstep    | keep | Trust in the European Parliament                                     |
+| trstlgl  |     17| trstlgl   | keep | Trust in the legal system                                            |
+| trstplc  |     18| trstplc   | keep | Trust in the police                                                  |
+| trstplt  |     19| trstplt   | drop | Trust in politicians                                                 |
+| trstprl  |     20| trstprl   | drop | Trust in country's parliament                                        |
+| trstun   |     21| trstun    | keep | Trust in the United Nations                                          |
+| eisced2  |     22| eisced2   | keep | Highest level of education, ES ISCED                                 |
+| trstprt2 |     23| trstprt2  | drop | Trust in political parties                                           |
+| stfgov2  |     24| stfgov2   | keep | How satisfied with the national government                           |
+| euftf2   |     25| euftf2    | keep | European Union: European unification go further or gone too far      |
 
 ``` r
 # the reduced data
@@ -1520,7 +1527,7 @@ ggplot(data= ds_unhcr %>% filter(ess_year==2013),
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-35-1.png)
@@ -1533,7 +1540,7 @@ ggplot(data= ds_unhcr %>% filter(ess_year==2016),
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-35-2.png)
@@ -1551,7 +1558,7 @@ ggplot(data= ds_unhcr %>% filter(ess_year==2016),
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-36-1.png)
@@ -1577,9 +1584,9 @@ GetPplOfConcernSubset <- function(ds_unhr, wb_data, pop_set, new_indicator, new_
       ifelse(new_name == "", pop_set[1], new_name), 
              "(% of population) - calculated")
   
-  print(pop_set)
-  print(the_indicator)
-  print(the_name)
+  # print(pop_set)
+  # print(the_indicator)
+  # print(the_name)
   
   ds <- GetPreProcessUnhcrData(
     ds_unhcr = ds_unhcr %>%
@@ -1601,33 +1608,10 @@ for (pop_type in pop_type_major){
   unhcr_data <- unhcr_data %>% bind_rows(ds_pop$data)
   unhcr_indicator_table <- unhcr_indicator_table %>% bind_rows(ds_pop$indicators)
 }
-```
 
-    ## [1] "Refugees (incl. refugee-like situations)"
-    ## [1] "UNHCR.Refugee.PCT"
-    ## [1] "Refugees (incl. refugee-like situations)(% of population) - calculated"
-    ## [1] "Asylum-seekers"
-    ## [1] "UNHCR.Asylum-.PCT"
-    ## [1] "Asylum-seekers(% of population) - calculated"
-    ## [1] "Internally displaced persons"
-    ## [1] "UNHCR.Interna.PCT"
-    ## [1] "Internally displaced persons(% of population) - calculated"
-    ## [1] "Stateless"
-    ## [1] "UNHCR.Statele.PCT"
-    ## [1] "Stateless(% of population) - calculated"
-
-``` r
 ds_pop <- GetPplOfConcernSubset(ds_unhr, wb_data, pop_type_other, 
                                 new_indicator="Other", 
                                 new_name="Other population types together")
-```
-
-    ## [1] "Others of concern" "Stateless persons" "Returned IDPs"    
-    ## [4] "Returnees"         "Returned refugees"
-    ## [1] "UNHCR.Other.PCT"
-    ## [1] "Other population types together(% of population) - calculated"
-
-``` r
 unhcr_data <- unhcr_data %>%
   bind_rows(ds_pop$data)
 unhcr_indicator_table <- unhcr_indicator_table %>%
@@ -1642,7 +1626,7 @@ ggplot(data=unhcr_data %>% filter(ess_year==2016),
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-37-1.png)
@@ -1678,7 +1662,7 @@ ggplot(data = ds_ss_avg %>%
                 ess_year==2016),
        aes(x=reorder(cntry_name, -value), y=value, fill=indicator)) +
   geom_bar(stat = "identity", position = "dodge") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.25)) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) + 
   xlab("") + ylab("")
 ```
 
@@ -1738,14 +1722,8 @@ ds_ss_avg_cntry_ind <- ds_ss_avg %>%
 for (indicator_short in unique(ds_ss_avg$indicator)){
   
   # getting the right long description out
-  
-  last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
-  indicator_short_old <- ifelse(last_char=="2", 
-                                substr(indicator_short, 1, nchar(indicator_short)-1),
-                                indicator_short)
-  
-  this_ind <- indicator_table %>% 
-    filter(indicator == indicator_short_old)
+
+  this_ind <- GetIndicator(indicator_short, indicator_table)
   
   # the plot
   
@@ -1967,6 +1945,8 @@ Using multivariate linear model which assumes <http://www.statisticssolutions.co
 
 The following pairwise correlation graph gives a view into some of the above. And the diagnostic graphs produced in the model give more.
 
+Multicollinearity was handled already earlier when we chose only one variable out of a set which was highly correlated with each other.
+
 ``` r
 p_pairs <- ggpairs(
   ds_subset_50_ave %>% 
@@ -1990,9 +1970,6 @@ print(p_pairs)
 ``` r
 the_correlations <- rcorr(as.matrix(ds_subset_50_ave %>% 
     select(-cntry_name, -ess_year)))
-
-# knitr::kable(the_correlations$r, digits = 3, caption = "Cross correlations")
-# knitr::kable(the_correlations$P, digits = 3, caption = "p-values of the correlations")
 
 diag(the_correlations$r) <- NA
 print(paste("Highest correlation coefficient", round(max(abs(the_correlations$r), na.rm = TRUE),3)))
@@ -2104,8 +2081,9 @@ CheckModel <- function(labels, ds, pred_val, response_var, k, txt_head=""){
   print(p)
 }
 
-ShowModelCoeffs <- function(the_mod, pred_name){
-  # show the coefficients in descending absolute order
+GetModelCoeffs <- function(the_mod, pred_name){
+  txt_title <- paste(pred_name, "linear model coefficients")
+  txt_subtitle  <- "Coefficients shown in descending order of absolute value"
   the_set <- summary(the_mod)$coefficients[-1,]
   df_set <- data.frame(variable = rownames(the_set),
                        coefficient = the_set[,1],
@@ -2117,10 +2095,29 @@ ShowModelCoeffs <- function(the_mod, pred_name){
                   y=coefficient, fill=p_val)) +
     geom_bar(stat = "identity") +
     xlab("") + ylab("") +
-    labs(title=paste(pred_name, "linear model coefficients"),
-         subtitle="Note that the variables have been normalized") +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  print(p)
+    labs(title=txt_title,
+         subtitle=txt_title) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  return(list("plot"=p, "df"=df_set, "title"= txt_title, "subtitle"=txt_subtitle))
+}
+
+
+# 
+GetModelCrossCorr <- function(ds, predict_this, factor_names) {
+  p_pairs <- ggpairs(
+    ds %>% 
+      select(c(predict_this, as.character(factor_names))),
+    lower = list(
+      continuous = wrap("points", alpha = 0.3,    size=0.1)
+    ),
+    upper = list(
+      continuous = wrap("cor", size = 1.5, alignPercent = 1)
+    )) +
+    theme(strip.text.x = element_text(size = 5),
+          strip.text.y = element_text(size = 4),
+          panel.grid.major = element_blank(), 
+          axis.text = element_text(size = 2.5))
+  return(p_pairs)
 }
 
 PredAndCheck <- function(predict_this, ds_train, ds_test, txt_head){
@@ -2133,8 +2130,25 @@ PredAndCheck <- function(predict_this, ds_train, ds_test, txt_head){
   print(p)
   pred <- PredictWithModel(ds_test, mod, predict_this)
   CheckModel(ds_test$cntry_name, ds_test, pred, predict_this, mod$rank, txt_head)
-  ShowModelCoeffs(mod, predict_this)
-  return(mod)
+  mod_coeffs <- GetModelCoeffs(mod, predict_this)
+  pair_cc <- GetModelCrossCorr(
+    ds = ds_train,
+    predict_this = predict_this,
+    factor_names = mod_coeffs$df$variable)
+  
+  return(list("model"=mod, "coeffs"=mod_coeffs, "paircc"=pair_cc))
+}
+
+ShowCoeffSummary <- function(coeffs, indicator_table) {
+  print(coeffs$plot)
+  knitr::kable(coeffs$df %>% 
+                 arrange(desc(abs(coefficient))) %>% 
+                 mutate(name = lapply(variable, 
+                                      function(x) GetIndicator(as.character(x),
+                                                               indicator_table)$name)), 
+               row.names = FALSE, 
+               caption = paste0(coeffs$title, "\n", coeffs$subtitle),
+               digits = 3)
 }
 ```
 
@@ -2235,8 +2249,8 @@ print(paste("Countries used as test data in",
 
     ## [1] "Countries used as test data in 2016 : Austria, Belgium, Czechia, Estonia, Finland, France, Germany, Hungary, Ireland, Israel, Italy, Lithuania, Netherlands, Norway, Poland, Portugal, Russia, Slovenia, Spain, Sweden, Switzerland, United Kingdom"
 
-Models and facts
-----------------
+Models and observations
+-----------------------
 
 ### Subjective Happiness
 
@@ -2287,32 +2301,122 @@ the_mod <- PredAndCheck("happy", ds_train, ds_test, "- train 2002-2014, test 201
     ## [1] "                    R-squared: 0.757"
     ## [1] "           Adjusted R-squared: 0.361"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-2.png)
 
 ``` r
-the_mod_sum <- summary(the_mod)
+ShowCoeffSummary(the_mod$coeffs, indicator_table)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-3.png)
+
+| variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
+|:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
+| pplhlp   |        0.375|     0.061|   6.193|   0.000| Most of the time people helpful or mostly looking out for themselves |
+| trstun   |       -0.296|     0.058|  -5.126|   0.000| Trust in the United Nations                                          |
+| stfhlth  |        0.213|     0.048|   4.456|   0.000| State of health services in country nowadays                         |
+| stfedu   |        0.207|     0.055|   3.766|   0.000| State of education in country nowadays                               |
+| eisced2  |       -0.206|     0.031|  -6.589|   0.000| Highest level of education, ES ISCED                                 |
+| stfeco   |        0.200|     0.053|   3.742|   0.000| How satisfied with present state of economy in country               |
+| imueclt  |        0.194|     0.053|   3.633|   0.000| Country's cultural life undermined or enriched by immigrants         |
+| trstlgl  |        0.174|     0.063|   2.745|   0.007| Trust in the legal system                                            |
+| impcntr  |       -0.154|     0.049|  -3.134|   0.002| Allow many/few immigrants from poorer countries outside Europe       |
+| imbgeco  |       -0.130|     0.052|  -2.483|   0.014| Immigration bad or good for country's economy                        |
+| health   |       -0.129|     0.039|  -3.282|   0.001| Subjective general health                                            |
+| euftf2   |        0.091|     0.038|   2.379|   0.019| European Union: European unification go further or gone too far      |
+
+``` r
+print(the_mod$paircc)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-4.png)
+
+``` r
+the_mod_sum <- summary(the_mod$model)
 ```
 
 The model explains 89.1% of variation.
 
-Top coefficients impacting into positive direction
-
--   pplhlp *Most of the time people helpful or mostly looking out for themselves*: people usually trying to be helpful is a positive factor
--   stfhlth *State of health services in country nowadays*: health services are naturally close to each and every person
--   stfedu *State of education in country nowadays*
--   stfeco *How satisfied with present state of economy in country*
--   imueclt *Country's cultural life undermined or enriched by immigrants*
-
-Top coefficients into negative direction
-
--   trstun *Trust in the United Nations*
--   eisced2 *Highest level of education, ES - ISCED*
--   impcntr *Allow many/few immigrants from poorer countries outside Europe*: Note that lower values of this indicator mean favoring more immigration and higher values less. In other words, favoring more immigration is associated with higher happiness and "closing the borders" associated with lower level of happiness
--   imbgeco *Immigration bad or good for country's economy*: This factor seems to be in some kind of conflict with impcntr as the view of immigration being good for country's economy is associated with lower level of happiness.
-
-But perhaps one should not assume that each and all of the factors has a separate message.
+Note that for `impcntr` *Allow many/few immigrants from poorer countries outside Europe* lower values of this indicator mean allowing more more immigration and higher values less. Favoring more immigration is associated with higher happiness and "closing the borders" associated with lower level of happiness
 
 ### Helpful People
+
+#### ESS results
+
+``` r
+ess_set <- GetObservationsSet(
+  ds = ds_ss_avg,
+  ds_obs = ds_subset_50,
+  the_indicator = "pplhlp",
+  indicator_table = indicator_table,
+  cntry_list = cntry_in_100pct)
+```
+
+    ## Joining, by = "cntry_name"
+
+    ## Warning: Column `cntry_name` joining factors with different levels,
+    ## coercing to character vector
+
+``` r
+print(ess_set$summary)
+```
+
+    ##     ess_year    cntry_name         indicator             value    
+    ##  Min.   : NA   Length:0           Length:0           Min.   : NA  
+    ##  1st Qu.: NA   Class :character   Class :character   1st Qu.: NA  
+    ##  Median : NA   Mode  :character   Mode  :character   Median : NA  
+    ##  Mean   :NaN                                         Mean   :NaN  
+    ##  3rd Qu.: NA                                         3rd Qu.: NA  
+    ##  Max.   : NA                                         Max.   : NA
+
+``` r
+MyPrintInteractive(ess_set$map, FALSE) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-1.png)
+
+``` r
+MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-2.png)
+
+``` r
+MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-3.png)
+
+``` r
+tab.3_cap <- table_nums(name="tab_3",
+                        caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
+```
+
+Tab. 3: Most of the time people helpful or mostly looking out for themselves2002-2016, significance and effect size of the change
+
+``` r
+knitr::kable(ess_set$sig$table, digits = 3, 
+             col.names = gsub("_", " ", colnames(ess_set$sig$table)))
+```
+
+| cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
+|:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
+| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.680|          |   0.005|         0.008|         0.012| negligible |   0.936|          |
+| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.858|          |  -0.017|         0.061|         0.065| negligible |   0.824|          |
+| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.010| \*\*     |   0.185|        -0.047|        -0.043| negligible |   0.000| \*\*\*   |
+| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.004| \*\*     |   0.181|        -0.057|        -0.053| negligible |   0.048| \*       |
+| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.520|          |
+| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.106|          |
+| Finland        |  5.676|  5.933|  6.110|   0.434|        -0.191|        -0.187| negligible |   0.000| \*\*\*   |   0.178|        -0.191|        -0.187| negligible |   0.002| \*\*     |
+| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.036| \*       |
+| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.280|          |
+| Hungary        |  4.147|  4.368|  4.616|   0.469|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |   0.248|        -0.085|        -0.081| negligible |   0.008| \*\*     |
+| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.062| +        |
+| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |
+| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.056| +        |
+| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.022| \*       |
+| Norway         |  6.013|  6.048|  6.984|   0.971|        -0.307|        -0.303| small      |   0.000| \*\*\*   |   0.936|        -0.307|        -0.303| small      |   0.000| \*\*\*   |
+
+#### Modeling
 
 Investigating the highest factor in happy model - and excluding `happy` from the model as I do not think it can be an independent variable at all.
 
@@ -2356,17 +2460,43 @@ the_mod <- PredAndCheck("pplhlp",
     ## Multiple R-squared:  0.8554, Adjusted R-squared:  0.845 
     ## F-statistic: 82.25 on 11 and 153 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-1.png)
 
     ## [1] "For pplhlp"
     ## [1] "Mean squared prediction error: 0.249"
     ## [1] "                    R-squared: 0.681"
     ## [1] "           Adjusted R-squared: 0.255"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-2.png)
 
 ``` r
-the_mod_sum <- summary(the_mod)
+ShowCoeffSummary(the_mod$coeffs, indicator_table)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-3.png)
+
+| variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                            |
+|:---------|------------:|---------:|-------:|-------:|:----------------------------------------------------------------|
+| euftf2   |       -0.319|     0.054|  -5.893|   0.000| European Union: European unification go further or gone too far |
+| imwbcnt  |        0.317|     0.092|   3.437|   0.001| Immigrants make country worse or better place to live           |
+| trstun   |        0.299|     0.068|   4.398|   0.000| Trust in the United Nations                                     |
+| polintr  |       -0.192|     0.045|  -4.230|   0.000| How interested in politics                                      |
+| trstplc  |        0.174|     0.071|   2.452|   0.015| Trust in the police                                             |
+| imueclt  |       -0.173|     0.085|  -2.049|   0.042| Country's cultural life undermined or enriched by immigrants    |
+| trstep   |       -0.150|     0.054|  -2.787|   0.006| Trust in the European Parliament                                |
+| stfeco   |        0.147|     0.051|   2.875|   0.005| How satisfied with present state of economy in country          |
+| eisced2  |        0.107|     0.041|   2.578|   0.011| Highest level of education, ES ISCED                            |
+| health   |       -0.091|     0.049|  -1.847|   0.067| Subjective general health                                       |
+| impcntr  |        0.076|     0.051|   1.489|   0.138| Allow many/few immigrants from poorer countries outside Europe  |
+
+``` r
+print(the_mod$paircc)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-4.png)
+
+``` r
+the_mod_sum <- summary(the_mod$model)
 ```
 
 The model explains 84.5% of variation.
@@ -2378,6 +2508,84 @@ Interestingly, this is negatively correlated with the `euftf` *European Union: E
 ### Trust in United Nations
 
 Trust in the UN seems to be an important factor, so let's drill deeper.
+
+#### ESS results
+
+``` r
+ess_set <- GetObservationsSet(
+  ds = ds_ss_avg,
+  ds_obs = ds_subset_50,
+  the_indicator = "trstun",
+  indicator_table = indicator_table,
+  cntry_list = cntry_in_100pct)
+```
+
+    ## Joining, by = "cntry_name"
+
+    ## Warning: Column `cntry_name` joining factors with different levels,
+    ## coercing to character vector
+
+``` r
+print(ess_set$summary)
+```
+
+    ##     ess_year    cntry_name         indicator             value    
+    ##  Min.   : NA   Length:0           Length:0           Min.   : NA  
+    ##  1st Qu.: NA   Class :character   Class :character   1st Qu.: NA  
+    ##  Median : NA   Mode  :character   Mode  :character   Median : NA  
+    ##  Mean   :NaN                                         Mean   :NaN  
+    ##  3rd Qu.: NA                                         3rd Qu.: NA  
+    ##  Max.   : NA                                         Max.   : NA
+
+``` r
+MyPrintInteractive(ess_set$map, FALSE) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-1.png)
+
+``` r
+MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-2.png)
+
+``` r
+MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-3.png)
+
+``` r
+tab.4_cap <- table_nums(name="tab_4",
+                        caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
+```
+
+Tab. 4: Trust in the United Nations2002-2016, significance and effect size of the change
+
+``` r
+knitr::kable(ess_set$sig$table, digits = 3, 
+             col.names = gsub("_", " ", colnames(ess_set$sig$table)))
+```
+
+| cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
+|:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
+| Hungary        |  5.972|  5.369|  4.934|  -1.038|         0.422|         0.426| small      |   0.000| \*\*\*   |  -0.435|         0.422|         0.426| small      |   0.000| \*\*\*   |
+| Poland         |  5.634|  4.604|  4.909|  -0.725|         0.247|         0.252| small      |   0.000| \*\*\*   |   0.305|         0.247|         0.252| small      |   0.000| \*\*\*   |
+| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.042| \*       |
+| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.028| \*       |
+| Germany        |  5.170|  4.680|  4.812|  -0.358|         0.125|         0.128| negligible |   0.000| \*\*\*   |   0.132|         0.125|         0.128| negligible |   0.046| \*       |
+| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.034| \*       |  -0.096|         0.042|         0.046| negligible |   0.242|          |
+| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.140|          |   0.205|         0.047|         0.051| negligible |   0.004| \*\*     |
+| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   0.994|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
+| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.958|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
+| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.586|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
+| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.222|          |   0.125|        -0.032|        -0.028| negligible |   0.100| +        |
+| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.232|          |  -0.047|        -0.014|        -0.010| negligible |   0.588|          |
+| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.006| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.720|          |
+| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.006| \*\*     |
+| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.020| \*       |
+
+#### Modeling
 
 ``` r
 the_mod <- PredAndCheck("trstun", 
@@ -2426,108 +2634,109 @@ the_mod <- PredAndCheck("trstun",
     ## Multiple R-squared:  0.8745, Adjusted R-squared:  0.8619 
     ## F-statistic: 69.23 on 15 and 149 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-1.png)
 
     ## [1] "For trstun"
     ## [1] "Mean squared prediction error: 0.239"
     ## [1] "                    R-squared: 0.809"
     ## [1] "           Adjusted R-squared: 0.2"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-2.png)
 
 ``` r
-the_mod_sum <- summary(the_mod)
+ShowCoeffSummary(the_mod$coeffs, indicator_table)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-3.png)
+
+| variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
+|:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
+| trstep   |        0.418|     0.049|   8.566|   0.000| Trust in the European Parliament                                     |
+| trstlgl  |        0.363|     0.081|   4.482|   0.000| Trust in the legal system                                            |
+| impcntr  |       -0.335|     0.053|  -6.329|   0.000| Allow many/few immigrants from poorer countries outside Europe       |
+| pplhlp   |        0.290|     0.071|   4.075|   0.000| Most of the time people helpful or mostly looking out for themselves |
+| stfhlth  |       -0.257|     0.048|  -5.346|   0.000| State of health services in country nowadays                         |
+| imbgeco  |       -0.245|     0.058|  -4.204|   0.000| Immigration bad or good for country's economy                        |
+| stfedu   |        0.242|     0.057|   4.234|   0.000| State of education in country nowadays                               |
+| health   |        0.237|     0.046|   5.147|   0.000| Subjective general health                                            |
+| stfgov2  |       -0.218|     0.067|  -3.274|   0.001| How satisfied with the national government                           |
+| imwbcnt  |        0.183|     0.092|   1.988|   0.049| Immigrants make country worse or better place to live                |
+| euftf2   |       -0.175|     0.057|  -3.061|   0.003| European Union: European unification go further or gone too far      |
+| stfeco   |        0.173|     0.072|   2.389|   0.018| How satisfied with present state of economy in country               |
+| eisced2  |       -0.129|     0.037|  -3.454|   0.001| Highest level of education, ES ISCED                                 |
+| imueclt  |        0.116|     0.080|   1.449|   0.150| Country's cultural life undermined or enriched by immigrants         |
+| polintr  |        0.115|     0.053|   2.154|   0.033| How interested in politics                                           |
+
+``` r
+print(the_mod$paircc)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-4.png)
+
+``` r
+the_mod_sum <- summary(the_mod$model)
 ```
 
 The model explains 86.2% of variation.
 
-Top positive factors
-
--   trstlgl
--   pplhlp
--   trstep
-
-Top negative factors
-
--   impcntrl
--   happy
--   strfecu
-
 ### Trust in European Parliament
 
-#### Observations
+#### EES Results
 
 ``` r
-summary(dataset$trstep)
+ess_set <- GetObservationsSet(
+  ds = ds_ss_avg,
+  ds_obs = ds_subset_50,
+  the_indicator = "trstep",
+  indicator_table = indicator_table,
+  cntry_list = cntry_in_100pct)
 ```
 
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##    0.00    3.00    5.00   14.46    7.00   99.00
+    ## Joining, by = "cntry_name"
+
+    ## Warning: Column `cntry_name` joining factors with different levels,
+    ## coercing to character vector
 
 ``` r
-# # need weighted averages for trstep
-ds_trstep <- dataset %>%
-  filter(!is.na(trstep), trstep <=10) %>%
-  group_by(ess_year, cntry_name) %>%
-  summarise(var_ave = Hmisc::wtd.mean(trstep, pspwght),
-            n=sum(pspwght))
-
-ds_trstep_averages <- MakeAverageSummary(
-  ds = ds_trstep,
-  value_term = "var_ave")
-
-CreateEuroMap(mymap=mymap, 
-              ds = ds_trstep_averages %>%
-                filter(ess_year=="Mean", cntry_name != "Mean"), 
-              ind_name = "var_ave",
-              txt_title = "Trust in European Parliament 2002-2016 - 'trstep'",
-              txt_subtitle = "Average score of the indicator, scale 0-10",
-              txt_caption = "ESS 2002-2016")
+print(ess_set$summary)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-1.png)
-
-It might not be a big surprise to see which countries are having lowest trust levels.
-
-#### Heatmap
-
-First a view to the changes through a heatmap.
+    ##     ess_year    cntry_name         indicator             value    
+    ##  Min.   : NA   Length:0           Length:0           Min.   : NA  
+    ##  1st Qu.: NA   Class :character   Class :character   1st Qu.: NA  
+    ##  Median : NA   Mode  :character   Mode  :character   Median : NA  
+    ##  Mean   :NaN                                         Mean   :NaN  
+    ##  3rd Qu.: NA                                         3rd Qu.: NA  
+    ##  Max.   : NA                                         Max.   : NA
 
 ``` r
-# and the heatmap
-plot_trstep <- MakeIndicatorHeatSet(
-  ds = ds_trstep_averages,
-  value_term = "var_ave",
-  txt_name = "Trust in EU Parliament - 'trstep'",
-  txt_subtitle = "Average score of the indicator, scale 0-10",
-  txt_caption = "ESS surveys 2002-2016")
-
-MyPrintInteractive(plot_trstep, create_interactive_plot) 
+MyPrintInteractive(ess_set$map, FALSE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-1.png)
-
-Levels of trust are at a much lower level than for happiness. But perhaps that applies to politicians and political institutions in general.
-
-#### Significance
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-1.png)
 
 ``` r
-trstep_res <- GetComparisonBoxPlot(indval_name =  "trstep", 
-                                  ds_avg = ds_trstep_averages, 
-                                  ds = dataset %>% filter(!is.na(trstep), trstep <=10),
-                                  cntry_list = cntry_in_100pct,
-                                  skip_plot = FALSE)
-
-tab.4_cap <- table_nums(name="tab_4",
-                        caption = "TRust in European Parliament 2002-2016 - 'trstep' p-values for significance of the change")
+MyPrintInteractive(ess_set$heat, create_interactive_plot) 
 ```
 
-Tab. 3: TRust in European Parliament 2002-2016 - 'trstep' p-values for significance of the change
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-2.png)
 
 ``` r
-#knitr::kable(impcntr_res$table, digits = 3)
-knitr::kable(trstep_res$table, digits = 3, 
-             col.names = gsub("_", " ", colnames(trstep_res$table)))
+MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-3.png)
+
+``` r
+tab.5_cap <- table_nums(name="tab_5",
+                        caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
+```
+
+Tab. 5: Trust in the European Parliament2002-2016, significance and effect size of the change
+
+``` r
+knitr::kable(ess_set$sig$table, digits = 3, 
+             col.names = gsub("_", " ", colnames(ess_set$sig$table)))
 ```
 
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
@@ -2536,17 +2745,17 @@ knitr::kable(trstep_res$table, digits = 3,
 | Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.002| \*\*     |
 | Portugal       |  4.835|  3.501|  4.103|  -0.733|         0.145|         0.150| negligible |   0.000| \*\*\*   |   0.601|         0.145|         0.150| negligible |   0.000| \*\*\*   |
 | Slovenia       |  4.620|  3.389|  3.944|  -0.676|         0.248|         0.253| small      |   0.000| \*\*\*   |   0.555|         0.248|         0.253| small      |   0.000| \*\*\*   |
-| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.078| +        |
+| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.066| +        |
 | Spain          |  4.767|  3.886|  4.245|  -0.522|         0.177|         0.182| negligible |   0.000| \*\*\*   |   0.359|         0.177|         0.182| negligible |   0.000| \*\*\*   |
-| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.762|          |
-| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.010| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.004| \*\*     |
-| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.086| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
-| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.034| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
-| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.140|          |   0.188|         0.033|         0.038| negligible |   0.002| \*\*     |
+| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.766|          |
+| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.010| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.010| \*\*     |
+| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.078| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
+| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.050| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
+| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.102|          |   0.188|         0.033|         0.038| negligible |   0.010| \*\*     |
 | United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.292|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
 | Finland        |  4.878|  4.673|  5.173|   0.295|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |   0.501|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |
-| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.072| +        |
-| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.332|          |
+| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.084| +        |
+| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.312|          |
 
 As can be seen above, the big positive changes in UK and Portugal as well as Finland and Slovenia from 2014 to 2016 were significant as per weighted t-test.
 
@@ -2554,7 +2763,7 @@ And the same applies to quite large drops in Belgium, France and Hungary.
 
 With more investigation one might find some interesting correlations between those changes and other indicators in ESS data and elsewhere. But that adventure is beyond the scope of this post.
 
-#### Run the model
+#### Modeling
 
 ``` r
 the_mod <- PredAndCheck("trstep", 
@@ -2600,68 +2809,106 @@ the_mod <- PredAndCheck("trstep",
     ## Multiple R-squared:  0.7582, Adjusted R-squared:  0.7391 
     ## F-statistic: 39.71 on 12 and 152 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-1.png)
 
     ## [1] "For trstep"
     ## [1] "Mean squared prediction error: 0.354"
     ## [1] "                    R-squared: 0.69"
     ## [1] "           Adjusted R-squared: 0.187"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-2.png)
 
 ``` r
-the_mod_sum <- summary(the_mod)
+ShowCoeffSummary(the_mod$coeffs, indicator_table)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-3.png)
+
+| variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
+|:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
+| trstun   |        0.873|     0.070|  12.406|   0.000| Trust in the United Nations                                          |
+| stfgov2  |        0.510|     0.083|   6.160|   0.000| How satisfied with the national government                           |
+| euftf2   |        0.494|     0.063|   7.792|   0.000| European Union: European unification go further or gone too far      |
+| pplhlp   |       -0.298|     0.098|  -3.044|   0.003| Most of the time people helpful or mostly looking out for themselves |
+| imwbcnt  |       -0.281|     0.091|  -3.092|   0.002| Immigrants make country worse or better place to live                |
+| stfeco   |       -0.250|     0.097|  -2.585|   0.011| How satisfied with present state of economy in country               |
+| impcntr  |        0.242|     0.067|   3.634|   0.000| Allow many/few immigrants from poorer countries outside Europe       |
+| imbgeco  |        0.241|     0.079|   3.046|   0.003| Immigration bad or good for country's economy                        |
+| health   |       -0.133|     0.054|  -2.479|   0.014| Subjective general health                                            |
+| stfhlth  |        0.124|     0.060|   2.072|   0.040| State of health services in country nowadays                         |
+| eisced2  |        0.115|     0.046|   2.493|   0.014| Highest level of education, ES ISCED                                 |
+| polintr  |        0.106|     0.058|   1.836|   0.068| How interested in politics                                           |
+
+``` r
+print(the_mod$paircc)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-4.png)
+
+``` r
+the_mod_sum <- summary(the_mod$model)
 ```
 
 The model explains 73.9% of variation.
 
-#### Findings
-
-xxx
-
 ### Immigrants from poorer countries outside Europe
 
-#### Observations
+#### EES Results
 
 ``` r
-ds_impcntr <- dataset %>%
-  filter(!is.na(impcntr), impcntr <=4) %>%
-  group_by(ess_year, cntry_name) %>%
-  summarise(var_ave = Hmisc::wtd.mean(impcntr, pspwght),
-            n=sum(pspwght))
-
-ds_impcntr_averages <- MakeAverageSummary(
-  ds = ds_impcntr,
-  value_term = "var_ave")
-
-CreateEuroMap(mymap=mymap, 
-              ds = ds_impcntr_averages %>%
-                filter(ess_year=="Mean", cntry_name != "Mean"), 
-              ind_name = "var_ave",
-              txt_title = "Immigrants from poorer countries outside Europe 2002-2016 - 'impcntr'",
-              txt_subtitle = "Average score of the indicator, scale 1-4",
-              txt_caption = "ESS 2002-2016")
+ess_set <- GetObservationsSet(
+  ds = ds_ss_avg,
+  ds_obs = ds_subset_50,
+  the_indicator = "impcntr",
+  indicator_table = indicator_table,
+  cntry_list = cntry_in_100pct)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-1.png)
+    ## Joining, by = "cntry_name"
+
+    ## Warning: Column `cntry_name` joining factors with different levels,
+    ## coercing to character vector
 
 ``` r
-impcntr_res <- GetComparisonBoxPlot(indval_name =  "impcntr", 
-                                  ds_avg = ds_impcntr_averages, 
-                                  ds = dataset %>% filter(!is.na(impcntr), impcntr <=4),
-                                  cntry_list = cntry_in_100pct,
-                                  skip_plot = FALSE)
-
-tab.3_cap <- table_nums(name="tab_3",
-                        caption = "Immigrants from poorer countries outside Europe 2002-2016 - 'impcntr' p-values for significance of the change")
+print(ess_set$summary)
 ```
 
-Tab. 4: Immigrants from poorer countries outside Europe 2002-2016 - 'impcntr' p-values for significance of the change
+    ##     ess_year    cntry_name         indicator             value    
+    ##  Min.   : NA   Length:0           Length:0           Min.   : NA  
+    ##  1st Qu.: NA   Class :character   Class :character   1st Qu.: NA  
+    ##  Median : NA   Mode  :character   Mode  :character   Median : NA  
+    ##  Mean   :NaN                                         Mean   :NaN  
+    ##  3rd Qu.: NA                                         3rd Qu.: NA  
+    ##  Max.   : NA                                         Max.   : NA
 
 ``` r
-#knitr::kable(impcntr_res$table, digits = 3)
-knitr::kable(impcntr_res$table, digits = 3, 
-             col.names = gsub("_", " ", colnames(impcntr_res$table)))
+MyPrintInteractive(ess_set$map, FALSE) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-1.png)
+
+``` r
+MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-2.png)
+
+``` r
+MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-3.png)
+
+``` r
+tab.6_cap <- table_nums(name="tab_6",
+                        caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
+```
+
+Tab. 6: Allow many/few immigrants from poorer countries outside Europe2002-2016, significance and effect size of the change
+
+``` r
+knitr::kable(ess_set$sig$table, digits = 3, 
+             col.names = gsub("_", " ", colnames(ess_set$sig$table)))
 ```
 
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
@@ -2675,14 +2922,14 @@ knitr::kable(impcntr_res$table, digits = 3,
 | Belgium        |  2.482|  2.580|  2.293|  -0.189|         0.136|         0.140| negligible |   0.000| \*\*\*   |  -0.286|         0.136|         0.140| negligible |   0.000| \*\*\*   |
 | Netherlands    |  2.467|  2.505|  2.323|  -0.144|         0.095|         0.099| negligible |   0.000| \*\*\*   |  -0.182|         0.095|         0.099| negligible |   0.000| \*\*\*   |
 | Finland        |  2.603|  2.697|  2.511|  -0.092|         0.093|         0.097| negligible |   0.000| \*\*\*   |  -0.186|         0.093|         0.097| negligible |   0.000| \*\*\*   |
-| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.002| \*\*     |   0.039|         0.120|         0.124| negligible |   0.142|          |
-| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.424|          |  -0.041|        -0.025|        -0.020| negligible |   0.260|          |
-| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.114|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
-| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.008| \*\*     |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
+| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.002| \*\*     |   0.039|         0.120|         0.124| negligible |   0.112|          |
+| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.488|          |  -0.041|        -0.025|        -0.020| negligible |   0.286|          |
+| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.138|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
+| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.010| \*\*     |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
 | Poland         |  2.409|  2.455|  2.591|   0.182|        -0.218|        -0.213| small      |   0.000| \*\*\*   |   0.135|        -0.218|        -0.213| small      |   0.000| \*\*\*   |
 | Hungary        |  3.101|  3.318|  3.558|   0.457|        -0.210|        -0.205| small      |   0.000| \*\*\*   |   0.240|        -0.210|        -0.205| small      |   0.000| \*\*\*   |
 
-#### Run the model
+#### Modeling
 
 ``` r
 the_mod <- PredAndCheck("impcntr", 
@@ -2733,24 +2980,46 @@ the_mod <- PredAndCheck("impcntr",
     ## [1] "                    R-squared: 0.778"
     ## [1] "           Adjusted R-squared: 0.333"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-2.png)
 
 ``` r
-the_mod_sum <- summary(the_mod)
+ShowCoeffSummary(the_mod$coeffs, indicator_table)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-3.png)
+
+| variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
+|:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
+| trstlgl  |        0.979|     0.135|   7.243|   0.000| Trust in the legal system                                            |
+| trstun   |       -0.585|     0.091|  -6.409|   0.000| Trust in the United Nations                                          |
+| polintr  |        0.358|     0.062|   5.770|   0.000| How interested in politics                                           |
+| trstplc  |       -0.331|     0.125|  -2.641|   0.009| Trust in the police                                                  |
+| imbgeco  |       -0.330|     0.073|  -4.504|   0.000| Immigration bad or good for country's economy                        |
+| stfedu   |        0.311|     0.080|   3.866|   0.000| State of education in country nowadays                               |
+| health   |        0.237|     0.058|   4.071|   0.000| Subjective general health                                            |
+| stfgov2  |       -0.226|     0.076|  -2.962|   0.004| How satisfied with the national government                           |
+| imwbcnt  |       -0.192|     0.082|  -2.337|   0.021| Immigrants make country worse or better place to live                |
+| stfhlth  |       -0.185|     0.066|  -2.809|   0.006| State of health services in country nowadays                         |
+| pplhlp   |        0.180|     0.091|   1.965|   0.051| Most of the time people helpful or mostly looking out for themselves |
+| trstep   |        0.157|     0.065|   2.412|   0.017| Trust in the European Parliament                                     |
+| eisced2  |       -0.079|     0.053|  -1.475|   0.142| Highest level of education, ES ISCED                                 |
+
+``` r
+print(the_mod$paircc)
+```
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-4.png)
+
+``` r
+the_mod_sum <- summary(the_mod$model)
 ```
 
 The model explains 74.5% of variation.
 
-#### Findings
-
-xxx
-
 Clustering the countries
 ------------------------
 
-We investigate if there are any clusters of countries in the data using as clusterig elements observations identified by country name and year of ess survey where all selected ess indicators ane available (rows with any NA values are excluded).
-
-Generally following the script outlined at article <https://datascienceplus.com/finding-optimal-number-of-clusters/>
+We investigate if there are any clusters of countries in the data using as clusterig elements observations identified by country name and year of ess survey where all selected ess indicators
 
 ### Preprocess
 
@@ -2865,7 +3134,7 @@ rownames(scaled_data) <- paste(myDataClean$cntry_name, myDataClean$ess_year)
 
 ### PCA
 
-Reducing dimensionality using Primary Component Analysis
+Experiment reducing dimensionality with Primary Component Analysis
 
 ``` r
 # PCA
@@ -2926,24 +3195,17 @@ library(ggfortify)
 # Take the principal components needed for 85%
 comp <- data.frame(pc$x[,1:n_CumPoV_085])
 
-# Plot
+# Plot cross correlations
 ggpairs(data=comp) +
   labs(title="Correlations between Primary Components",
-       subtitle="Very low correlations - as expected in PCA")
+       subtitle="Zero correlations - as expected")
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-2.png)
 
-``` r
-# library(rgl)
-# # Multi 3D plot
-# plot3d(comp$PC1, comp$PC2, comp$PC3)
-# plot3d(comp$PC1, comp$PC3, comp$PC4)
-```
-
 ### K-means clustering
 
-Identifying potential clusters in country / ess year indicator rows.
+Identifying potential clusters in country / ess year indicator rows using the PCA analysis results.
 
 ``` r
 # Use the data in PCA space for k-means clustering
@@ -3054,6 +3316,8 @@ print(paste("Majority vote decision:", n_clusters, "clusters"))
 
     ## [1] "Majority vote decision: 2 clusters"
 
+Visual identification is always somewhat vague. Fortunately there is an algorithm that can do it independently - even if one can always havwe a debate on whether the selection the algorithm made was right. This looks good enough for this purpose - at least for now.
+
 ### Visualize groups in PCA space
 
 Annoyingly, the two plots do not use the same colours for clusters.
@@ -3088,16 +3352,16 @@ autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster',
 
 ### Countries split to classes
 
-The Nordic countries are in the same class, which is not that surprising given their relatively common values and ways in their respective societies.
+The Nordic countries are in the same cluster, which is not that surprising given their relatively common values and ways in their respective societies. Other participants in that cluster are perhaps not as clear or obvious - at least to me.
 
-Other participants in that group are perhaps not as clear or obvious.
+And then there is the rest of Europe in the other cluster.
 
-And then there is the rest of Europe in the other basket.
+(I did at some point of time the same clustering excercise using scaled indicators and came up with the same clusters as with PCA)
 
 ``` r
-# classify countries based on clusters they have most often been in
+# classify countries based on the clusters they have most often been based on survey scores
 
-clustered_countries <- ds_clusters %>% 
+cntry_clusters <- ds_clusters %>% 
   group_by(cntry_name, cluster) %>% 
   summarise(n=n()) %>% 
   arrange(desc(n)) %>%
@@ -3105,7 +3369,7 @@ clustered_countries <- ds_clusters %>%
   arrange(cluster)
 
 p <- CreateEuroMap(mymap=mymap, 
-                   ds = clustered_countries, 
+                   ds = cntry_clusters, 
                    ind_name = "cluster",
                    txt_title = "Countries clustered by indicators",
                    txt_subtitle = "Based on the cluster a country most often has been in",
@@ -3126,23 +3390,30 @@ ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
   geom_bar(stat = "identity", position = "fill") +
   geom_hline(yintercept = c(0.25, 0.5, 0.75), linetype="dashed") + 
   labs(title="Relative size of groups",
-       subtitle = "As countries assigned in each survey") 
+       subtitle = "As classified by country/survey granularity",
+       txt_caption = "ESS surveys 2002-2016") 
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-2.png)
 
+Looking into details of how do the two grups differ we can see that in most of the indicators countries in cluster 2 give higher scores which roughly translate to “more” or “better” — with a couple of noteworthy exceptions
+
+-   health – low value is good and high value is poor health
+-   impcntrl – low value means more immigration and high less immigration from poor countriesThere seems
+
 ``` r
 # compare the indicators between classes
 
+# ESS
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
          group_by(indicator) %>%
          mutate(value_s = scale(value)) %>%
          ungroup() %>%
-         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
        aes(x=indicator, y=value_s, fill=cluster)) +
   geom_boxplot() + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="Variables scaled to same range")
@@ -3151,52 +3422,78 @@ ggplot(data=ds_ss_avg %>%
     ## Warning: Column `cntry_name` joining character vector and factor, coercing
     ## into character vector
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-61-1.png)
+
+Using the same classification on selected World Bank and UNHCR seems to be supportive of the grouping even though no formal clustering based on these values has been conducted - at least not yet.
 
 ``` r
+# World Bank
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>%
                                   filter(indicator %in% pct_indicators,
                                          source=="WB"))$indicator) %>%
-         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
        aes(x=indicator, y=value, fill=cluster)) +
   geom_boxplot() + 
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
-       subtitle="WB Variables ") +
+       subtitle="WB Variables", 
+       caption = "World Bank") +
   coord_flip()
 ```
 
     ## Warning: Column `cntry_name` joining character vector and factor, coercing
     ## into character vector
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-62-1.png)
 
 ``` r
+# UNHCR
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% 
                                   filter(indicator %in% pct_indicators,
                                          source=="UNHCR"))$indicator,
                 !is.na(value)) %>%
-         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
        aes(x=indicator, y=value+1, fill=cluster)) +
   geom_boxplot() + 
   scale_y_log10() +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
-       subtitle="UNHCR Variables on logarithmic scale (offset +1%)") +
+       subtitle="UNHCR Variables on logarithmic scale (offset +1%)",
+       caption="UNHCR") +
   coord_flip()
 ```
 
     ## Warning: Column `cntry_name` joining character vector and factor, coercing
     ## into character vector
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-5.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-62-2.png)
+
+Visual box plot comparisons of selected UNHCR and WB indicators seem to support the clustering clustering based on ESS data.
+
+-   Cluster 2 countries appear more urbanized than cluster 1
+-   Proportion of population born in another country is higher in cluster 2 even though there is quite some overlap in distributions
+-   There is higher percentage of people active in workforce in cluster 2
+-   Government health and education expenditures vs. GDP are higher in cluster 2
+-   GDP growth (and per capita growth) is higher in cluster 1 countries but there is significant overlap with cluster 2 distribution
+-   Significantly higher share of population is using Internet in cluster 2 compared to cluster 1
+-   Tax revenues as % of GDP are higher in cluster 2
+-   Personal remittances received (% of GDP) is higher in cluster 1
 
 Summary
 -------
 
-Let's plot happiness against trust in European Parliament to have a good look on the main indicators in this study.
+ESS data is an interesting source for getting insights into the recent history and ongoing present of Europe from data.
+
+In this post perhaps the most interesting – but perhaps not surprising – findings were
+
+-   Europe can be split into two groups of countries, apparently with different views on life in general and on immigration and refugees
+-   major explaining factors for subjective happiness were willingness of people to help other (positive, not surprising) and trust in United Nations (negative, somewhat strange, indirectly linked to trust in European Parliament as it is the main positive factor in trust in United Nations)
+-   major explaining factors for trust in European Parliament were trust in United Nations (positive), satisfaction in government (positive), further integration of European Union (positive), which all were perhaps not surprising
+-   views on immigration and refugees are polarized and it appears that those countries where immigration is seen positively impacting economy tend to be those which are more open to immigration from poor countries outside of Europe
+
+Linking between ESS and other data may give further insights and I will probably return to this topic later.
 
 ------------------------------------------------------------------------
 
@@ -3208,6 +3505,8 @@ A real serious study on the topic (I've yet to read myself):
 -   Europeans’ Personal and Social Wellbeing, Topline Results from Round 6 of the European Social Survey
 -   link: <http://www.europeansocialsurvey.org/docs/findings/ESS6_toplines_issue_5_personal_and_social_wellbeing.pdf>
 
+### ESS
+
 Citation of data:
 
 -   European Social Survey Cumulative File, ESS 1-7 (2016). Data file edition 1.0. NSD - Norwegian Centre for Research Data, Norway - Data Archive and distributor of ESS data for ESS REIC.
@@ -3218,7 +3517,7 @@ Citation of documentation:
 -   European Social Survey (2016). ESS 1-7, European Social Survey Cumulative File, Study Description. Bergen: NSD - Norwegian Centre for Research Data for ESS ERIC.
 -   European Social Survey (2016): ESS8- 2016 Documentation Report. Edition 2.0. Bergen, European Social Survey Data Archive, NSD - Norwegian Centre for Research Data for ESS ERIC
 
-**Distributor of Data**
+Distributor of Data
 
 NSD - Norwegian Centre for Research Data,
 Harald Hårfagresgt. 29 N-5007 Bergen, Norway.
@@ -3229,6 +3528,22 @@ Web: <http://www.nsd.no/english>
 
 ESS: <essdata@nsd.no>
 ESS: www.europeansocialsurvey.org
+
+### World Bank
+
+World Development Indicators <https://data.worldbank.org/products/wdi>
+
+The primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
+
+Excel file was downloaded and used
+
+### UNHCR
+
+Population Statistics / Time Series <http://popstats.unhcr.org/en/time_series>
+
+On this page, each row of data represents the information about UNHCR’s populations of concern for a given year and country of residence and/or origin. Data is presented as a yearly time series across the page. In the 2017 data, figures between 1 and 4 have been replaced with an asterisk (\*). These represent situations where the figures are being kept confidential to protect the anonymity of individuals. Such figures are not included in any totals”
+
+Csv extract of all data was used.
 
 Technical notes
 ---------------

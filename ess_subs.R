@@ -21,7 +21,7 @@ MyPrintInteractive <- function(p, make_interactive, hover_css = "") {
 
 
 GetIndicator <- function(indicator_short, indicator_table) {
-  print(indicator_short)
+  # print(indicator_short)
   last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
   indicator_short_old <- ifelse(last_char=="2", 
                                 substr(indicator_short, 1, nchar(indicator_short)-1),
@@ -734,8 +734,8 @@ PlotIndicatorHistogram <- function(ds,
   return(p)
 }
 
-# compare significance of change in mean between two pairs of dates: 2002-2016, 2014, 2016
 CreateComparisonTable021416 <- function(ds_averages, ds_raw) {
+  # compare significance of change in mean between two pairs of dates: 2002-2016, 2014, 2016
   # take only the countries included in ds_raw - even if years are fixed
   the_countries <- unique(ds_raw$cntry_name)
   
@@ -779,7 +779,7 @@ CreateComparisonTable021416 <- function(ds_averages, ds_raw) {
   }
   
   ret_changes <- ds_averages  %>%
-    select(-n) %>%
+    # select(-n) %>%
     filter(ess_year %in% c(2002, 2014, 2016)) %>%
     spread(ess_year, var_ave) %>%
     mutate(d0216 = `2016` - `2002`,
@@ -834,8 +834,8 @@ CreateComparisonTable021416 <- function(ds_averages, ds_raw) {
 }
 
 
-# changes between selected surveys - only for countries which were in 2002, 2014, 2016 
-GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, skip_plot=FALSE) {
+GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, txt_name, txt_subtitle, txt_caption, skip_plot=FALSE) {
+  # changes between selected surveys - only for countries which were in 2002, 2014, 2016 
   
   ds <- ds %>% filter(cntry_name %in% cntry_list)
   ds_avg <- ds_avg %>% filter(cntry_name %in% cntry_list)
@@ -870,15 +870,65 @@ GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, skip_plot=
             plot.title = element_text(hjust = 0),
             plot.subtitle = element_text(hjust = 0)) + 
       guides(fill=FALSE) +
-      labs(title = "Subjective happiness 2002, 2014 and 2016",
+      labs(title = paste(txt_name, "2002, 2014 and 2016"),
            subtitle = "Boxplot with mean (using weighted data, for countries participating all surveys)",
-           caption = "ESS surveys 2002-2016")
+           caption = txt_caption)
   }
   
   return(list("plot"=p, "table"=indval_changes))
   
 }
 
+GetObservationsSet <- function(ds, ds_obs, the_indicator, indicator_table, cntry_list){
+  # packaging the steps for an indicator into one since this is needed for a few in the
+  # same way
+  
+  this_indicator <- GetIndicator(the_indicator, indicator_table)
+  
+  if (!is.na(this_indicator$min)){
+    txt_scale <- paste(", scale", this_indicator$min, "..", this_indicator$max)
+  } else {
+    txt_scale <- ""
+  }
+  
+  ind_summary <- summary(ds %>% filter(indicator=="the_indicator"))
+  
+  ds_averages <- MakeAverageSummary(
+    ds = ds %>%
+      filter(indicator==the_indicator) %>%
+      mutate(var_ave=value) %>%
+      select(-value),
+    value_term = "var_ave")
+  
+  eu_map <- CreateEuroMap(mymap=mymap, 
+                          ds = ds_averages %>%
+                            filter(ess_year=="Mean", cntry_name != "Mean"), 
+                          ind_name = "var_ave",
+                          txt_title = paste(this_indicator$name),
+                          txt_subtitle = paste0(the_indicator, " - average score", txt_scale),
+                          txt_caption = "ESS 2002-2016")
+  
+  
+  eu_heat <- MakeIndicatorHeatSet(
+    ds = ds_averages,
+    value_term = "var_ave",
+    txt_name = paste(this_indicator$name),
+    txt_subtitle = paste0(the_indicator, " - average score", txt_scale),
+    txt_caption = "ESS surveys 2002-2016")
+  
+  ds_obs$myind <- ds_obs[,the_indicator]
+  eu_sig <- GetComparisonBoxPlot(
+    indval_name =  the_indicator,
+    ds_avg = ds_averages, 
+    ds = ds_obs %>% filter(!is.na(myind)),
+    cntry_list = cntry_list,
+    txt_name = paste(this_indicator$name),
+    txt_subtitle = paste0(the_indicator, " - average score", txt_scale),
+    txt_caption = "ESS surveys 2002-2016",
+    skip_plot = FALSE)
+  
+  return(list("summary"=ind_summary, "map"= eu_map, "heat"=eu_heat, "sig"=eu_sig, "indicator"=this_indicator))
+}
 
 
 # helpers to identify columns with / without NA values
