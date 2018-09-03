@@ -953,9 +953,19 @@ for (i in 1:length(ind_plots))
 
 Mostly the distributions at this level do not seem significantly skewed.
 
+Concern: 
+This could be an effect from averaging over all data and could hide potential 
+time-dependent or country-dependent skew impacting later analysis.
+However, at this stage we will assume that there are no issues that 
+would require making elaborate transformations like what we
+experimented with in the first analysis of `happy` earlier.
+Perhaps later.
+
+
 ### Weights
 
-Next we apply proper weights for the selected indicators to get meaningful averages.
+Next we apply post stratification weights for the selected 
+indicators to get meaningful averages.
 
 ```{r}
 
@@ -969,7 +979,7 @@ ds_subset_50_ave <- ds_subset_50 %>%
 
 ```
 
-### *Missing values
+### Missing values
 
 Checking the indicators.
 
@@ -991,17 +1001,19 @@ We will create new indicators where we fill in missing values by
 interpolation and/or use the first / last real value for missing 
 beginning / end values.
 
-Naturally, these are not the real thing anymore and need to be taken as such.
+Naturally, these are not the real thing anymore but should
+be close enough for this analysis.
 
 ```{r}
-# special case for Greece which has only one entry for eisced
+
+# special case for Greece which has only one entry for eisced (education level)
 
 Greece_eisced2 <- ds_subset_50_ave %>% 
   filter(cntry_name == "Greece", !is.na(eisced)) %>% 
   select(eisced)
 if (nrow(Greece_eisced2) != 1) stop("Greece eisced assumption not valid")
 
-# using zoo package to fill in missing values
+# using zoo package to impute missing values
 
 ds_subset_50_ave <- ds_subset_50_ave %>% 
   group_by(cntry_name) %>% 
@@ -1014,15 +1026,13 @@ ds_subset_50_ave <- ds_subset_50_ave %>%
     euftf2 = zoo::na.fill(euftf, "extend")) %>% 
   ungroup()
 
-
-cntry_imputed <- (ds_subset_50_ave %>% 
-                    filter(!complete.cases(.)) %>% 
-                    select(cntry_name) %>% 
-                    filter(!duplicated(cntry_name)))$cntry_name
-
-
-# Diagnostic, the table is fairly long..
+# Diagnostic to show what values were before/after imputation
+# but as the table is fairly long, commented out now
 # 
+# cntry_imputed <- (ds_subset_50_ave %>% 
+#                     filter(!complete.cases(.)) %>% 
+#                     select(cntry_name) %>% 
+#                     filter(!duplicated(cntry_name)))$cntry_name
 # knitr::kable(ds_subset_50_ave %>% 
 #                filter(cntry_name %in% cntry_imputed) %>%
 #                select(cntry_name, ess_year, eisced, eisced2, trstprt, trstprt2, 
@@ -1030,28 +1040,30 @@ cntry_imputed <- (ds_subset_50_ave %>%
 #              digits = 3,
 #              caption = "Table of original and imputed values")
 
-# removing the originals from the dataframe for simplicity
+# removing the originals from the dataframe as they are not needed in the 
+# subsequent work
 
 ds_subset_50_ave <- ds_subset_50_ave %>%
   select(-eisced, -trstprt, -stfgov, -euftf)
   
-
 ```
 
 #### Get rid of collinear variables
 
-Since we intend to come up with a model we must remove indicators that are essentially the same,
-i.e. indicators which have too high correlation and would really not add to the model.
+Since we intend to come up with a model we must remove indicators 
+that are essentially the same,
+i.e. indicators which have too high correlation and would really not add to the model
+and would be in conflict with the requirements of linear modeling
+we aim to do.
 
 ```{r}
 
 coll_cutoff <- 0.9
-print(paste("Cutoff level for too good correlation", coll_cutoff))
+print(paste("Cutoff level for correlation", coll_cutoff))
 
 # exclude metadata indicators
 
-df1 = ds_subset_50_ave %>% 
-  select(-ess_year, -cntry_name)
+df1 = ds_subset_50_ave %>% select(-ess_year, -cntry_name)
 df2 = cor(df1)
 
 # findCorrelation searches through a correlation matrix and returns a vector of 
@@ -1065,8 +1077,8 @@ hc = caret::findCorrelation(
 hc = sort(hc)
 
 # from abbreviation to long name
-indicator_list <- indicator_table$name
-names(indicator_list) <- indicator_table$indicator
+feature_names <- indicator_table$name
+names(feature_names) <- indicator_table$indicator
 
 # summary
 keep_table <- data.frame(
@@ -1075,8 +1087,9 @@ keep_table <- data.frame(
   keep = ifelse((1:dim(df1)[2]) %in% hc, 
                 "drop", 
                 "keep"),
-  name = indicator_list[colnames(df1)]
+  name = sapply(colnames(df1), function(x) GetIndicator(x, indicator_table)$name)
 )
+
 knitr::kable(keep_table, caption = "Features")
 
 # the reduced data
@@ -1359,14 +1372,8 @@ ds_ss_avg_cntry_ind <- ds_ss_avg %>%
 for (indicator_short in unique(ds_ss_avg$indicator)){
   
   # getting the right long description out
-  
-  last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
-  indicator_short_old <- ifelse(last_char=="2", 
-                                substr(indicator_short, 1, nchar(indicator_short)-1),
-                                indicator_short)
-  
-  this_ind <- indicator_table %>% 
-    filter(indicator == indicator_short_old)
+
+  this_ind <- GetIndicator(indicator_short, indicator_table)
   
   # the plot
   
@@ -1779,6 +1786,7 @@ Top negative factors
 
 ```{r}
 
+#  TODO: use ds_ss_avg instead of Dataset!!
 
 summary(dataset$trstep)
 
@@ -1873,10 +1881,6 @@ the_mod_sum <- summary(the_mod)
 
 The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
 
-#### Findings
-
-xxx
-
 ### Immigrants from poorer countries outside Europe
 
 #### Observations
@@ -1935,18 +1939,11 @@ the_mod_sum <- summary(the_mod)
 
 The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
 
-#### Findings
-
-xxx
 
 ## Clustering the countries
 
 We investigate if there are any clusters of countries in the data using as clusterig elements
-observations identified by country name and year of ess survey where all selected ess indicators 
-ane available (rows with any NA values are excluded).
-
-Generally following the script outlined at article
-https://datascienceplus.com/finding-optimal-number-of-clusters/
+observations identified by country name and year of ess survey where all selected ess indicators
 
 ### Preprocess
 
@@ -1972,9 +1969,10 @@ rownames(scaled_data) <- paste(myDataClean$cntry_name, myDataClean$ess_year)
 
 ### PCA
 
-Reducing dimensionality using Primary Component Analysis
+Experiment reducing dimensionality with Primary Component Analysis
 
 ```{r}
+
 # PCA
 pc <- prcomp(scaled_data)
 PoV <- pc$sdev^2/sum(pc$sdev^2) # proportion of variance
@@ -2001,24 +1999,22 @@ library(ggfortify)
 # Take the principal components needed for 85%
 comp <- data.frame(pc$x[,1:n_CumPoV_085])
 
-# Plot
+# Plot cross correlations
 ggpairs(data=comp) +
   labs(title="Correlations between Primary Components",
-       subtitle="Very low correlations - as expected in PCA")
+       subtitle="Zero correlations - as expected")
 
-
-# library(rgl)
-# # Multi 3D plot
-# plot3d(comp$PC1, comp$PC2, comp$PC3)
-# plot3d(comp$PC1, comp$PC3, comp$PC4)
+# Multi 3D plot
+library(rgl)
+plot3d(comp$PC1, comp$PC2, comp$PC3)
+plot3d(comp$PC1, comp$PC3, comp$PC4)
 
 
 ```
 
-
 ### K-means clustering
 
-Identifying potential clusters in country / ess year indicator rows.
+Identifying potential clusters in country / ess year indicator rows using the PCA analysis results.
 
 ```{r}
 
@@ -2069,6 +2065,11 @@ print(paste("Majority vote decision:", n_clusters, "clusters"))
 
 ```
 
+Visual identification is always somewhat vague. 
+Fortunately there is an algorithm that can do it independently - even if one can
+always havwe a debate on whether the selection the algorithm made was right.
+This looks good enough for this purpose - at least for now.
+
 ### Visualize groups in PCA space
 
 Annoyingly, the two plots do not use the same colours for clusters. 
@@ -2098,18 +2099,21 @@ autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster',
 
 ### Countries split to classes
 
-The Nordic countries are in the same class, which is not that surprising
+The Nordic countries are in the same cluster, which is not that surprising
 given their relatively common values and ways in their respective societies.
+Other participants in that cluster are perhaps not as clear or 
+obvious - at least to me.
 
-Other participants in that group are perhaps not as clear or obvious.
+And then there is the rest of Europe in the other cluster.
 
-And then there is the rest of Europe in the other basket.
+(I did at some point of time the same clustering excercise using scaled indicators 
+and came up with the same clusters as with PCA)
 
 ```{r}
 
-# classify countries based on clusters they have most often been in
+# classify countries based on the clusters they have most often been based on survey scores
 
-clustered_countries <- ds_clusters %>% 
+cntry_clusters <- ds_clusters %>% 
   group_by(cntry_name, cluster) %>% 
   summarise(n=n()) %>% 
   arrange(desc(n)) %>%
@@ -2117,7 +2121,7 @@ clustered_countries <- ds_clusters %>%
   arrange(cluster)
 
 p <- CreateEuroMap(mymap=mymap, 
-                   ds = clustered_countries, 
+                   ds = cntry_clusters, 
                    ind_name = "cluster",
                    txt_title = "Countries clustered by indicators",
                    txt_subtitle = "Based on the cluster a country most often has been in",
@@ -2134,17 +2138,29 @@ ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
   geom_bar(stat = "identity", position = "fill") +
   geom_hline(yintercept = c(0.25, 0.5, 0.75), linetype="dashed") + 
   labs(title="Relative size of groups",
-       subtitle = "As countries assigned in each survey") 
+       subtitle = "As classified by country/survey granularity",
+       txt_caption = "ESS surveys 2002-2016") 
 
+```
+
+Looking into details of how do the two grups differ we can see that in most of 
+the indicators countries in cluster 2 give higher scores which 
+roughly translate to “more” or “better” — with a couple of noteworthy exceptions
+
+* health – low value is good and high value is poor health
+* impcntrl – low value means more immigration and high less immigration from poor countriesThere seems 
+
+```{r}
 
 # compare the indicators between classes
 
+# ESS
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
          group_by(indicator) %>%
          mutate(value_s = scale(value)) %>%
          ungroup() %>%
-         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
        aes(x=indicator, y=value_s, fill=cluster)) +
   geom_boxplot() + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -2152,45 +2168,70 @@ ggplot(data=ds_ss_avg %>%
   labs(title="Differences between groups of countries",
        subtitle="Variables scaled to same range")
 
+```
 
+Using the same classification on selected World Bank and UNHCR seems to be supportive
+of the grouping even though no formal clustering based on these values has been 
+conducted - at least not yet.
+
+```{r}
+# World Bank
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>%
                                   filter(indicator %in% pct_indicators,
                                          source=="WB"))$indicator) %>%
-         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
        aes(x=indicator, y=value, fill=cluster)) +
   geom_boxplot() + 
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
-       subtitle="WB Variables ") +
+       subtitle="WB Variables", 
+       caption = "World Bank") +
   coord_flip()
 
-
+# UNHCR
 ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% 
                                   filter(indicator %in% pct_indicators,
                                          source=="UNHCR"))$indicator,
                 !is.na(value)) %>%
-         left_join(clustered_countries %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
        aes(x=indicator, y=value+1, fill=cluster)) +
   geom_boxplot() + 
   scale_y_log10() +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
-       subtitle="UNHCR Variables on logarithmic scale (offset +1%)") +
+       subtitle="UNHCR Variables on logarithmic scale (offset +1%)",
+       caption="UNHCR") +
   coord_flip()
-
 
 ```
 
+Visual box plot comparisons of selected UNHCR and WB indicators seem to support the clustering
+clustering based on ESS data.
 
-
-
+* Cluster 2 countries appear more urbanized than cluster 1
+* Proportion of population born in another country is higher in cluster 2 even though there is quite some overlap in distributions
+* There is higher percentage of people active in workforce in cluster 2
+* Government health and education expenditures vs. GDP are higher in cluster 2
+* GDP growth (and per capita growth) is higher in cluster 1 countries but there is significant overlap with cluster 2 distribution
+* Significantly higher share of population is using Internet in cluster 2 compared to cluster 1
+* Tax revenues as % of GDP are higher in cluster 2
+* Personal remittances received (% of GDP) is higher in cluster 1
 
 ## Summary
 
-Let's plot happiness against trust in European Parliament to have a good look on the
-main indicators in this study.
+ESS data is an interesting source for getting insights into the recent history and ongoing present of Europe from data.
+
+In this post perhaps the most interesting – but perhaps not surprising – findings were
+
+* Europe can be split into two groups of countries, apparently with different views on life in general and on immigration and refugees
+* major explaining factors for subjective happiness were willingness of people to help other (positive, not surprising) and trust in United Nations (negative, somewhat strange, indirectly linked to trust in European Parliament as it is the main positive factor in trust in United Nations)
+* major explaining factors for trust in European Parliament were trust in United Nations (positive), satisfaction in government (positive), further integration of European Union (positive), which all were perhaps not surprising
+* views on immigration and refugees are polarized and it appears that those countries where immigration is seen positively impacting economy tend to be those which are more open to immigration from poor countries outside of Europe
+
+Linking between ESS and other data may give further insights and I will probably return to this topic later.
+
 
 ```{r}
 

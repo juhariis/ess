@@ -19,6 +19,21 @@ MyPrintInteractive <- function(p, make_interactive, hover_css = "") {
 }
 
 
+
+GetIndicator <- function(indicator_short, indicator_table) {
+  print(indicator_short)
+  last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
+  indicator_short_old <- ifelse(last_char=="2", 
+                                substr(indicator_short, 1, nchar(indicator_short)-1),
+                                indicator_short)
+  
+  this_ind <- indicator_table %>% 
+    filter(indicator == indicator_short_old)
+  return(this_ind)
+}
+
+
+
 # ESS Data
 
 GetData <- function(data_folder, use_rds) {
