@@ -1,0 +1,938 @@
+ 
+ 
+#### happy
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('happy', indicator_table)
+pind0  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'happy',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind0$ci <- pind0$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind0$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### health
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('health', indicator_table)
+pind24  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'health',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind24$ci <- pind24$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind24$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### imbgeco
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('imbgeco', indicator_table)
+pind48  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'imbgeco',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind48$ci <- pind48$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind48$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### impcntr
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('impcntr', indicator_table)
+pind72  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'impcntr',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind72$ci <- pind72$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind72$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### imueclt
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('imueclt', indicator_table)
+pind96  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'imueclt',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind96$ci <- pind96$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind96$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### imwbcnt
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('imwbcnt', indicator_table)
+pind120  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'imwbcnt',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind120$ci <- pind120$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind120$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### polintr
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('polintr', indicator_table)
+pind144  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'polintr',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind144$ci <- pind144$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind144$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### pplhlp
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('pplhlp', indicator_table)
+pind168  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'pplhlp',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind168$ci <- pind168$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind168$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### stfeco
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('stfeco', indicator_table)
+pind192  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'stfeco',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind192$ci <- pind192$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind192$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### stfedu
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('stfedu', indicator_table)
+pind216  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'stfedu',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind216$ci <- pind216$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind216$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### stfhlth
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('stfhlth', indicator_table)
+pind240  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'stfhlth',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind240$ci <- pind240$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind240$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### trstep
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('trstep', indicator_table)
+pind264  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'trstep',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind264$ci <- pind264$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind264$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### trstlgl
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('trstlgl', indicator_table)
+pind288  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'trstlgl',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind288$ci <- pind288$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind288$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### trstplc
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('trstplc', indicator_table)
+pind312  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'trstplc',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind312$ci <- pind312$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind312$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### trstun
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('trstun', indicator_table)
+pind336  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'trstun',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind336$ci <- pind336$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind336$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### eisced2
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('eisced2', indicator_table)
+pind360  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'eisced2',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind360$ci <- pind360$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind360$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### stfgov2
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('stfgov2', indicator_table)
+pind384  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'stfgov2',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind384$ci <- pind384$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind384$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### euftf2
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('euftf2', indicator_table)
+pind408  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'euftf2',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind408$ci <- pind408$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind408$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SH.XPD.GHED.GD.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SH.XPD.GHED.GD.ZS', indicator_table)
+pind432  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SH.XPD.GHED.GD.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind432$ci <- pind432$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind432$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### NY.GDP.MKTP.KD
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('NY.GDP.MKTP.KD', indicator_table)
+pind456  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'NY.GDP.MKTP.KD',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind456$ci <- pind456$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind456$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### NY.GDP.MKTP.KD.ZG
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('NY.GDP.MKTP.KD.ZG', indicator_table)
+pind480  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'NY.GDP.MKTP.KD.ZG',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind480$ci <- pind480$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind480$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### NY.GDP.PCAP.KD
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('NY.GDP.PCAP.KD', indicator_table)
+pind504  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'NY.GDP.PCAP.KD',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind504$ci <- pind504$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind504$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### NY.GDP.PCAP.KD.ZG
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('NY.GDP.PCAP.KD.ZG', indicator_table)
+pind528  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'NY.GDP.PCAP.KD.ZG',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind528$ci <- pind528$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind528$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SE.XPD.TOTL.GD.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SE.XPD.TOTL.GD.ZS', indicator_table)
+pind552  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SE.XPD.TOTL.GD.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind552$ci <- pind552$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind552$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### IT.NET.USER.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('IT.NET.USER.ZS', indicator_table)
+pind576  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'IT.NET.USER.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind576$ci <- pind576$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind576$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SM.POP.TOTL.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SM.POP.TOTL.ZS', indicator_table)
+pind600  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SM.POP.TOTL.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind600$ci <- pind600$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind600$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SL.TLF.CACT.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SL.TLF.CACT.ZS', indicator_table)
+pind624  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SL.TLF.CACT.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind624$ci <- pind624$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind624$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### BX.TRF.PWKR.DT.GD.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('BX.TRF.PWKR.DT.GD.ZS', indicator_table)
+pind648  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'BX.TRF.PWKR.DT.GD.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind648$ci <- pind648$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind648$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SP.POP.TOTL
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SP.POP.TOTL', indicator_table)
+pind672  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SP.POP.TOTL',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind672$ci <- pind672$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind672$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SM.POP.REFG
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SM.POP.REFG', indicator_table)
+pind696  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SM.POP.REFG',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind696$ci <- pind696$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind696$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SP.RUR.TOTL.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SP.RUR.TOTL.ZS', indicator_table)
+pind720  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SP.RUR.TOTL.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind720$ci <- pind720$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind720$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### GC.TAX.TOTL.GD.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('GC.TAX.TOTL.GD.ZS', indicator_table)
+pind744  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'GC.TAX.TOTL.GD.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind744$ci <- pind744$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind744$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### SP.URB.TOTL.IN.ZS
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('SP.URB.TOTL.IN.ZS', indicator_table)
+pind768  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'SP.URB.TOTL.IN.ZS',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind768$ci <- pind768$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind768$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### REFG.PCT
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('REFG.PCT', indicator_table)
+pind792  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'REFG.PCT',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind792$ci <- pind792$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind792$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### UNHCR.Refugee.PCT
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('UNHCR.Refugee.PCT', indicator_table)
+pind816  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'UNHCR.Refugee.PCT',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind816$ci <- pind816$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind816$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### UNHCR.Asylum-.PCT
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('UNHCR.Asylum-.PCT', indicator_table)
+pind840  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'UNHCR.Asylum-.PCT',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind840$ci <- pind840$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind840$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### UNHCR.Interna.PCT
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('UNHCR.Interna.PCT', indicator_table)
+pind864  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'UNHCR.Interna.PCT',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind864$ci <- pind864$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind864$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### UNHCR.Statele.PCT
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('UNHCR.Statele.PCT', indicator_table)
+pind888  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'UNHCR.Statele.PCT',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind888$ci <- pind888$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind888$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 
+#### UNHCR.Other.PCT
+ 
+```{r, echo=FALSE, warning=FALSE}
+this_ind <- GetIndicator('UNHCR.Other.PCT', indicator_table)
+pind912  <- MakeIndicatorCountryPlot(
+ds = ds_ss_avg_cntry_ind,
+id_term = 'UNHCR.Other.PCT',
+cntry_term = 'cntry_name',
+year_term = 'ess_year',
+txt_head = as.character(this_ind$name),
+txt_subhead = indicator_short,
+txt_caption = paste(as.character(this_ind$source), '2002-2016'),
+show_summary = TRUE,
+plevel = p_val)
+if (!is.na(this_ind$lblmin)){
+pind912$ci <- pind912$ci +
+ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
+theme(axis.title.y = element_text(size = 9))
+}
+MyPrintInteractive(pind912$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') 
+ 
+```
+ 
+ 

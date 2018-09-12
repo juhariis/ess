@@ -1,7 +1,7 @@
 Happiness and European Parliament - Adventures in European Social Survey Data
 ================
 Juha Riissanen - <juhariis@gmail.com>
-2018-09-03
+2018-09-03 (updated 2018-09-11)
 
 -   [European Social Survey](#european-social-survey)
 -   [ESS Data](#ess-data)
@@ -16,18 +16,91 @@ Juha Riissanen - <juhariis@gmail.com>
     -   [Variations](#variations)
     -   [Significance and meaning of changes](#significance-and-meaning-of-changes)
     -   [Trends on standardized scale](#trends-on-standardized-scale)
+        -   [Reflect and log transform](#reflect-and-log-transform)
+        -   [Scale](#scale)
+        -   [Trends of transformed and scaled happiness](#trends-of-transformed-and-scaled-happiness)
     -   [Wrapup and what next](#wrapup-and-what-next)
 -   [Happiness and associations](#happiness-and-associations)
     -   [ESS indicators](#ess-indicators)
+        -   [Pre-processing](#pre-processing-1)
     -   [Shape of distributions](#shape-of-distributions)
     -   [Weights](#weights-1)
     -   [Missing values](#missing-values)
+        -   [Get rid of collinear variables](#get-rid-of-collinear-variables)
+        -   [Reshape](#reshape)
     -   [World Bank](#world-bank)
     -   [UNHCR](#unhcr)
     -   [Pct indicators](#pct-indicators)
 -   [Explore Extended Data](#explore-extended-data)
     -   [By indicator](#by-indicator)
+        -   [happy](#happy)
+        -   [health](#health)
+        -   [imbgeco](#imbgeco)
+        -   [impcntr](#impcntr)
+        -   [imueclt](#imueclt)
+        -   [imwbcnt](#imwbcnt)
+        -   [polintr](#polintr)
+        -   [pplhlp](#pplhlp)
+        -   [stfeco](#stfeco)
+        -   [stfedu](#stfedu)
+        -   [stfhlth](#stfhlth)
+        -   [trstep](#trstep)
+        -   [trstlgl](#trstlgl)
+        -   [trstplc](#trstplc)
+        -   [trstun](#trstun)
+        -   [eisced2](#eisced2)
+        -   [stfgov2](#stfgov2)
+        -   [euftf2](#euftf2)
+        -   [SH.XPD.GHED.GD.ZS](#sh.xpd.ghed.gd.zs)
+        -   [NY.GDP.MKTP.KD](#ny.gdp.mktp.kd)
+        -   [NY.GDP.MKTP.KD.ZG](#ny.gdp.mktp.kd.zg)
+        -   [NY.GDP.PCAP.KD](#ny.gdp.pcap.kd)
+        -   [NY.GDP.PCAP.KD.ZG](#ny.gdp.pcap.kd.zg)
+        -   [SE.XPD.TOTL.GD.ZS](#se.xpd.totl.gd.zs)
+        -   [IT.NET.USER.ZS](#it.net.user.zs)
+        -   [SM.POP.TOTL.ZS](#sm.pop.totl.zs)
+        -   [SL.TLF.CACT.ZS](#sl.tlf.cact.zs)
+        -   [BX.TRF.PWKR.DT.GD.ZS](#bx.trf.pwkr.dt.gd.zs)
+        -   [SP.POP.TOTL](#sp.pop.totl)
+        -   [SM.POP.REFG](#sm.pop.refg)
+        -   [SP.RUR.TOTL.ZS](#sp.rur.totl.zs)
+        -   [GC.TAX.TOTL.GD.ZS](#gc.tax.totl.gd.zs)
+        -   [SP.URB.TOTL.IN.ZS](#sp.urb.totl.in.zs)
+        -   [REFG.PCT](#refg.pct)
+        -   [UNHCR.Refugee.PCT](#unhcr.refugee.pct)
+        -   [UNHCR.Asylum-.PCT](#unhcr.asylum-.pct)
+        -   [UNHCR.Interna.PCT](#unhcr.interna.pct)
+        -   [UNHCR.Statele.PCT](#unhcr.statele.pct)
+        -   [UNHCR.Other.PCT](#unhcr.other.pct)
     -   [By country](#by-country)
+        -   [Austria](#austria)
+        -   [Belgium](#belgium)
+        -   [Bulgaria](#bulgaria)
+        -   [Cyprus](#cyprus)
+        -   [Czechia](#czechia)
+        -   [Denmark](#denmark)
+        -   [Estonia](#estonia)
+        -   [Finland](#finland)
+        -   [France](#france)
+        -   [Germany](#germany)
+        -   [Greece](#greece)
+        -   [Hungary](#hungary)
+        -   [Ireland](#ireland)
+        -   [Israel](#israel)
+        -   [Italy](#italy)
+        -   [Lithuania](#lithuania)
+        -   [Netherlands](#netherlands)
+        -   [Norway](#norway)
+        -   [Poland](#poland)
+        -   [Portugal](#portugal)
+        -   [Russia](#russia)
+        -   [Slovakia](#slovakia)
+        -   [Slovenia](#slovenia)
+        -   [Spain](#spain)
+        -   [Sweden](#sweden)
+        -   [Switzerland](#switzerland)
+        -   [Ukraine](#ukraine)
+        -   [United Kingdom](#united-kingdom)
 -   [Linear Modeling](#linear-modeling)
     -   [Assumptions](#assumptions)
     -   [The model](#the-model)
@@ -36,9 +109,17 @@ Juha Riissanen - <juhariis@gmail.com>
 -   [Models and observations](#models-and-observations)
     -   [Subjective Happiness](#subjective-happiness-1)
     -   [Helpful People](#helpful-people)
+        -   [ESS results](#ess-results)
+        -   [Modeling](#modeling)
     -   [Trust in United Nations](#trust-in-united-nations)
+        -   [ESS results](#ess-results-1)
+        -   [Modeling](#modeling-1)
     -   [Trust in European Parliament](#trust-in-european-parliament)
+        -   [EES Results](#ees-results)
+        -   [Modeling](#modeling-2)
     -   [Immigrants from poorer countries outside Europe](#immigrants-from-poorer-countries-outside-europe)
+        -   [EES Results](#ees-results-1)
+        -   [Modeling](#modeling-3)
 -   [Clustering the countries](#clustering-the-countries)
     -   [Preprocess](#preprocess)
     -   [PCA](#pca)
@@ -54,7 +135,7 @@ Juha Riissanen - <juhariis@gmail.com>
 
 ------------------------------------------------------------------------
 
-This workbook is used to create content for the completely revised and rewritten blog post on investigation of European Social Study.
+This workbook is used to create content for the completely revised and rewritten blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and [Azure](https://juhariis.z16.web.core.windows.net/). Because Rpubs seems to have some size limitations, the exploratory graphs on indicators and countries are not included. Current Azure subscription has not these limitations so there we have all content)
 
 ------------------------------------------------------------------------
 
@@ -150,7 +231,7 @@ library(viridis)       # red-green colour blind compatible palettes
 
 
 # must set false for github_markup 
-create_interactive_plot <- FALSE
+create_interactive_plot <- params$interactive_graphs
 
 source("ess_subs.r")
 
@@ -257,6 +338,7 @@ p <- CreateEuroMap(mymap=mymap,
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
 
+
 # TODO: interactive mode ggiraph crashes for the map - could be a bug in the way
 # I use it with map. Will have to investigate more at a later date. But now set
 # interactive mode to FALSE
@@ -268,7 +350,8 @@ MyPrintInteractive(p, FALSE)
 So, there is a band of countries starting from Finland in the north eastern corner of Europe, stretching all the way to Spain and Portugal in the far south western corner, which have been in all or nearly all surveys.
 
 ``` r
-ggplot(data=ds_participations, aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
+p <- ggplot(data=ds_participations, 
+            aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
   geom_bar(stat="identity", fill="grey") +
   labs(
     title="Participation in surveys",
@@ -278,6 +361,8 @@ ggplot(data=ds_participations, aes(x=reorder(cntry_name, n_surveys), y=n_surveys
   theme(plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+
+print(p)
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-4-1.png)
@@ -344,7 +429,7 @@ We will use `pspwght` post stratification weighting which attempts to take into 
 The weights do vary quite a bit, from almost zero all the way up to close to seven, meaning that a response can essentially vote on behalf of almost seven persons and another practically none, as illustrated in the following graph.
 
 ``` r
-ggplot(data = dataset, aes(pspwght)) +
+p <- ggplot(data = dataset, aes(pspwght)) +
   geom_histogram(bins = 200, fill = 'gray') +
   geom_vline(
     xintercept = quantile(dataset$pspwght),
@@ -363,6 +448,7 @@ ggplot(data = dataset, aes(pspwght)) +
   theme(plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
+print(p)
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-5-1.png)
@@ -657,20 +743,20 @@ knitr::kable(happy_res$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Ireland        |  7.863|  7.331|  7.550|  -0.312|         0.071|         0.075| negligible |   0.000| \*\*\*   |   0.219|         0.071|         0.075| negligible |   0.000| \*\*\*   |
-| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.680|          |  -0.047|         0.079|         0.083| negligible |   0.404|          |
-| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.854|          |   0.045|         0.010|         0.014| negligible |   0.414|          |
-| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.528|          |  -0.016|        -0.014|        -0.010| negligible |   0.742|          |
-| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.418|          |   0.065|         0.365|         0.369| small      |   0.258|          |
-| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.040| \*       |   0.072|        -0.021|        -0.017| negligible |   0.102|          |
-| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.062| +        |   0.084|        -0.043|        -0.039| negligible |   0.084| +        |
-| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.008| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.156|          |
-| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.024| \*       |
+| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.676|          |  -0.047|         0.079|         0.083| negligible |   0.394|          |
+| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.826|          |   0.045|         0.010|         0.014| negligible |   0.390|          |
+| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.544|          |  -0.016|        -0.014|        -0.010| negligible |   0.796|          |
+| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.392|          |   0.065|         0.365|         0.369| small      |   0.258|          |
+| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.034| \*       |   0.072|        -0.021|        -0.017| negligible |   0.082| +        |
+| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.042| \*       |   0.084|        -0.043|        -0.039| negligible |   0.056| +        |
+| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.012| \*       |   0.080|        -0.039|        -0.035| negligible |   0.180|          |
+| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.034| \*       |
 | Spain          |  7.457|  7.437|  7.747|   0.290|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |   0.310|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |
 | Portugal       |  6.953|  6.973|  7.437|   0.484|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |   0.465|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |
 | Germany        |  7.189|  7.586|  7.757|   0.568|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |   0.171|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |
 | Slovenia       |  6.906|  7.116|  7.477|   0.571|        -0.230|        -0.225| small      |   0.000| \*\*\*   |   0.361|        -0.230|        -0.225| small      |   0.000| \*\*\*   |
 | Hungary        |  6.325|  6.384|  6.901|   0.577|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |   0.518|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |
-| Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.002| \*\*     |
+| Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.006| \*\*     |
 
 ``` r
 MyPrintInteractive(happy_res$plot, create_interactive_plot) 
@@ -1175,7 +1261,7 @@ for (i in 1:length(ind_plots))
   MyPrintInteractive(ind_plots[[i]], FALSE)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-3.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-4.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-5.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-6.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-7.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-8.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-9.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-10.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-11.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-12.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-13.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-14.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-15.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-16.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-17.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-18.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-19.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-20.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-21.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-22.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-23.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-24.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-25.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-3.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-4.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-5.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-6.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-7.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-8.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-9.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-10.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-11.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-12.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-13.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-14.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-15.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-16.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-17.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-18.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-19.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-20.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-21.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-22.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-23.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-24.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-25.png)
 
 Mostly the distributions at this level do not seem significantly skewed.
 
@@ -1516,7 +1602,7 @@ ggplot(data= ds_unhcr, aes(x=ess_year, y=value, fill=pop_type)) +
   xlab("") + ylab("")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-34-1.png) So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
+![](EuropeanSocialSurvey_files/figure-markdown_github/get_unhcr_data-1.png) So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
 
 Some insigt - perhaps - from two snapshots, i.e. 2013 and 2016.
 
@@ -1531,7 +1617,7 @@ ggplot(data= ds_unhcr %>% filter(ess_year==2013),
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-35-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-30-1.png)
 
 ``` r
 ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
@@ -1544,7 +1630,7 @@ ggplot(data= ds_unhcr %>% filter(ess_year==2016),
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-35-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-30-2.png)
 
 Huge increase in "internally displaced persons" in Ukraine - yes, there was and still is that crisis regarding Crimea
 
@@ -1562,7 +1648,7 @@ ggplot(data= ds_unhcr %>% filter(ess_year==2016),
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-36-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-31-1.png)
 
 ``` r
 # top 4 and all others
@@ -1630,7 +1716,7 @@ ggplot(data=unhcr_data %>% filter(ess_year==2016),
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-37-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-32-1.png)
 
 ``` r
 # merge data
@@ -1667,7 +1753,7 @@ ggplot(data = ds_ss_avg %>%
   xlab("") + ylab("")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-38-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-33-1.png)
 
 Looks good and reassuring.
 
@@ -1703,226 +1789,446 @@ knitr::kable(indicator_table[idx_pct,], digits = 3)
 | UNHCR.Statele.PCT    | Stateless(% of population) - calculated                                                       |    0.000|  11.048| UNHCR  | NA     | NA     |
 | UNHCR.Other.PCT      | Other population types together(% of population) - calculated                                 |    0.000|   6.276| UNHCR  | NA     | NA     |
 
+``` r
+# save  a copies to be used by other scripts
+
+saveRDS(indicator_table, file="indicator_table.rds")
+saveRDS(ds_ss_avg, file="ds_ss_avg.rds")
+
+ds_ss_avg_cntry_ind <- ds_ss_avg %>% 
+  spread(indicator, value)
+
+ds_ss_avg_ind_cntry <- ds_ss_avg %>% 
+  spread(cntry_name, value)
+```
+
 Explore Extended Data
 ---------------------
 
 Investiating and learning the extended ESS data set spiced up with World Bank and UNHCR data.
+
+Note that an interactive version of the graphs below is available at the time of writing as a [shine application](https://juhariis.shinyapps.io/ess_shiny/) on web.
 
 ### By indicator
 
 Checking first what we can learn from by indicator view, i.e. how different are the trajectories of countries. Are there any curious outliers?
 
 ``` r
-create_static_plot <- TRUE
+# need to construct a temporary rmd file which does not put javascript output inside 
+# a loop construct - the temporary file gets read by the next chunk of the document
 
-# By indicator
-
-ds_ss_avg_cntry_ind <- ds_ss_avg %>% 
-  spread(indicator, value)
-
-for (indicator_short in unique(ds_ss_avg$indicator)){
-  
-  # getting the right long description out
-
-  this_ind <- GetIndicator(indicator_short, indicator_table)
-  
-  # the plot
-  
-  p  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_cntry_ind,
-    id_term = indicator_short,
-    cntry_term = "cntry_name",
-    year_term = "ess_year",
-    txt_head = as.character(this_ind$name),
-    txt_subhead = indicator_short,
-    txt_caption = paste(as.character(this_ind$source), "2002-2016"),
-    show_summary = TRUE,
-    plevel = p_val)
-
-  if (!is.na(this_ind$lblmin)){
-    p$ci <- p$ci +
-      ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
-      theme(axis.title.y = element_text(size = 9))
-  }
-  MyPrintInteractive(p$ci, create_interactive_plot, 
-                   hover_css = "stroke-width:3px;") 
+GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
+  # preparing an additional file to allow renderin of javascript, id and prefix not necessary
+  c(
+    " ",
+    paste0("#### ", indicator_short),
+    " ",
+    "```{r, echo=FALSE, warning=FALSE}", 
+    paste0("this_ind <- GetIndicator('", 
+           indicator_short,
+           "', indicator_table)"),
+    paste0("p",prefix,id,"  <- MakeIndicatorCountryPlot("),
+    "ds = ds_ss_avg_cntry_ind,",
+    paste0("id_term = '",indicator_short,"',"),
+    "cntry_term = 'cntry_name',",
+    "year_term = 'ess_year',",
+    "txt_head = as.character(this_ind$name),",
+    "txt_subhead = indicator_short,",
+    "txt_caption = paste(as.character(this_ind$source), '2002-2016'),",
+    "show_summary = TRUE,",
+    "plevel = p_val)",
+    "if (!is.na(this_ind$lblmin)){",
+    paste0("p",prefix,id,"$ci <- p",prefix,id,"$ci +"),
+    "ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +",
+    "theme(axis.title.y = element_text(size = 9))",
+    "}",
+    paste0("MyPrintInteractive(p",prefix,id,"$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') "),
+    " ",
+    "```", 
+    " "
+  )
 }
+
+if (params$explore_indicator_graphs){
+  ascript <- NULL
+  for (indicator_short in unique(ds_ss_avg$indicator)){
+    ascript <- c(ascript, GetIndicatorPlotJs(indicator_short, length(ascript), "ind"))
+  }
+} else {
+  ascript <- c("", "Exploratory graphs skipped due to keep the document shorter.", " ")
+}
+
+tmp_indicators_rmd <- "tmp_indicators.rmd"
+if (file.exists(tmp_indicators_rmd)) file.remove(tmp_indicators_rmd)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-3.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-4.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-5.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-6.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-7.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-8.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-9.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-10.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-11.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-12.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-13.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-14.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-15.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-16.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-17.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-18.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-19.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-20.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-21.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-22.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-23.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-24.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-25.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-26.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-27.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-28.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-29.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-30.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-31.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-32.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-33.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-34.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-35.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-36.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-37.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-38.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-40-39.png)
+    ## [1] TRUE
+
+``` r
+fileConn<-file(tmp_indicators_rmd)
+writeLines(c(
+  " ",
+  ascript, 
+  " "
+  ), fileConn)
+close(fileConn)
+```
+
+#### happy
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-59-1.png)
+
+#### health
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-1.png)
+
+#### imbgeco
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-61-1.png)
+
+#### impcntr
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-62-1.png)
+
+#### imueclt
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-63-1.png)
+
+#### imwbcnt
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-64-1.png)
+
+#### polintr
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-65-1.png)
+
+#### pplhlp
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-66-1.png)
+
+#### stfeco
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-67-1.png)
+
+#### stfedu
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-68-1.png)
+
+#### stfhlth
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-69-1.png)
+
+#### trstep
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-70-1.png)
+
+#### trstlgl
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-71-1.png)
+
+#### trstplc
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-72-1.png)
+
+#### trstun
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-73-1.png)
+
+#### eisced2
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-74-1.png)
+
+#### stfgov2
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-75-1.png)
+
+#### euftf2
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-76-1.png)
+
+#### SH.XPD.GHED.GD.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-77-1.png)
+
+#### NY.GDP.MKTP.KD
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-78-1.png)
+
+#### NY.GDP.MKTP.KD.ZG
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-79-1.png)
+
+#### NY.GDP.PCAP.KD
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-80-1.png)
+
+#### NY.GDP.PCAP.KD.ZG
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-81-1.png)
+
+#### SE.XPD.TOTL.GD.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-82-1.png)
+
+#### IT.NET.USER.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-83-1.png)
+
+#### SM.POP.TOTL.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-84-1.png)
+
+#### SL.TLF.CACT.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-85-1.png)
+
+#### BX.TRF.PWKR.DT.GD.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-86-1.png)
+
+#### SP.POP.TOTL
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-87-1.png)
+
+#### SM.POP.REFG
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-88-1.png)
+
+#### SP.RUR.TOTL.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-89-1.png)
+
+#### GC.TAX.TOTL.GD.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-90-1.png)
+
+#### SP.URB.TOTL.IN.ZS
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-91-1.png)
+
+#### REFG.PCT
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-92-1.png)
+
+#### UNHCR.Refugee.PCT
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-93-1.png)
+
+#### UNHCR.Asylum-.PCT
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-94-1.png)
+
+#### UNHCR.Interna.PCT
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-95-1.png)
+
+#### UNHCR.Statele.PCT
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-96-1.png)
+
+#### UNHCR.Other.PCT
+
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-97-1.png)
 
 ### By country
 
 ``` r
+GetCountryPlotJs <- function(cntry) {
+  # preparing an additional file to allow rendering of javascript
+  c(
+    " ",
+    paste0("#### ", cntry),
+    "```{r, echo=FALSE, warning=FALSE}", 
+    " ",
+    "p_ess  <- MakeIndicatorCountryPlot(",
+    "  ds = ds_ss_avg_ind_cntry %>% ",
+    "    filter(indicator %in% (indicator_table %>% ",
+    "                             filter(source=='ESS'))$indicator),",
+    paste0("  id_term = '",cntry,"',"),
+    "  cntry_term = 'indicator',",
+    "  year_term = 'ess_year',",
+    paste0("  txt_head = '",cntry,"',"),
+    "  txt_subhead = 'ESS survey indicators',",
+    "  txt_caption = 'ESS 2002-2016',",
+    "  show_summary = FALSE,",
+    "  label_size_coef = lbl_coef,",
+    "  plevel = p_val)",
+    " ",
+    "p_wb_a  <- MakeIndicatorCountryPlot(",
+    "  ds = ds_ss_avg_ind_cntry %>% ",
+    "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
+    "                             filter(max > pct_max_split))$indicator),",
+    paste0("  id_term = '",cntry,"',"),
+    "  cntry_term = 'indicator',",
+    "  year_term = 'ess_year',",
+    paste0("  txt_head = '",cntry,"',"),
+    "  txt_subhead = 'World Bank Development Indices & UNHCR',",
+    "  txt_caption = 'World Bank & UNHCR 2002-16',",
+    "  show_summary = FALSE,",
+    "  label_size_coef = lbl_coef,",
+    "  plevel = p_val)",
+    " ",
+    "p_wb_b  <- MakeIndicatorCountryPlot(",
+    "  ds = ds_ss_avg_ind_cntry %>% ",
+    "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
+    "                             filter(max <= pct_max_split))$indicator),",
+    paste0("  id_term = '",cntry,"',"),
+    "  cntry_term = 'indicator',",
+    "  year_term = 'ess_year',",
+    paste0("  txt_head = '",cntry,"',"),
+    "  txt_subhead = 'World Bank Development Indices & UNHCR',",
+    "  txt_caption = 'World Bank & UNHCR 2002-16',",
+    "  show_summary = FALSE,",
+    "  label_size_coef = lbl_coef,",
+    "  plevel = p_val)",
+    " ",
+    "MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_a$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_b$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "```", 
+    " "
+  )
+}
+
 lbl_coef <- 1
 pct_max_split <- 30
 
-ds_ss_avg_ind_cntry <- ds_ss_avg %>% 
-  spread(cntry_name, value)
-
-for (cntry in unique(ds_ss_avg$cntry_name)){
-  
-  cat(paste0("\n\n#### ",cntry, '\n\n'))
-  
-  p_ess  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_ind_cntry %>% 
-      filter(indicator %in% (indicator_table %>% 
-                               filter(source=="ESS"))$indicator),
-    id_term = cntry,
-    cntry_term = "indicator",
-    year_term = "ess_year",
-    txt_head = cntry,
-    txt_subhead = "ESS survey indicators",
-    txt_caption = "ESS 2002-2016",
-    show_summary = FALSE,
-    label_size_coef = lbl_coef,
-    plevel = p_val)
-  
-  p_wb_a  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_ind_cntry %>% 
-      filter(indicator %in% (indicator_table[idx_pct,] %>% 
-                               filter(max > pct_max_split))$indicator),
-    id_term = cntry,
-    cntry_term = "indicator",
-    year_term = "ess_year",
-    txt_head = cntry,
-    txt_subhead = "World Bank Development Indices & UNHCR",
-    txt_caption = "World Bank & UNHCR 2002-16",
-    show_summary = FALSE,
-    label_size_coef = lbl_coef,
-    plevel = p_val)
-  
-  p_wb_b  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_ind_cntry %>% 
-      filter(indicator %in% (indicator_table[idx_pct,] %>% 
-                               filter(max <= pct_max_split))$indicator),
-    id_term = cntry,
-    cntry_term = "indicator",
-    year_term = "ess_year",
-    txt_head = cntry,
-    txt_subhead = "World Bank Development Indices & UNHCR",
-    txt_caption = "World Bank & UNHCR 2002-16",
-    show_summary = FALSE,
-    label_size_coef = lbl_coef,
-    plevel = p_val)
-  
-  MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = "stroke-width:3px;") 
-  MyPrintInteractive(p_wb_a$ci, create_interactive_plot,hover_css = "stroke-width:3px;") 
-  MyPrintInteractive(p_wb_b$ci, create_interactive_plot,hover_css = "stroke-width:3px;") 
+if (params$explore_country_graphs){
+  ascript <- NULL
+  for (cntry in unique(ds_ss_avg$cntry_name)){
+    ascript <- c(ascript, GetCountryPlotJs(cntry))
+  } 
+}else {
+  ascript <- c("", "Exploratory graphs skipped to keep the document shorter.", " ")
 }
+
+tmp_countries_rmd <- "tmp_countries.rmd"
+if (file.exists(tmp_countries_rmd)) file.remove(tmp_countries_rmd)
+```
+
+    ## [1] TRUE
+
+``` r
+fileConn<-file(tmp_countries_rmd)
+writeLines(c(
+  "",
+  ascript, 
+  ""
+  ), fileConn)
+close(fileConn)
 ```
 
 #### Austria
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-98-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-98-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-98-3.png)
 
 #### Belgium
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-4.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-5.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-6.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-99-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-99-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-99-3.png)
 
 #### Bulgaria
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-7.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-8.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-9.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-100-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-100-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-100-3.png)
 
 #### Cyprus
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-10.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-11.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-12.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-101-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-101-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-101-3.png)
 
 #### Czechia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-13.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-14.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-15.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-102-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-102-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-102-3.png)
 
 #### Denmark
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-16.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-17.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-18.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-103-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-103-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-103-3.png)
 
 #### Estonia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-19.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-20.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-21.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-104-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-104-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-104-3.png)
 
 #### Finland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-22.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-23.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-24.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-105-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-105-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-105-3.png)
 
 #### France
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-25.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-26.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-27.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-106-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-106-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-106-3.png)
 
 #### Germany
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-28.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-29.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-30.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-107-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-107-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-107-3.png)
 
 #### Greece
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-31.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-32.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-33.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-108-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-108-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-108-3.png)
 
 #### Hungary
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-34.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-35.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-36.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-109-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-109-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-109-3.png)
 
 #### Ireland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-37.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-38.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-39.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-110-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-110-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-110-3.png)
 
 #### Israel
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-40.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-41.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-42.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-111-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-111-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-111-3.png)
 
 #### Italy
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-43.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-44.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-45.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-112-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-112-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-112-3.png)
 
 #### Lithuania
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-46.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-47.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-48.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-113-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-113-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-113-3.png)
 
 #### Netherlands
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-49.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-50.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-51.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-114-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-114-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-114-3.png)
 
 #### Norway
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-52.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-53.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-54.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-115-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-115-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-115-3.png)
 
 #### Poland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-55.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-56.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-57.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-116-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-116-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-116-3.png)
 
 #### Portugal
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-58.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-59.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-60.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-117-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-117-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-117-3.png)
 
 #### Russia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-61.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-62.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-63.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-118-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-118-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-118-3.png)
 
 #### Slovakia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-64.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-65.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-66.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-119-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-119-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-119-3.png)
 
 #### Slovenia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-67.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-68.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-69.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-120-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-120-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-120-3.png)
 
 #### Spain
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-70.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-71.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-72.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-121-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-121-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-121-3.png)
 
 #### Sweden
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-73.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-74.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-75.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-122-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-122-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-122-3.png)
 
 #### Switzerland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-76.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-77.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-78.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-123-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-123-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-123-3.png)
 
 #### Ukraine
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-79.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-80.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-81.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-124-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-124-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-124-3.png)
 
 #### United Kingdom
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-82.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-83.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-84.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-125-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-125-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-125-3.png)
 
 Linear Modeling
 ---------------
@@ -1966,7 +2272,7 @@ p_pairs <- ggpairs(
 print(p_pairs)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-42-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-37-1.png)
 
 ``` r
 the_correlations <- rcorr(as.matrix(ds_subset_50_ave %>% 
@@ -2295,20 +2601,20 @@ the_mod <- PredAndCheck("happy", ds_train, ds_test, "- train 2002-2014, test 201
     ## Multiple R-squared:  0.8993, Adjusted R-squared:  0.8914 
     ## F-statistic: 113.2 on 12 and 152 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-1.png)
 
     ## [1] "For happy"
     ## [1] "Mean squared prediction error: 0.138"
     ## [1] "                    R-squared: 0.757"
     ## [1] "           Adjusted R-squared: 0.361"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -2329,7 +2635,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -2373,19 +2679,19 @@ print(ess_set$summary)
 MyPrintInteractive(ess_set$map, FALSE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-43-1.png)
 
 ``` r
 MyPrintInteractive(ess_set$heat, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-43-2.png)
 
 ``` r
 MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-43-3.png)
 
 ``` r
 tab.3_cap <- table_nums(name="tab_3",
@@ -2401,20 +2707,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
-| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.726|          |   0.005|         0.008|         0.012| negligible |   0.938|          |
-| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.810|          |  -0.017|         0.061|         0.065| negligible |   0.774|          |
-| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.016| \*       |   0.185|        -0.047|        -0.043| negligible |   0.000| \*\*\*   |
-| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.006| \*\*     |   0.181|        -0.057|        -0.053| negligible |   0.042| \*       |
-| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.498|          |
-| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.106|          |
+| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.750|          |   0.005|         0.008|         0.012| negligible |   0.958|          |
+| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.894|          |  -0.017|         0.061|         0.065| negligible |   0.754|          |
+| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.008| \*\*     |   0.185|        -0.047|        -0.043| negligible |   0.002| \*\*     |
+| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.002| \*\*     |   0.181|        -0.057|        -0.053| negligible |   0.040| \*       |
+| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.466|          |
+| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.116|          |
 | Finland        |  5.676|  5.933|  6.110|   0.434|        -0.191|        -0.187| negligible |   0.000| \*\*\*   |   0.178|        -0.191|        -0.187| negligible |   0.002| \*\*     |
-| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.030| \*       |
-| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.278|          |
-| Hungary        |  4.147|  4.368|  4.616|   0.469|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |   0.248|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |
-| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.050| \*       |
-| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.002| \*\*     |
-| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.048| \*       |
-| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.018| \*       |
+| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.046| \*       |
+| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.308|          |
+| Hungary        |  4.147|  4.368|  4.616|   0.469|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |   0.248|        -0.085|        -0.081| negligible |   0.004| \*\*     |
+| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.034| \*       |
+| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |
+| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.044| \*       |
+| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.036| \*       |
 | Norway         |  6.013|  6.048|  6.984|   0.971|        -0.307|        -0.303| small      |   0.000| \*\*\*   |   0.936|        -0.307|        -0.303| small      |   0.000| \*\*\*   |
 
 #### Modeling
@@ -2461,20 +2767,20 @@ the_mod <- PredAndCheck("pplhlp",
     ## Multiple R-squared:  0.8554, Adjusted R-squared:  0.845 
     ## F-statistic: 82.25 on 11 and 153 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-1.png)
 
     ## [1] "For pplhlp"
     ## [1] "Mean squared prediction error: 0.249"
     ## [1] "                    R-squared: 0.681"
     ## [1] "           Adjusted R-squared: 0.255"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                            |
 |:---------|------------:|---------:|-------:|-------:|:----------------------------------------------------------------|
@@ -2494,7 +2800,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -2542,19 +2848,19 @@ print(ess_set$summary)
 MyPrintInteractive(ess_set$map, FALSE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-1.png)
 
 ``` r
 MyPrintInteractive(ess_set$heat, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-2.png)
 
 ``` r
 MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-3.png)
 
 ``` r
 tab.4_cap <- table_nums(name="tab_4",
@@ -2571,20 +2877,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.972|  5.369|  4.934|  -1.038|         0.422|         0.426| small      |   0.000| \*\*\*   |  -0.435|         0.422|         0.426| small      |   0.000| \*\*\*   |
-| Poland         |  5.634|  4.604|  4.909|  -0.725|         0.247|         0.252| small      |   0.000| \*\*\*   |   0.305|         0.247|         0.252| small      |   0.002| \*\*     |
-| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.052| +        |
-| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.012| \*       |
-| Germany        |  5.170|  4.680|  4.812|  -0.358|         0.125|         0.128| negligible |   0.000| \*\*\*   |   0.132|         0.125|         0.128| negligible |   0.054| +        |
-| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.030| \*       |  -0.096|         0.042|         0.046| negligible |   0.252|          |
-| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.104|          |   0.205|         0.047|         0.051| negligible |   0.002| \*\*     |
-| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   0.898|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
-| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.976|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
-| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.548|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
-| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.186|          |   0.125|        -0.032|        -0.028| negligible |   0.122|          |
-| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.260|          |  -0.047|        -0.014|        -0.010| negligible |   0.590|          |
-| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.006| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.698|          |
-| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.004| \*\*     |
-| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.012| \*       |
+| Poland         |  5.634|  4.604|  4.909|  -0.725|         0.247|         0.252| small      |   0.000| \*\*\*   |   0.305|         0.247|         0.252| small      |   0.000| \*\*\*   |
+| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.068| +        |
+| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.022| \*       |
+| Germany        |  5.170|  4.680|  4.812|  -0.358|         0.125|         0.128| negligible |   0.000| \*\*\*   |   0.132|         0.125|         0.128| negligible |   0.046| \*       |
+| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.034| \*       |  -0.096|         0.042|         0.046| negligible |   0.300|          |
+| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.116|          |   0.205|         0.047|         0.051| negligible |   0.000| \*\*\*   |
+| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   1.000|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
+| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.940|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
+| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.572|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
+| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.214|          |   0.125|        -0.032|        -0.028| negligible |   0.088| +        |
+| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.246|          |  -0.047|        -0.014|        -0.010| negligible |   0.650|          |
+| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.008| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.646|          |
+| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.002| \*\*     |
+| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.026| \*       |
 
 #### Modeling
 
@@ -2635,20 +2941,20 @@ the_mod <- PredAndCheck("trstun",
     ## Multiple R-squared:  0.8745, Adjusted R-squared:  0.8619 
     ## F-statistic: 69.23 on 15 and 149 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-1.png)
 
     ## [1] "For trstun"
     ## [1] "Mean squared prediction error: 0.239"
     ## [1] "                    R-squared: 0.809"
     ## [1] "           Adjusted R-squared: 0.2"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -2672,7 +2978,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -2714,19 +3020,19 @@ print(ess_set$summary)
 MyPrintInteractive(ess_set$map, FALSE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-1.png)
 
 ``` r
 MyPrintInteractive(ess_set$heat, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-2.png)
 
 ``` r
 MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-3.png)
 
 ``` r
 tab.5_cap <- table_nums(name="tab_5",
@@ -2743,20 +3049,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.625|  4.867|  4.367|  -1.258|         0.523|         0.528| medium     |   0.000| \*\*\*   |  -0.501|         0.523|         0.528| medium     |   0.000| \*\*\*   |
-| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.000| \*\*\*   |
+| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.002| \*\*     |
 | Portugal       |  4.835|  3.501|  4.103|  -0.733|         0.145|         0.150| negligible |   0.000| \*\*\*   |   0.601|         0.145|         0.150| negligible |   0.000| \*\*\*   |
 | Slovenia       |  4.620|  3.389|  3.944|  -0.676|         0.248|         0.253| small      |   0.000| \*\*\*   |   0.555|         0.248|         0.253| small      |   0.000| \*\*\*   |
-| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.070| +        |
+| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.060| +        |
 | Spain          |  4.767|  3.886|  4.245|  -0.522|         0.177|         0.182| negligible |   0.000| \*\*\*   |   0.359|         0.177|         0.182| negligible |   0.000| \*\*\*   |
-| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.844|          |
-| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.012| \*       |  -0.221|         0.043|         0.047| negligible |   0.010| \*\*     |
-| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.080| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
-| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.042| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
-| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.144|          |   0.188|         0.033|         0.038| negligible |   0.010| \*\*     |
-| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.262|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
+| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.814|          |
+| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.006| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.004| \*\*     |
+| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.058| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
+| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.020| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
+| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.138|          |   0.188|         0.033|         0.038| negligible |   0.004| \*\*     |
+| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.304|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
 | Finland        |  4.878|  4.673|  5.173|   0.295|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |   0.501|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |
-| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.084| +        |
-| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.330|          |
+| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.088| +        |
+| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.356|          |
 
 As can be seen above, the big positive changes in UK and Portugal as well as Finland and Slovenia from 2014 to 2016 were significant as per weighted t-test.
 
@@ -2810,20 +3116,20 @@ the_mod <- PredAndCheck("trstep",
     ## Multiple R-squared:  0.7582, Adjusted R-squared:  0.7391 
     ## F-statistic: 39.71 on 12 and 152 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-1.png)
 
     ## [1] "For trstep"
     ## [1] "Mean squared prediction error: 0.354"
     ## [1] "                    R-squared: 0.69"
     ## [1] "           Adjusted R-squared: 0.187"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -2844,7 +3150,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -2886,19 +3192,19 @@ print(ess_set$summary)
 MyPrintInteractive(ess_set$map, FALSE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-1.png)
 
 ``` r
 MyPrintInteractive(ess_set$heat, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-2.png)
 
 ``` r
 MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-3.png)
 
 ``` r
 tab.6_cap <- table_nums(name="tab_6",
@@ -2923,10 +3229,10 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | Belgium        |  2.482|  2.580|  2.293|  -0.189|         0.136|         0.140| negligible |   0.000| \*\*\*   |  -0.286|         0.136|         0.140| negligible |   0.000| \*\*\*   |
 | Netherlands    |  2.467|  2.505|  2.323|  -0.144|         0.095|         0.099| negligible |   0.000| \*\*\*   |  -0.182|         0.095|         0.099| negligible |   0.000| \*\*\*   |
 | Finland        |  2.603|  2.697|  2.511|  -0.092|         0.093|         0.097| negligible |   0.000| \*\*\*   |  -0.186|         0.093|         0.097| negligible |   0.000| \*\*\*   |
-| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.000| \*\*\*   |   0.039|         0.120|         0.124| negligible |   0.120|          |
-| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.464|          |  -0.041|        -0.025|        -0.020| negligible |   0.278|          |
-| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.132|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
-| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.006| \*\*     |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
+| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.002| \*\*     |   0.039|         0.120|         0.124| negligible |   0.130|          |
+| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.456|          |  -0.041|        -0.025|        -0.020| negligible |   0.232|          |
+| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.148|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
+| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.014| \*       |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
 | Poland         |  2.409|  2.455|  2.591|   0.182|        -0.218|        -0.213| small      |   0.000| \*\*\*   |   0.135|        -0.218|        -0.213| small      |   0.000| \*\*\*   |
 | Hungary        |  3.101|  3.318|  3.558|   0.457|        -0.210|        -0.205| small      |   0.000| \*\*\*   |   0.240|        -0.210|        -0.205| small      |   0.000| \*\*\*   |
 
@@ -2974,20 +3280,20 @@ the_mod <- PredAndCheck("impcntr",
     ## Multiple R-squared:  0.7648, Adjusted R-squared:  0.7445 
     ## F-statistic: 37.76 on 13 and 151 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-1.png)
 
     ## [1] "For impcntr"
     ## [1] "Mean squared prediction error: 0.327"
     ## [1] "                    R-squared: 0.778"
     ## [1] "           Adjusted R-squared: 0.333"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -3009,7 +3315,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -3161,7 +3467,7 @@ p_var <- ggplot(data=data.frame(PoV=PoV, CumPoV=CumPoV, n=1:length(CumPoV)), aes
 MyPrintInteractive(p_var, create_interactive_plot) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-1.png)
 
 ``` r
 knitr::kable(pc$rotation, digits = 2, caption = "Primary componets vs indicators")
@@ -3202,7 +3508,7 @@ ggpairs(data=comp) +
        subtitle="Zero correlations - as expected")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-2.png)
 
 ### K-means clustering
 
@@ -3238,7 +3544,7 @@ ggplot(data = data.frame(n=1:k.max, wss=wss), aes(x=n, y=wss)) +
   ylab("Total within-clusters sum of squares")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-58-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-1.png)
 
 ``` r
 # NbClust - vote on kmeans ==> use this as the outcome
@@ -3253,7 +3559,7 @@ nb <- NbClust(kmeans_data,
               alphaBeale = 0.1)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-58-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-2.png)
 
     ## *** : The Hubert index is a graphical method of determining the number of clusters.
     ##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
@@ -3261,7 +3567,7 @@ nb <- NbClust(kmeans_data,
     ##                 index second differences plot. 
     ## 
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-58-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-3.png)
 
     ## *** : The D index is a graphical method of determining the number of clusters. 
     ##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
@@ -3308,7 +3614,7 @@ ggplot(data=data.frame(n=nb$Best.nc[1,]), aes(n)) +
        subtitle="As majority vote determined by 'NbClust' function")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-58-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-4.png)
 
 ``` r
 n_clusters <- length(unique(nb$Best.partition))
@@ -3338,7 +3644,7 @@ autoplot(pam_obj, frame.type = 'norm', label=TRUE, label.size=2.5, label.alpha=0
        subtitle="Each classification identified")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-59-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-1.png)
 
 ``` r
 autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster', 
@@ -3349,7 +3655,7 @@ autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster',
        subtitle="Eigenvectors of original indicators shown")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-59-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-2.png)
 
 ### Countries split to classes
 
@@ -3378,7 +3684,7 @@ p <- CreateEuroMap(mymap=mymap,
 MyPrintInteractive(p, FALSE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-1.png)
 
 ``` r
 # how does clustering changed annually
@@ -3395,7 +3701,7 @@ ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
        txt_caption = "ESS surveys 2002-2016") 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-2.png)
 
 Looking into details of how do the two grups differ we can see that in most of the indicators countries in cluster 2 give higher scores which roughly translate to “more” or “better” — with a couple of noteworthy exceptions
 
@@ -3423,7 +3729,7 @@ ggplot(data=ds_ss_avg %>%
     ## Warning: Column `cntry_name` joining character vector and factor, coercing
     ## into character vector
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-61-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-56-1.png)
 
 Using the same classification on selected World Bank and UNHCR seems to be supportive of the grouping even though no formal clustering based on these values has been conducted - at least not yet.
 
@@ -3446,7 +3752,7 @@ ggplot(data=ds_ss_avg %>%
     ## Warning: Column `cntry_name` joining character vector and factor, coercing
     ## into character vector
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-62-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-1.png)
 
 ``` r
 # UNHCR
@@ -3469,7 +3775,7 @@ ggplot(data=ds_ss_avg %>%
     ## Warning: Column `cntry_name` joining character vector and factor, coercing
     ## into character vector
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-62-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-2.png)
 
 Visual box plot comparisons of selected UNHCR and WB indicators seem to support the clustering clustering based on ESS data.
 
@@ -3550,3 +3856,33 @@ Technical notes
 ---------------
 
 Caption and figure numbering is produced as described by Norbert Köhler in his blog post ["R Markdown: How to number and reference tables"](https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/)
+
+Top matter definitios
+
+-   Azure - handles javascript, no problem with document size
+    -   output:
+        -   html\_document:
+            -   toc: yes
+            -   toc\_depth: 4
+    -   params:
+        -   interactive\_graphs: TRUE
+        -   explore\_indicator\_graphs: TRUE
+        -   explore\_country\_graphs: TRUE
+-   RPubs - handles javascript, document size limitation
+    -   output:
+        -   html\_document:
+            -   toc: yes
+            -   toc\_depth: 4
+    -   params:
+        -   interactive\_graphs: TRUE
+        -   explore\_indicator\_graphs: FALSE
+        -   explore\_country\_graphs: FALSE
+-   Github - does not handle javascript, no size limit
+    -   output:
+        -   github\_document:
+            -   toc: yes
+            -   toc\_depth: 4
+    -   params:
+        -   interactive\_graphs: FALSE
+        -   explore\_indicator\_graphs: TRUE
+        -   explore\_country\_graphs: TRUE

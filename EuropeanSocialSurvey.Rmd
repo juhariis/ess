@@ -1,16 +1,26 @@
 ---
 title: "Happiness and European Parliament - Adventures in European Social Survey Data"
 author: "Juha Riissanen - juhariis@gmail.com"
-date: "2018-09-03"
+date: "2018-09-03 (updated 2018-09-11)"
 output:
   github_document:
     toc: yes
+    toc_depth: 4
+params:
+  interactive_graphs: FALSE
+  explore_indicator_graphs: TRUE
+  explore_country_graphs: TRUE
 ---
 
 * * *
 
 This workbook is used to create content for the completely revised and rewritten
-blog post on investigation of European Social Study.
+blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). 
+(HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and 
+[Azure](https://juhariis.z16.web.core.windows.net/). 
+Because Rpubs seems to have some size limitations, the exploratory graphs on indicators and 
+countries are not included.
+Current Azure subscription has not these limitations so there we have all content)
 
 * * * 
 
@@ -144,7 +154,7 @@ library(viridis)       # red-green colour blind compatible palettes
 
 
 # must set false for github_markup 
-create_interactive_plot <- FALSE
+create_interactive_plot <- params$interactive_graphs
 
 source("ess_subs.r")
 
@@ -207,6 +217,7 @@ p <- CreateEuroMap(mymap=mymap,
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
 
+
 # TODO: interactive mode ggiraph crashes for the map - could be a bug in the way
 # I use it with map. Will have to investigate more at a later date. But now set
 # interactive mode to FALSE
@@ -219,7 +230,8 @@ stretching all the way to Spain and Portugal in the far south western corner,
 which have been in all or nearly all surveys.
 
 ```{r}
-ggplot(data=ds_participations, aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
+p <- ggplot(data=ds_participations, 
+            aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
   geom_bar(stat="identity", fill="grey") +
   labs(
     title="Participation in surveys",
@@ -229,6 +241,8 @@ ggplot(data=ds_participations, aes(x=reorder(cntry_name, n_surveys), y=n_surveys
   theme(plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+
+print(p)
 
 # creating a caption for table so that it can be referenced in the text later on
 # ref https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/
@@ -260,7 +274,7 @@ persons and another practically none, as illustrated in the following
 graph.
 
 ```{r}
-ggplot(data = dataset, aes(pspwght)) +
+p <- ggplot(data = dataset, aes(pspwght)) +
   geom_histogram(bins = 200, fill = 'gray') +
   geom_vline(
     xintercept = quantile(dataset$pspwght),
@@ -279,6 +293,7 @@ ggplot(data = dataset, aes(pspwght)) +
   theme(plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
+print(p)
 
 ```
 
@@ -857,7 +872,7 @@ Scoping to the countries which have been in 50% or more of the surveys
 And just as a reminder, it is about associations and correlations only.
 Not possible to go into honest discussion about causality based on the data available.
 
-```{r}
+```{r get_ds_subset_50}
 
 ds_subset_50 <- dataset %>% 
   filter(cntry_name %in% cntry_in_50pct)
@@ -1073,7 +1088,7 @@ i.e. indicators which have too high correlation and would really not add to the 
 and would be in conflict with the requirements of linear modeling
 we aim to do.
 
-```{r}
+```{r address_collinearity}
 
 coll_cutoff <- 0.9
 print(paste("Cutoff level for correlation", coll_cutoff))
@@ -1117,7 +1132,7 @@ ds_subset_50_ave <- ds_subset_50_ave %>% select(colnames_keep)
 
 Turn dataset into narrow format for flexibility
 
-```{r}
+```{r create_ds_ss_avg}
 
 ds_ss_avg  <- ds_subset_50_ave %>% 
   gather(indicator, value, which(colnames(ds_subset_50_ave) %in% colnames(reduced_Data)))
@@ -1139,7 +1154,7 @@ missing.
 Since the countries differ in size - and therefore the indicators as well - we 
 use percentages and ratios when possible.
 
-```{r, warning=FALSE}
+```{r get_wb_data, warning=FALSE}
 
 wb_data <- GetPreProcessWbData(
   read_rds = TRUE, 
@@ -1184,7 +1199,7 @@ from UNHCR
 But first, we check what is in that UNHCR people of concern classification and how it has 
 changed over 2000s.
 
-```{r}
+```{r get_unhcr_data}
 
 # take data from beginning of ess surveys
 
@@ -1363,9 +1378,30 @@ knitr::kable(indicator_table[idx_pct,], digits = 3)
 
 ```
 
+
+```{r}
+
+# save  a copies to be used by other scripts
+
+saveRDS(indicator_table, file="indicator_table.rds")
+saveRDS(ds_ss_avg, file="ds_ss_avg.rds")
+
+ds_ss_avg_cntry_ind <- ds_ss_avg %>% 
+  spread(indicator, value)
+
+ds_ss_avg_ind_cntry <- ds_ss_avg %>% 
+  spread(cntry_name, value)
+
+
+```
+
 ## Explore Extended Data
 
 Investiating and learning the extended ESS data set spiced up with World Bank and UNHCR data.
+
+Note that an interactive version of the graphs below is available at the time
+of writing as a
+[shine application](https://juhariis.shinyapps.io/ess_shiny/) on web.
 
 ### By indicator
 
@@ -1373,107 +1409,156 @@ Checking first what we can learn from by indicator view, i.e.
 how different are the trajectories of countries.
 Are there any curious outliers?
 
-```{r, warning=FALSE}
+```{r explore_indicators, warning=FALSE}
 
-create_static_plot <- TRUE
+# need to construct a temporary rmd file which does not put javascript output inside 
+# a loop construct - the temporary file gets read by the next chunk of the document
 
-# By indicator
-
-ds_ss_avg_cntry_ind <- ds_ss_avg %>% 
-  spread(indicator, value)
-
-for (indicator_short in unique(ds_ss_avg$indicator)){
-  
-  # getting the right long description out
-
-  this_ind <- GetIndicator(indicator_short, indicator_table)
-  
-  # the plot
-  
-  p  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_cntry_ind,
-    id_term = indicator_short,
-    cntry_term = "cntry_name",
-    year_term = "ess_year",
-    txt_head = as.character(this_ind$name),
-    txt_subhead = indicator_short,
-    txt_caption = paste(as.character(this_ind$source), "2002-2016"),
-    show_summary = TRUE,
-    plevel = p_val)
-
-  if (!is.na(this_ind$lblmin)){
-    p$ci <- p$ci +
-      ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +
-      theme(axis.title.y = element_text(size = 9))
-  }
-  MyPrintInteractive(p$ci, create_interactive_plot, 
-                   hover_css = "stroke-width:3px;") 
+GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
+  # preparing an additional file to allow renderin of javascript, id and prefix not necessary
+  c(
+    " ",
+    paste0("#### ", indicator_short),
+    " ",
+    "```{r, echo=FALSE, warning=FALSE}", 
+    paste0("this_ind <- GetIndicator('", 
+           indicator_short,
+           "', indicator_table)"),
+    paste0("p",prefix,id,"  <- MakeIndicatorCountryPlot("),
+    "ds = ds_ss_avg_cntry_ind,",
+    paste0("id_term = '",indicator_short,"',"),
+    "cntry_term = 'cntry_name',",
+    "year_term = 'ess_year',",
+    "txt_head = as.character(this_ind$name),",
+    "txt_subhead = indicator_short,",
+    "txt_caption = paste(as.character(this_ind$source), '2002-2016'),",
+    "show_summary = TRUE,",
+    "plevel = p_val)",
+    "if (!is.na(this_ind$lblmin)){",
+    paste0("p",prefix,id,"$ci <- p",prefix,id,"$ci +"),
+    "ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +",
+    "theme(axis.title.y = element_text(size = 9))",
+    "}",
+    paste0("MyPrintInteractive(p",prefix,id,"$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') "),
+    " ",
+    "```", 
+    " "
+  )
 }
+
+if (params$explore_indicator_graphs){
+  ascript <- NULL
+  for (indicator_short in unique(ds_ss_avg$indicator)){
+    ascript <- c(ascript, GetIndicatorPlotJs(indicator_short, length(ascript), "ind"))
+  }
+} else {
+  ascript <- c("", "Exploratory graphs skipped due to keep the document shorter.", " ")
+}
+
+tmp_indicators_rmd <- "tmp_indicators.rmd"
+if (file.exists(tmp_indicators_rmd)) file.remove(tmp_indicators_rmd)
+fileConn<-file(tmp_indicators_rmd)
+writeLines(c(
+  " ",
+  ascript, 
+  " "
+  ), fileConn)
+close(fileConn)
 
 ```
 
+```{r indicators-active, child = 'tmp_indicators.Rmd'}
+```
+
+
 ### By country
 
-```{r, warning=FALSE, results='asis'}
+```{r, warning=FALSE}
+
+GetCountryPlotJs <- function(cntry) {
+  # preparing an additional file to allow rendering of javascript
+  c(
+    " ",
+    paste0("#### ", cntry),
+    "```{r, echo=FALSE, warning=FALSE}", 
+    " ",
+    "p_ess  <- MakeIndicatorCountryPlot(",
+    "  ds = ds_ss_avg_ind_cntry %>% ",
+    "    filter(indicator %in% (indicator_table %>% ",
+    "                             filter(source=='ESS'))$indicator),",
+    paste0("  id_term = '",cntry,"',"),
+    "  cntry_term = 'indicator',",
+    "  year_term = 'ess_year',",
+    paste0("  txt_head = '",cntry,"',"),
+    "  txt_subhead = 'ESS survey indicators',",
+    "  txt_caption = 'ESS 2002-2016',",
+    "  show_summary = FALSE,",
+    "  label_size_coef = lbl_coef,",
+    "  plevel = p_val)",
+    " ",
+    "p_wb_a  <- MakeIndicatorCountryPlot(",
+    "  ds = ds_ss_avg_ind_cntry %>% ",
+    "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
+    "                             filter(max > pct_max_split))$indicator),",
+    paste0("  id_term = '",cntry,"',"),
+    "  cntry_term = 'indicator',",
+    "  year_term = 'ess_year',",
+    paste0("  txt_head = '",cntry,"',"),
+    "  txt_subhead = 'World Bank Development Indices & UNHCR',",
+    "  txt_caption = 'World Bank & UNHCR 2002-16',",
+    "  show_summary = FALSE,",
+    "  label_size_coef = lbl_coef,",
+    "  plevel = p_val)",
+    " ",
+    "p_wb_b  <- MakeIndicatorCountryPlot(",
+    "  ds = ds_ss_avg_ind_cntry %>% ",
+    "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
+    "                             filter(max <= pct_max_split))$indicator),",
+    paste0("  id_term = '",cntry,"',"),
+    "  cntry_term = 'indicator',",
+    "  year_term = 'ess_year',",
+    paste0("  txt_head = '",cntry,"',"),
+    "  txt_subhead = 'World Bank Development Indices & UNHCR',",
+    "  txt_caption = 'World Bank & UNHCR 2002-16',",
+    "  show_summary = FALSE,",
+    "  label_size_coef = lbl_coef,",
+    "  plevel = p_val)",
+    " ",
+    "MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_a$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_b$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "```", 
+    " "
+  )
+}
 
 lbl_coef <- 1
 pct_max_split <- 30
 
-ds_ss_avg_ind_cntry <- ds_ss_avg %>% 
-  spread(cntry_name, value)
-
-for (cntry in unique(ds_ss_avg$cntry_name)){
-  
-  cat(paste0("\n\n#### ",cntry, '\n\n'))
-  
-  p_ess  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_ind_cntry %>% 
-      filter(indicator %in% (indicator_table %>% 
-                               filter(source=="ESS"))$indicator),
-    id_term = cntry,
-    cntry_term = "indicator",
-    year_term = "ess_year",
-    txt_head = cntry,
-    txt_subhead = "ESS survey indicators",
-    txt_caption = "ESS 2002-2016",
-    show_summary = FALSE,
-    label_size_coef = lbl_coef,
-    plevel = p_val)
-  
-  p_wb_a  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_ind_cntry %>% 
-      filter(indicator %in% (indicator_table[idx_pct,] %>% 
-                               filter(max > pct_max_split))$indicator),
-    id_term = cntry,
-    cntry_term = "indicator",
-    year_term = "ess_year",
-    txt_head = cntry,
-    txt_subhead = "World Bank Development Indices & UNHCR",
-    txt_caption = "World Bank & UNHCR 2002-16",
-    show_summary = FALSE,
-    label_size_coef = lbl_coef,
-    plevel = p_val)
-  
-  p_wb_b  <- MakeIndicatorCountryPlot(
-    ds = ds_ss_avg_ind_cntry %>% 
-      filter(indicator %in% (indicator_table[idx_pct,] %>% 
-                               filter(max <= pct_max_split))$indicator),
-    id_term = cntry,
-    cntry_term = "indicator",
-    year_term = "ess_year",
-    txt_head = cntry,
-    txt_subhead = "World Bank Development Indices & UNHCR",
-    txt_caption = "World Bank & UNHCR 2002-16",
-    show_summary = FALSE,
-    label_size_coef = lbl_coef,
-    plevel = p_val)
-  
-  MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = "stroke-width:3px;") 
-  MyPrintInteractive(p_wb_a$ci, create_interactive_plot,hover_css = "stroke-width:3px;") 
-  MyPrintInteractive(p_wb_b$ci, create_interactive_plot,hover_css = "stroke-width:3px;") 
+if (params$explore_country_graphs){
+  ascript <- NULL
+  for (cntry in unique(ds_ss_avg$cntry_name)){
+    ascript <- c(ascript, GetCountryPlotJs(cntry))
+  } 
+}else {
+  ascript <- c("", "Exploratory graphs skipped to keep the document shorter.", " ")
 }
 
+tmp_countries_rmd <- "tmp_countries.rmd"
+if (file.exists(tmp_countries_rmd)) file.remove(tmp_countries_rmd)
+fileConn<-file(tmp_countries_rmd)
+writeLines(c(
+  "",
+  ascript, 
+  ""
+  ), fileConn)
+close(fileConn)
+
 ```
+
+```{r countries-active, child = 'tmp_countries.Rmd'}
+```
+
 
 
 ## Linear Modeling
@@ -2312,3 +2397,34 @@ Csv extract of all data was used.
 Caption and figure numbering is produced as described by Norbert Köhler in 
 his blog post ["R Markdown: How to number and reference tables"](https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/)
 
+Top matter definitios
+
+* Azure - handles javascript, no problem with document size
+    * output:
+        * html_document:
+            * toc: yes
+            * toc_depth: 4
+    * params:
+        * interactive_graphs: TRUE
+        * explore_indicator_graphs: TRUE
+        * explore_country_graphs: TRUE
+        
+* RPubs - handles javascript, document size limitation
+    * output:
+        * html_document:
+            * toc: yes
+            * toc_depth: 4
+    * params:
+        * interactive_graphs: TRUE
+        * explore_indicator_graphs: FALSE
+        * explore_country_graphs: FALSE
+        
+* Github - does not handle javascript, no size limit
+    * output:
+        * github_document:
+            * toc: yes
+            * toc_depth: 4
+    * params:
+        * interactive_graphs: FALSE
+        * explore_indicator_graphs: TRUE
+        * explore_country_graphs: TRUE
