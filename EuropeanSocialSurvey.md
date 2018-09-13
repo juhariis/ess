@@ -1,7 +1,7 @@
 Happiness and European Parliament - Adventures in European Social Survey Data
 ================
 Juha Riissanen - <juhariis@gmail.com>
-2018-09-03 (updated 2018-09-11)
+2018-09-13
 
 -   [European Social Survey](#european-social-survey)
 -   [ESS Data](#ess-data)
@@ -135,7 +135,7 @@ Juha Riissanen - <juhariis@gmail.com>
 
 ------------------------------------------------------------------------
 
-This workbook is used to create content for the completely revised and rewritten blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and [Azure](https://juhariis.z16.web.core.windows.net/). Because Rpubs seems to have some size limitations, the exploratory graphs on indicators and countries are not included. Current Azure subscription has not these limitations so there we have all content)
+This workbook is used to create content for the blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and [Azure](https://juhariis.z16.web.core.windows.net/EuropeanSocialSurvey.html). Since Rpubs seems to have some size limitations, the exploratory graphs on indicators and countries are not included. Current Azure subscription has not these limitations so there we have all content. But loading of the page may take some time..)
 
 ------------------------------------------------------------------------
 
@@ -231,7 +231,7 @@ library(viridis)       # red-green colour blind compatible palettes
 
 
 # must set false for github_markup 
-create_interactive_plot <- params$interactive_graphs
+plot_wo_widget <- params$html_wo_widget
 
 source("ess_subs.r")
 
@@ -326,33 +326,27 @@ ds_participations <- dataset %>%
          n_surveys = n()) %>% 
   spread(ess_year, n)
 
-# map setup
-mymap <- SetupMyMap(data_folder = my_data_folder, 
-                    ds_participations = ds_participations)
-
 # On geographic map
-p <- CreateEuroMap(mymap=mymap, 
-                   ds = ds_participations, 
+p <- CreateEuroMap(dsin = ds_participations %>% ungroup(), 
                    ind_name = "n_surveys",
                    txt_title = "Participation in surveys",
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
-
-
-# TODO: interactive mode ggiraph crashes for the map - could be a bug in the way
-# I use it with map. Will have to investigate more at a later date. But now set
-# interactive mode to FALSE
-MyPrintInteractive(p, FALSE) 
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-3-1.png)
+    ## PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
 
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-15113682276a656d7271">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-3.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 So, there is a band of countries starting from Finland in the north eastern corner of Europe, stretching all the way to Spain and Portugal in the far south western corner, which have been in all or nearly all surveys.
 
 ``` r
 p <- ggplot(data=ds_participations, 
-            aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
-  geom_bar(stat="identity", fill="grey") +
+            aes(x=reorder(cntry_name, n_surveys))) +
+  geom_bar_interactive(stat="identity", fill="grey", aes(y=n_surveys, tooltip=paste0(cntry_name, '\n', n_surveys))) +
   labs(
     title="Participation in surveys",
     subtitle="Number of surveys a country has participated in",
@@ -362,11 +356,13 @@ p <- ggplot(data=ds_participations,
         plot.subtitle = element_text(hjust = 0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 
-print(p)
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-4-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3dc28159d26bef7d7cd9">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-4.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 # creating a caption for table so that it can be referenced in the text later on
 # ref https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/
@@ -540,18 +536,19 @@ Next we investigate the average scores by country on geographic map to see if th
 ``` r
 ds_happy_avgsum <- MakeAverageSummary(ds = ds_happy_ave, value_term = "var_ave")
 
-p <- CreateEuroMap(mymap=mymap, 
-                   ds = ds_happy_avgsum %>%
+p <- CreateEuroMap(dsin = ds_happy_avgsum %>%
                      filter(cntry_name != "Mean"), 
                    ind_name = "var_ave",
                    txt_title = "Subjective happiness 2002-2016",
                    txt_subtitle = "Average score of 'happy', scale 0-10",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, FALSE) 
+MyPrintInteractive(p, TRUE) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-9-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-d4f214e30a9f89ddb5a6">{"x":{"html":"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" id=\"svg_3\" viewBox=\"0 0 432.00 360.00\">\n  <g>\n    <defs>\n      <clipPath id=\"cl3_0\">\n        <rect x=\"0.00\" y=\"360.00\" width=\"0.00\" height=\"72.00\"/>\n      <\/clipPath>\n    <\/defs>\n    <rect x=\"0.00\" y=\"0.00\" width=\"432.00\" height=\"360.00\" id=\"1\" clip-path=\"url(#cl3_0)\" fill=\"#FFFFFF\" fill-opacity=\"1\" stroke-width=\"0.75\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <defs>\n      <clipPath id=\"cl3_1\">\n        <rect x=\"0.00\" y=\"0.00\" width=\"432.00\" height=\"360.00\"/>\n      <\/clipPath>\n    <\/defs>\n    <defs>\n      <clipPath id=\"cl3_2\">\n        <rect x=\"32.75\" y=\"81.34\" width=\"318.90\" height=\"226.98\"/>\n      <\/clipPath>\n    <\/defs>\n    <polyline points=\"32.75,279.24 351.66,279.24\" id=\"2\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,232.35 351.66,232.35\" id=\"3\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,185.45 351.66,185.45\" id=\"4\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,138.55 351.66,138.55\" id=\"5\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,91.66 351.66,91.66\" id=\"6\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"53.84,308.32 53.84,81.34\" id=\"7\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"119.73,308.32 119.73,81.34\" id=\"8\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"185.62,308.32 185.62,81.34\" id=\"9\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"251.50,308.32 251.50,81.34\" id=\"10\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"317.39,308.32 317.39,81.34\" id=\"11\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.320094\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,302.69 351.66,302.69\" id=\"12\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,255.79 351.66,255.79\" id=\"13\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,208.90 351.66,208.90\" id=\"14\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,162.00 351.66,162.00\" id=\"15\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"32.75,115.11 351.66,115.11\" id=\"16\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"86.78,308.32 86.78,81.34\" id=\"17\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"152.67,308.32 152.67,81.34\" id=\"18\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"218.56,308.32 218.56,81.34\" id=\"19\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"284.45,308.32 284.45,81.34\" id=\"20\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polyline points=\"350.34,308.32 350.34,81.34\" id=\"21\" clip-path=\"url(#cl3_2)\" fill=\"none\" stroke-width=\"0.426791\" stroke=\"#CCCCCC\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\"/>\n    <polygon points=\"207.79,200.59 207.31,202.54 204.27,202.53 205.27,203.57 203.32,206.63 202.24,207.43 197.43,207.51 194.59,208.56 190.07,208.14 182.35,206.77 181.33,205.09 175.84,205.81 175.08,206.71 171.87,205.96 169.11,205.76 166.79,204.83 167.81,203.68 167.73,202.82 169.40,202.60 171.94,204.00 172.89,202.75 177.63,203.06 181.59,202.28 184.16,202.47 185.74,203.48 186.33,202.68 185.89,199.56 187.88,198.99 189.97,196.82 193.78,198.41 196.92,196.50 198.81,196.17 202.84,197.66 205.35,197.43 207.77,198.34 207.32,198.94 207.79,200.59\" id=\"22\" clip-path=\"url(#cl3_2)\" fill=\"#29AF7F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"23\" clip-path=\"url(#cl3_2)\" fill=\"#218E8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"24\" clip-path=\"url(#cl3_2)\" fill=\"#1F958B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"25\" clip-path=\"url(#cl3_2)\" fill=\"#27AD81\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"26\" clip-path=\"url(#cl3_2)\" fill=\"#A2DA37\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"27\" clip-path=\"url(#cl3_2)\" fill=\"#A1DA38\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"28\" clip-path=\"url(#cl3_2)\" fill=\"#A7DB35\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"29\" clip-path=\"url(#cl3_2)\" fill=\"#99D83D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"30\" clip-path=\"url(#cl3_2)\" fill=\"#9DD93B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"31\" clip-path=\"url(#cl3_2)\" fill=\"#91D743\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.79,200.59 207.31,202.54 204.27,202.53 205.27,203.57 203.32,206.63 202.24,207.43 197.43,207.51 194.59,208.56 190.07,208.14 182.35,206.77 181.33,205.09 175.84,205.81 175.08,206.71 171.87,205.96 169.11,205.76 166.79,204.83 167.81,203.68 167.73,202.82 169.40,202.60 171.94,204.00 172.89,202.75 177.63,203.06 181.59,202.28 184.16,202.47 185.74,203.48 186.33,202.68 185.89,199.56 187.88,198.99 189.97,196.82 193.78,198.41 196.92,196.50 198.81,196.17 202.84,197.66 205.35,197.43 207.77,198.34 207.32,198.94 207.79,200.59\" id=\"32\" clip-path=\"url(#cl3_2)\" fill=\"#50C46A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"33\" clip-path=\"url(#cl3_2)\" fill=\"#AEDC30\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"34\" clip-path=\"url(#cl3_2)\" fill=\"#A2DA37\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"249.14,104.76 249.51,107.80 255.39,110.46 253.25,113.86 258.76,118.65 257.44,122.52 261.72,125.66 261.01,128.61 267.63,131.39 266.86,133.73 263.92,136.48 256.57,142.54 249.06,143.12 241.92,144.95 235.12,146.02 232.46,143.59 228.31,142.15 228.96,137.71 226.78,133.69 228.50,131.08 231.78,128.25 239.79,123.30 242.10,122.32 241.40,120.47 236.10,118.51 234.68,116.83 233.73,110.13 228.28,107.26 223.85,105.19 225.69,104.04 229.41,106.27 233.58,105.99 237.20,106.96 239.91,104.97 240.80,101.78 245.19,100.16 249.59,101.70 249.14,104.76\" id=\"35\" clip-path=\"url(#cl3_2)\" fill=\"#B6DE2B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"36\" clip-path=\"url(#cl3_2)\" fill=\"#25AC82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"37\" clip-path=\"url(#cl3_2)\" fill=\"#25AC82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"38\" clip-path=\"url(#cl3_2)\" fill=\"#32B67A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"39\" clip-path=\"url(#cl3_2)\" fill=\"#32B67A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"40\" clip-path=\"url(#cl3_2)\" fill=\"#2AB07F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"41\" clip-path=\"url(#cl3_2)\" fill=\"#2AB07F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"42\" clip-path=\"url(#cl3_2)\" fill=\"#22A785\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"43\" clip-path=\"url(#cl3_2)\" fill=\"#22A785\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"44\" clip-path=\"url(#cl3_2)\" fill=\"#21A585\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"45\" clip-path=\"url(#cl3_2)\" fill=\"#21A585\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"46\" clip-path=\"url(#cl3_2)\" fill=\"#1F9E89\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"47\" clip-path=\"url(#cl3_2)\" fill=\"#1F9E89\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"48\" clip-path=\"url(#cl3_2)\" fill=\"#25AB82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"49\" clip-path=\"url(#cl3_2)\" fill=\"#25AB82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"50\" clip-path=\"url(#cl3_2)\" fill=\"#2BB17E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"51\" clip-path=\"url(#cl3_2)\" fill=\"#2BB17E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.21,188.14 142.17,190.53 144.91,190.27 148.89,192.62 149.95,193.07 151.48,193.03 153.66,194.36 161.04,195.49 157.72,198.66 156.37,202.04 154.73,202.81 152.37,202.29 152.28,203.51 147.75,206.06 147.20,208.23 149.97,207.57 151.42,209.74 150.92,211.09 152.20,212.95 149.98,214.36 150.71,218.14 153.65,218.85 152.63,220.93 146.96,223.52 135.99,221.83 127.35,223.09 125.99,226.00 119.19,226.36 113.36,223.87 111.00,224.83 101.22,222.10 99.58,220.08 103.40,217.31 107.58,207.71 103.79,202.34 100.79,199.67 93.51,197.30 94.43,193.77 101.52,193.19 109.73,194.96 110.11,189.47 114.18,191.80 127.37,188.77 130.15,184.97 134.85,184.24 135.07,185.94 137.40,186.13 139.21,188.14\" id=\"52\" clip-path=\"url(#cl3_2)\" fill=\"#30B47C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"163.64,228.74 161.18,232.46 158.67,231.40 157.82,228.09 159.27,226.31 163.26,224.54 163.64,228.74\" id=\"53\" clip-path=\"url(#cl3_2)\" fill=\"#30B47C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"54\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"55\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"56\" clip-path=\"url(#cl3_2)\" fill=\"#4DC36B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"57\" clip-path=\"url(#cl3_2)\" fill=\"#4DC36B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"58\" clip-path=\"url(#cl3_2)\" fill=\"#37B878\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"59\" clip-path=\"url(#cl3_2)\" fill=\"#37B878\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"60\" clip-path=\"url(#cl3_2)\" fill=\"#40BD72\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"61\" clip-path=\"url(#cl3_2)\" fill=\"#40BD72\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"62\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"63\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"64\" clip-path=\"url(#cl3_2)\" fill=\"#2EB37C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"65\" clip-path=\"url(#cl3_2)\" fill=\"#2EB37C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"66\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"67\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"68\" clip-path=\"url(#cl3_2)\" fill=\"#4AC16D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"69\" clip-path=\"url(#cl3_2)\" fill=\"#4AC16D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"123.18,147.92 116.10,152.48 120.82,152.21 125.56,152.60 122.69,156.24 116.75,160.06 121.28,160.70 121.42,161.21 123.16,166.95 126.05,167.91 126.92,173.40 127.60,175.33 133.17,176.55 131.56,179.52 128.57,180.76 129.73,183.30 124.38,185.53 117.68,185.09 108.64,185.86 106.68,184.77 102.45,186.76 98.04,185.90 93.73,187.45 91.49,186.30 100.99,181.87 105.84,181.17 105.80,181.16 98.50,179.81 97.99,177.83 103.71,176.76 102.24,174.03 104.58,171.04 111.42,171.99 111.43,171.99 113.32,169.33 111.51,166.24 111.47,166.17 106.27,164.91 105.80,163.57 108.49,161.64 107.65,160.24 104.10,162.22 106.17,157.75 105.21,155.22 109.38,150.63 114.71,147.23 117.88,147.89 123.18,147.92\" id=\"70\" clip-path=\"url(#cl3_2)\" fill=\"#55C667\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"101.96,165.70 97.86,168.69 94.85,167.43 91.96,167.24 94.26,164.83 94.69,162.26 98.58,162.41 101.96,165.70\" id=\"71\" clip-path=\"url(#cl3_2)\" fill=\"#55C667\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"263.31,231.82 261.82,234.91 260.47,235.48 256.85,235.40 253.73,234.98 246.65,236.34 250.97,239.04 247.99,239.87 244.66,239.91 241.36,237.42 240.30,238.51 241.79,241.42 244.93,243.69 242.71,244.79 246.22,247.02 249.33,248.42 249.60,251.20 243.86,249.95 245.81,252.44 241.93,253.00 244.49,257.34 240.37,257.43 235.19,255.31 232.76,251.38 231.59,248.11 229.16,245.86 226.00,243.07 225.57,241.68 228.31,239.29 228.63,237.70 230.55,236.99 230.63,235.70 234.49,235.25 236.70,234.17 239.91,234.24 240.83,233.38 241.94,233.21 246.31,233.31 250.92,231.91 255.20,233.56 260.51,233.01 260.32,230.58 263.31,231.82\" id=\"72\" clip-path=\"url(#cl3_2)\" fill=\"#2D718E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"248.09,260.86 251.62,262.49 256.48,262.16 261.18,262.45 261.10,263.32 264.47,262.67 263.81,264.15 254.77,264.68 254.78,263.86 247.05,262.97 248.09,260.86\" id=\"73\" clip-path=\"url(#cl3_2)\" fill=\"#2D718E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"263.31,231.82 261.82,234.91 260.47,235.48 256.85,235.40 253.73,234.98 246.65,236.34 250.97,239.04 247.99,239.87 244.66,239.91 241.36,237.42 240.30,238.51 241.79,241.42 244.93,243.69 242.71,244.79 246.22,247.02 249.33,248.42 249.60,251.20 243.86,249.95 245.81,252.44 241.93,253.00 244.49,257.34 240.37,257.43 235.19,255.31 232.76,251.38 231.59,248.11 229.16,245.86 226.00,243.07 225.57,241.68 228.31,239.29 228.63,237.70 230.55,236.99 230.63,235.70 234.49,235.25 236.70,234.17 239.91,234.24 240.83,233.38 241.94,233.21 246.31,233.31 250.92,231.91 255.20,233.56 260.51,233.01 260.32,230.58 263.31,231.82\" id=\"74\" clip-path=\"url(#cl3_2)\" fill=\"#2A768E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"248.09,260.86 251.62,262.49 256.48,262.16 261.18,262.45 261.10,263.32 264.47,262.67 263.81,264.15 254.77,264.68 254.78,263.86 247.05,262.97 248.09,260.86\" id=\"75\" clip-path=\"url(#cl3_2)\" fill=\"#2A768E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"76\" clip-path=\"url(#cl3_2)\" fill=\"#5EC962\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"263.31,231.82 261.82,234.91 260.47,235.48 256.85,235.40 253.73,234.98 246.65,236.34 250.97,239.04 247.99,239.87 244.66,239.91 241.36,237.42 240.30,238.51 241.79,241.42 244.93,243.69 242.71,244.79 246.22,247.02 249.33,248.42 249.60,251.20 243.86,249.95 245.81,252.44 241.93,253.00 244.49,257.34 240.37,257.43 235.19,255.31 232.76,251.38 231.59,248.11 229.16,245.86 226.00,243.07 225.57,241.68 228.31,239.29 228.63,237.70 230.55,236.99 230.63,235.70 234.49,235.25 236.70,234.17 239.91,234.24 240.83,233.38 241.94,233.21 246.31,233.31 250.92,231.91 255.20,233.56 260.51,233.01 260.32,230.58 263.31,231.82\" id=\"77\" clip-path=\"url(#cl3_2)\" fill=\"#23888E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"248.09,260.86 251.62,262.49 256.48,262.16 261.18,262.45 261.10,263.32 264.47,262.67 263.81,264.15 254.77,264.68 254.78,263.86 247.05,262.97 248.09,260.86\" id=\"78\" clip-path=\"url(#cl3_2)\" fill=\"#23888E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"263.31,231.82 261.82,234.91 260.47,235.48 256.85,235.40 253.73,234.98 246.65,236.34 250.97,239.04 247.99,239.87 244.66,239.91 241.36,237.42 240.30,238.51 241.79,241.42 244.93,243.69 242.71,244.79 246.22,247.02 249.33,248.42 249.60,251.20 243.86,249.95 245.81,252.44 241.93,253.00 244.49,257.34 240.37,257.43 235.19,255.31 232.76,251.38 231.59,248.11 229.16,245.86 226.00,243.07 225.57,241.68 228.31,239.29 228.63,237.70 230.55,236.99 230.63,235.70 234.49,235.25 236.70,234.17 239.91,234.24 240.83,233.38 241.94,233.21 246.31,233.31 250.92,231.91 255.20,233.56 260.51,233.01 260.32,230.58 263.31,231.82\" id=\"79\" clip-path=\"url(#cl3_2)\" fill=\"#277E8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"248.09,260.86 251.62,262.49 256.48,262.16 261.18,262.45 261.10,263.32 264.47,262.67 263.81,264.15 254.77,264.68 254.78,263.86 247.05,262.97 248.09,260.86\" id=\"80\" clip-path=\"url(#cl3_2)\" fill=\"#277E8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"263.31,231.82 261.82,234.91 260.47,235.48 256.85,235.40 253.73,234.98 246.65,236.34 250.97,239.04 247.99,239.87 244.66,239.91 241.36,237.42 240.30,238.51 241.79,241.42 244.93,243.69 242.71,244.79 246.22,247.02 249.33,248.42 249.60,251.20 243.86,249.95 245.81,252.44 241.93,253.00 244.49,257.34 240.37,257.43 235.19,255.31 232.76,251.38 231.59,248.11 229.16,245.86 226.00,243.07 225.57,241.68 228.31,239.29 228.63,237.70 230.55,236.99 230.63,235.70 234.49,235.25 236.70,234.17 239.91,234.24 240.83,233.38 241.94,233.21 246.31,233.31 250.92,231.91 255.20,233.56 260.51,233.01 260.32,230.58 263.31,231.82\" id=\"81\" clip-path=\"url(#cl3_2)\" fill=\"#424186\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"248.09,260.86 251.62,262.49 256.48,262.16 261.18,262.45 261.10,263.32 264.47,262.67 263.81,264.15 254.77,264.68 254.78,263.86 247.05,262.97 248.09,260.86\" id=\"82\" clip-path=\"url(#cl3_2)\" fill=\"#424186\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.70,211.21 219.05,213.07 220.84,214.44 218.68,216.25 216.14,215.18 212.25,215.24 207.45,214.43 204.83,214.52 203.57,215.51 201.61,214.39 200.33,216.38 202.99,218.65 204.16,220.16 206.72,221.98 208.87,223.06 211.00,225.09 216.10,226.94 215.45,227.76 210.03,225.95 206.73,224.19 201.53,222.72 196.92,219.12 198.09,218.77 195.63,216.72 195.63,215.09 192.08,214.29 190.20,216.35 188.67,214.71 188.94,213.05 189.15,212.97 193.02,213.18 194.10,212.39 195.94,213.19 198.13,213.31 198.19,211.96 200.15,211.49 200.79,209.56 205.24,208.31 206.97,208.92 211.05,210.99 215.62,211.92 217.70,211.21\" id=\"83\" clip-path=\"url(#cl3_2)\" fill=\"#24878E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.70,211.21 219.05,213.07 220.84,214.44 218.68,216.25 216.14,215.18 212.25,215.24 207.45,214.43 204.83,214.52 203.57,215.51 201.61,214.39 200.33,216.38 202.99,218.65 204.16,220.16 206.72,221.98 208.87,223.06 211.00,225.09 216.10,226.94 215.45,227.76 210.03,225.95 206.73,224.19 201.53,222.72 196.92,219.12 198.09,218.77 195.63,216.72 195.63,215.09 192.08,214.29 190.20,216.35 188.67,214.71 188.94,213.05 189.15,212.97 193.02,213.18 194.10,212.39 195.94,213.19 198.13,213.31 198.19,211.96 200.15,211.49 200.79,209.56 205.24,208.31 206.97,208.92 211.05,210.99 215.62,211.92 217.70,211.21\" id=\"84\" clip-path=\"url(#cl3_2)\" fill=\"#228D8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.70,211.21 219.05,213.07 220.84,214.44 218.68,216.25 216.14,215.18 212.25,215.24 207.45,214.43 204.83,214.52 203.57,215.51 201.61,214.39 200.33,216.38 202.99,218.65 204.16,220.16 206.72,221.98 208.87,223.06 211.00,225.09 216.10,226.94 215.45,227.76 210.03,225.95 206.73,224.19 201.53,222.72 196.92,219.12 198.09,218.77 195.63,216.72 195.63,215.09 192.08,214.29 190.20,216.35 188.67,214.71 188.94,213.05 189.15,212.97 193.02,213.18 194.10,212.39 195.94,213.19 198.13,213.31 198.19,211.96 200.15,211.49 200.79,209.56 205.24,208.31 206.97,208.92 211.05,210.99 215.62,211.92 217.70,211.21\" id=\"85\" clip-path=\"url(#cl3_2)\" fill=\"#26828E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"86\" clip-path=\"url(#cl3_2)\" fill=\"#33638D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"87\" clip-path=\"url(#cl3_2)\" fill=\"#34608D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"88\" clip-path=\"url(#cl3_2)\" fill=\"#31688E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"89\" clip-path=\"url(#cl3_2)\" fill=\"#31678E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"90\" clip-path=\"url(#cl3_2)\" fill=\"#5DC863\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"91\" clip-path=\"url(#cl3_2)\" fill=\"#453882\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"92\" clip-path=\"url(#cl3_2)\" fill=\"#30698E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"93\" clip-path=\"url(#cl3_2)\" fill=\"#3D4D8A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"94\" clip-path=\"url(#cl3_2)\" fill=\"#32658E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"203.32,206.63 205.27,203.57 204.27,202.53 207.31,202.54 207.79,200.59 210.49,201.83 212.47,202.35 217.01,201.78 217.45,200.82 219.58,200.68 222.19,199.94 222.77,200.24 225.28,199.64 226.51,198.52 228.25,198.22 234.03,199.63 235.14,199.13 238.19,200.40 238.65,201.67 235.41,202.70 233.00,205.96 229.81,209.23 225.40,210.15 221.94,209.95 217.70,211.21 215.62,211.92 211.05,210.99 206.97,208.92 205.24,208.31 204.24,206.69 203.32,206.63\" id=\"95\" clip-path=\"url(#cl3_2)\" fill=\"#218E8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"96\" clip-path=\"url(#cl3_2)\" fill=\"#40BD72\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"97\" clip-path=\"url(#cl3_2)\" fill=\"#7DD24F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"98\" clip-path=\"url(#cl3_2)\" fill=\"#8CD646\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"99\" clip-path=\"url(#cl3_2)\" fill=\"#66CC5D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"100\" clip-path=\"url(#cl3_2)\" fill=\"#6ACD5B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"101\" clip-path=\"url(#cl3_2)\" fill=\"#3FBC73\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"102\" clip-path=\"url(#cl3_2)\" fill=\"#1F988B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"103\" clip-path=\"url(#cl3_2)\" fill=\"#1FA187\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"104\" clip-path=\"url(#cl3_2)\" fill=\"#29AF7F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"97.86,168.69 96.95,172.09 91.27,175.98 81.33,178.03 74.93,176.69 81.49,172.14 81.76,167.15 90.06,164.11 94.69,162.26 94.26,164.83 91.96,167.24 94.85,167.43 97.86,168.69\" id=\"105\" clip-path=\"url(#cl3_2)\" fill=\"#45BF70\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"104.72,108.66 101.41,111.30 102.48,114.78 95.17,117.42 82.60,118.85 78.90,119.15 75.08,117.75 67.30,114.68 72.57,113.41 68.01,109.97 74.48,110.26 75.75,109.00 70.46,106.70 75.75,104.41 81.00,104.72 82.55,108.49 89.73,107.06 92.41,108.94 99.79,107.54 104.72,108.66\" id=\"106\" clip-path=\"url(#cl3_2)\" fill=\"#D2E21B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"104.72,108.66 101.41,111.30 102.48,114.78 95.17,117.42 82.60,118.85 78.90,119.15 75.08,117.75 67.30,114.68 72.57,113.41 68.01,109.97 74.48,110.26 75.75,109.00 70.46,106.70 75.75,104.41 81.00,104.72 82.55,108.49 89.73,107.06 92.41,108.94 99.79,107.54 104.72,108.66\" id=\"107\" clip-path=\"url(#cl3_2)\" fill=\"#FDE725\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"108\" clip-path=\"url(#cl3_2)\" fill=\"#4FC46A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"104.72,108.66 101.41,111.30 102.48,114.78 95.17,117.42 82.60,118.85 78.90,119.15 75.08,117.75 67.30,114.68 72.57,113.41 68.01,109.97 74.48,110.26 75.75,109.00 70.46,106.70 75.75,104.41 81.00,104.72 82.55,108.49 89.73,107.06 92.41,108.94 99.79,107.54 104.72,108.66\" id=\"109\" clip-path=\"url(#cl3_2)\" fill=\"#C6E021\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"104.72,108.66 101.41,111.30 102.48,114.78 95.17,117.42 82.60,118.85 78.90,119.15 75.08,117.75 67.30,114.68 72.57,113.41 68.01,109.97 74.48,110.26 75.75,109.00 70.46,106.70 75.75,104.41 81.00,104.72 82.55,108.49 89.73,107.06 92.41,108.94 99.79,107.54 104.72,108.66\" id=\"110\" clip-path=\"url(#cl3_2)\" fill=\"#B1DD2E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"111\" clip-path=\"url(#cl3_2)\" fill=\"#55C667\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"112\" clip-path=\"url(#cl3_2)\" fill=\"#28AE80\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"113\" clip-path=\"url(#cl3_2)\" fill=\"#50C46A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"114\" clip-path=\"url(#cl3_2)\" fill=\"#56C667\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"115\" clip-path=\"url(#cl3_2)\" fill=\"#73D056\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"116\" clip-path=\"url(#cl3_2)\" fill=\"#4DC26C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.83,274.24 325.01,275.86 322.58,275.24 321.83,278.63 323.54,279.15 322.02,279.89 321.96,281.22 324.87,280.45 325.36,282.41 323.45,290.58 317.81,282.02 319.41,280.30 318.93,280.03 320.23,277.63 320.86,273.80 321.55,272.50 321.71,272.44 323.83,272.39 324.25,271.49 325.94,271.37 326.42,273.42 325.70,274.21 325.83,274.24\" id=\"117\" clip-path=\"url(#cl3_2)\" fill=\"#85D54A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"182.35,206.77 190.07,208.14 189.27,210.49 190.43,212.55 186.06,211.79 181.36,213.42 181.41,215.82 180.58,217.18 182.18,219.67 187.30,222.18 189.87,226.23 196.09,230.21 200.67,230.22 202.05,231.30 200.36,232.26 205.57,234.06 209.88,235.55 214.94,238.11 215.55,239.02 214.41,240.77 211.12,238.48 205.96,237.66 203.34,240.81 207.63,242.65 206.85,245.20 204.31,245.48 200.91,249.68 198.34,250.04 198.43,248.54 199.79,245.91 201.15,244.87 198.91,242.01 197.20,239.53 194.75,238.90 193.11,236.77 189.36,235.84 186.94,233.85 182.61,233.48 178.23,231.21 173.24,227.94 169.65,225.07 168.51,220.24 165.76,219.61 161.41,217.90 158.70,218.49 155.05,220.64 152.63,220.93 153.65,218.85 150.71,218.14 149.98,214.36 152.20,212.95 150.92,211.09 151.42,209.74 153.59,210.85 156.29,210.70 159.67,209.16 160.49,209.94 163.14,209.86 164.65,207.96 168.62,208.66 171.16,207.91 171.87,205.96 175.08,206.71 175.84,205.81 181.33,205.09 182.35,206.77\" id=\"118\" clip-path=\"url(#cl3_2)\" fill=\"#26818E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"197.41,248.45 195.02,252.31 195.87,253.84 194.45,256.37 189.82,254.47 186.71,253.91 178.31,251.29 179.38,248.77 186.49,249.31 192.76,248.84 197.41,248.45\" id=\"119\" clip-path=\"url(#cl3_2)\" fill=\"#26818E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"160.95,233.28 164.02,236.83 162.35,243.30 159.66,242.93 156.98,244.52 154.88,243.17 155.51,237.24 154.59,234.41 157.79,234.73 160.95,233.28\" id=\"120\" clip-path=\"url(#cl3_2)\" fill=\"#26818E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"121\" clip-path=\"url(#cl3_2)\" fill=\"#4DC36B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"182.35,206.77 190.07,208.14 189.27,210.49 190.43,212.55 186.06,211.79 181.36,213.42 181.41,215.82 180.58,217.18 182.18,219.67 187.30,222.18 189.87,226.23 196.09,230.21 200.67,230.22 202.05,231.30 200.36,232.26 205.57,234.06 209.88,235.55 214.94,238.11 215.55,239.02 214.41,240.77 211.12,238.48 205.96,237.66 203.34,240.81 207.63,242.65 206.85,245.20 204.31,245.48 200.91,249.68 198.34,250.04 198.43,248.54 199.79,245.91 201.15,244.87 198.91,242.01 197.20,239.53 194.75,238.90 193.11,236.77 189.36,235.84 186.94,233.85 182.61,233.48 178.23,231.21 173.24,227.94 169.65,225.07 168.51,220.24 165.76,219.61 161.41,217.90 158.70,218.49 155.05,220.64 152.63,220.93 153.65,218.85 150.71,218.14 149.98,214.36 152.20,212.95 150.92,211.09 151.42,209.74 153.59,210.85 156.29,210.70 159.67,209.16 160.49,209.94 163.14,209.86 164.65,207.96 168.62,208.66 171.16,207.91 171.87,205.96 175.08,206.71 175.84,205.81 181.33,205.09 182.35,206.77\" id=\"122\" clip-path=\"url(#cl3_2)\" fill=\"#2C728E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"197.41,248.45 195.02,252.31 195.87,253.84 194.45,256.37 189.82,254.47 186.71,253.91 178.31,251.29 179.38,248.77 186.49,249.31 192.76,248.84 197.41,248.45\" id=\"123\" clip-path=\"url(#cl3_2)\" fill=\"#2C728E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"160.95,233.28 164.02,236.83 162.35,243.30 159.66,242.93 156.98,244.52 154.88,243.17 155.51,237.24 154.59,234.41 157.79,234.73 160.95,233.28\" id=\"124\" clip-path=\"url(#cl3_2)\" fill=\"#2C728E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"182.35,206.77 190.07,208.14 189.27,210.49 190.43,212.55 186.06,211.79 181.36,213.42 181.41,215.82 180.58,217.18 182.18,219.67 187.30,222.18 189.87,226.23 196.09,230.21 200.67,230.22 202.05,231.30 200.36,232.26 205.57,234.06 209.88,235.55 214.94,238.11 215.55,239.02 214.41,240.77 211.12,238.48 205.96,237.66 203.34,240.81 207.63,242.65 206.85,245.20 204.31,245.48 200.91,249.68 198.34,250.04 198.43,248.54 199.79,245.91 201.15,244.87 198.91,242.01 197.20,239.53 194.75,238.90 193.11,236.77 189.36,235.84 186.94,233.85 182.61,233.48 178.23,231.21 173.24,227.94 169.65,225.07 168.51,220.24 165.76,219.61 161.41,217.90 158.70,218.49 155.05,220.64 152.63,220.93 153.65,218.85 150.71,218.14 149.98,214.36 152.20,212.95 150.92,211.09 151.42,209.74 153.59,210.85 156.29,210.70 159.67,209.16 160.49,209.94 163.14,209.86 164.65,207.96 168.62,208.66 171.16,207.91 171.87,205.96 175.08,206.71 175.84,205.81 181.33,205.09 182.35,206.77\" id=\"125\" clip-path=\"url(#cl3_2)\" fill=\"#39568C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"197.41,248.45 195.02,252.31 195.87,253.84 194.45,256.37 189.82,254.47 186.71,253.91 178.31,251.29 179.38,248.77 186.49,249.31 192.76,248.84 197.41,248.45\" id=\"126\" clip-path=\"url(#cl3_2)\" fill=\"#39568C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"160.95,233.28 164.02,236.83 162.35,243.30 159.66,242.93 156.98,244.52 154.88,243.17 155.51,237.24 154.59,234.41 157.79,234.73 160.95,233.28\" id=\"127\" clip-path=\"url(#cl3_2)\" fill=\"#39568C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"182.35,206.77 190.07,208.14 189.27,210.49 190.43,212.55 186.06,211.79 181.36,213.42 181.41,215.82 180.58,217.18 182.18,219.67 187.30,222.18 189.87,226.23 196.09,230.21 200.67,230.22 202.05,231.30 200.36,232.26 205.57,234.06 209.88,235.55 214.94,238.11 215.55,239.02 214.41,240.77 211.12,238.48 205.96,237.66 203.34,240.81 207.63,242.65 206.85,245.20 204.31,245.48 200.91,249.68 198.34,250.04 198.43,248.54 199.79,245.91 201.15,244.87 198.91,242.01 197.20,239.53 194.75,238.90 193.11,236.77 189.36,235.84 186.94,233.85 182.61,233.48 178.23,231.21 173.24,227.94 169.65,225.07 168.51,220.24 165.76,219.61 161.41,217.90 158.70,218.49 155.05,220.64 152.63,220.93 153.65,218.85 150.71,218.14 149.98,214.36 152.20,212.95 150.92,211.09 151.42,209.74 153.59,210.85 156.29,210.70 159.67,209.16 160.49,209.94 163.14,209.86 164.65,207.96 168.62,208.66 171.16,207.91 171.87,205.96 175.08,206.71 175.84,205.81 181.33,205.09 182.35,206.77\" id=\"128\" clip-path=\"url(#cl3_2)\" fill=\"#1F9A8A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"197.41,248.45 195.02,252.31 195.87,253.84 194.45,256.37 189.82,254.47 186.71,253.91 178.31,251.29 179.38,248.77 186.49,249.31 192.76,248.84 197.41,248.45\" id=\"129\" clip-path=\"url(#cl3_2)\" fill=\"#1F9A8A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"160.95,233.28 164.02,236.83 162.35,243.30 159.66,242.93 156.98,244.52 154.88,243.17 155.51,237.24 154.59,234.41 157.79,234.73 160.95,233.28\" id=\"130\" clip-path=\"url(#cl3_2)\" fill=\"#1F9A8A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"182.35,206.77 190.07,208.14 189.27,210.49 190.43,212.55 186.06,211.79 181.36,213.42 181.41,215.82 180.58,217.18 182.18,219.67 187.30,222.18 189.87,226.23 196.09,230.21 200.67,230.22 202.05,231.30 200.36,232.26 205.57,234.06 209.88,235.55 214.94,238.11 215.55,239.02 214.41,240.77 211.12,238.48 205.96,237.66 203.34,240.81 207.63,242.65 206.85,245.20 204.31,245.48 200.91,249.68 198.34,250.04 198.43,248.54 199.79,245.91 201.15,244.87 198.91,242.01 197.20,239.53 194.75,238.90 193.11,236.77 189.36,235.84 186.94,233.85 182.61,233.48 178.23,231.21 173.24,227.94 169.65,225.07 168.51,220.24 165.76,219.61 161.41,217.90 158.70,218.49 155.05,220.64 152.63,220.93 153.65,218.85 150.71,218.14 149.98,214.36 152.20,212.95 150.92,211.09 151.42,209.74 153.59,210.85 156.29,210.70 159.67,209.16 160.49,209.94 163.14,209.86 164.65,207.96 168.62,208.66 171.16,207.91 171.87,205.96 175.08,206.71 175.84,205.81 181.33,205.09 182.35,206.77\" id=\"131\" clip-path=\"url(#cl3_2)\" fill=\"#1F9E89\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"197.41,248.45 195.02,252.31 195.87,253.84 194.45,256.37 189.82,254.47 186.71,253.91 178.31,251.29 179.38,248.77 186.49,249.31 192.76,248.84 197.41,248.45\" id=\"132\" clip-path=\"url(#cl3_2)\" fill=\"#1F9E89\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"160.95,233.28 164.02,236.83 162.35,243.30 159.66,242.93 156.98,244.52 154.88,243.17 155.51,237.24 154.59,234.41 157.79,234.73 160.95,233.28\" id=\"133\" clip-path=\"url(#cl3_2)\" fill=\"#1F9E89\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.01,275.86 325.83,274.24 333.29,276.01 335.14,280.03 334.98,288.40 333.74,290.28 331.19,291.92 323.78,291.31 323.45,290.58 325.36,282.41 324.87,280.45 325.56,278.94 325.01,275.86\" id=\"134\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"135\" clip-path=\"url(#cl3_2)\" fill=\"#74D055\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"228.95,229.82 228.71,230.82 227.97,230.78 227.53,229.02 226.13,228.53 224.87,227.23 225.93,226.14 227.31,225.78 228.07,224.17 229.09,223.90 229.93,224.58 231.02,224.87 231.80,225.64 232.76,225.86 233.92,226.76 234.74,226.72 234.14,227.91 233.46,228.49 233.67,228.86 232.37,229.05 228.95,229.82\" id=\"136\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.94,271.37 324.25,271.49 323.83,272.39 321.71,272.44 323.20,268.28 325.63,264.65 325.71,264.48 328.57,264.63 330.00,266.56 326.95,268.57 325.94,271.37\" id=\"137\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"158.11,294.24 157.96,291.89 156.25,287.41 159.55,286.30 160.31,284.18 159.82,282.09 164.44,280.23 166.58,278.65 169.84,277.26 170.52,273.42 177.92,275.24 180.64,274.84 185.96,275.73 194.40,278.03 197.27,282.49 203.09,283.49 212.26,285.62 219.23,288.11 222.43,286.81 225.54,284.50 223.99,280.67 225.99,278.23 230.60,275.88 235.01,275.18 243.75,276.15 246.05,278.37 248.46,278.37 250.56,279.21 257.02,279.73 258.71,281.37 256.51,283.80 257.65,285.93 256.15,289.05 258.36,293.08\" id=\"138\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 236.14,170.16 236.55,168.88 234.39,168.17 229.38,167.40 228.20,163.53 233.43,162.07 241.21,162.26 245.69,161.73 246.46,162.67 248.96,162.92 253.77,165.05 254.54,167.11 250.88,168.68 250.13,171.33 245.10,173.18 240.41,173.22 239.12,171.80 236.61,171.34\" id=\"139\" clip-path=\"url(#cl3_2)\" fill=\"#31668E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"140\" clip-path=\"url(#cl3_2)\" fill=\"#57C666\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 236.14,170.16 236.55,168.88 234.39,168.17 229.38,167.40 228.20,163.53 233.43,162.07 241.21,162.26 245.69,161.73 246.46,162.67 248.96,162.92 253.77,165.05 254.54,167.11 250.88,168.68 250.13,171.33 245.10,173.18 240.41,173.22 239.12,171.80 236.61,171.34\" id=\"141\" clip-path=\"url(#cl3_2)\" fill=\"#3A548C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 236.14,170.16 236.55,168.88 234.39,168.17 229.38,167.40 228.20,163.53 233.43,162.07 241.21,162.26 245.69,161.73 246.46,162.67 248.96,162.92 253.77,165.05 254.54,167.11 250.88,168.68 250.13,171.33 245.10,173.18 240.41,173.22 239.12,171.80 236.61,171.34\" id=\"142\" clip-path=\"url(#cl3_2)\" fill=\"#2E6E8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 236.14,170.16 236.55,168.88 234.39,168.17 229.38,167.40 228.20,163.53 233.43,162.07 241.21,162.26 245.69,161.73 246.46,162.67 248.96,162.92 253.77,165.05 254.54,167.11 250.88,168.68 250.13,171.33 245.10,173.18 240.41,173.22 239.12,171.80 236.61,171.34\" id=\"143\" clip-path=\"url(#cl3_2)\" fill=\"#2F6C8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 236.14,170.16 236.55,168.88 234.39,168.17 229.38,167.40 228.20,163.53 233.43,162.07 241.21,162.26 245.69,161.73 246.46,162.67 248.96,162.92 253.77,165.05 254.54,167.11 250.88,168.68 250.13,171.33 245.10,173.18 240.41,173.22 239.12,171.80 236.61,171.34\" id=\"144\" clip-path=\"url(#cl3_2)\" fill=\"#31678E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"151.48,189.85 152.25,190.96 151.48,193.03 149.95,193.07 148.89,192.62 150.09,189.98 151.48,189.85\" id=\"145\" clip-path=\"url(#cl3_2)\" fill=\"#79D152\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"151.48,189.85 152.25,190.96 151.48,193.03 149.95,193.07 148.89,192.62 150.09,189.98 151.48,189.85\" id=\"146\" clip-path=\"url(#cl3_2)\" fill=\"#8BD646\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"151.48,189.85 152.25,190.96 151.48,193.03 149.95,193.07 148.89,192.62 150.09,189.98 151.48,189.85\" id=\"147\" clip-path=\"url(#cl3_2)\" fill=\"#68CD5B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"228.20,163.53 228.20,160.07 230.29,157.17 234.42,155.56 238.30,158.94 241.94,158.79 242.40,155.26 246.09,154.37 248.12,154.89 252.24,156.50 255.94,156.41 258.31,157.40 259.13,159.61 261.13,162.28 256.48,164.20 253.77,165.05 248.96,162.92 246.46,162.67 245.69,161.73 241.21,162.26 233.43,162.07 228.20,163.53\" id=\"148\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"68.64,257.05 71.70,259.36 77.61,259.30 83.68,260.69 86.34,260.87 87.87,264.18 87.50,267.25 88.44,272.66 89.86,273.80 88.27,275.71 79.79,276.24 76.49,278.00 72.72,278.29 71.55,282.04 63.61,283.75 60.55,286.20 54.97,287.35 48.39,287.85 50.49,266.65 55.68,264.80 61.33,259.78 64.18,256.79 68.64,257.05\" id=\"149\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"259.47,199.73 260.65,199.00 264.12,198.45 268.28,199.83 270.51,199.95 273.15,201.17 273.04,202.80 275.15,203.52 276.29,205.50 278.41,206.67 278.16,207.39 279.26,207.85 277.88,208.25 274.62,208.20 273.97,207.55 272.89,207.96 273.42,208.81 272.16,210.38 271.46,212.05 270.14,212.61 268.82,210.44 269.09,208.38 268.59,206.28 265.03,203.51 263.02,201.53 261.16,200.16 259.47,199.73\" id=\"150\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"151\" clip-path=\"url(#cl3_2)\" fill=\"#66CC5D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"227.97,230.78 228.71,230.82 228.95,229.82 232.37,229.05 233.67,228.86 235.64,228.56 238.34,228.46 241.34,229.99 241.94,233.21 240.83,233.38 239.91,234.24 236.70,234.17 234.49,235.25 230.63,235.70 228.14,234.53 227.26,232.44 227.97,230.78\" id=\"152\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"223.31,227.66 222.93,226.75 220.43,229.14 220.83,230.69 219.60,230.31 217.96,228.73 215.45,227.76 216.10,226.94 216.96,224.27 218.83,223.15 219.90,222.70 221.43,223.53 222.28,224.20 224.18,224.72 226.40,225.72 225.93,226.14 224.87,227.23 223.31,227.66\" id=\"153\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"139.15,183.51 142.72,184.05 147.65,183.28 150.30,185.47 152.82,186.68 151.48,189.85 150.09,189.98 148.89,192.62 144.91,190.27 142.17,190.53 139.21,188.14 137.40,186.13 135.07,185.94 134.85,184.24 139.15,183.51\" id=\"154\" clip-path=\"url(#cl3_2)\" fill=\"#63CB5F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"155\" clip-path=\"url(#cl3_2)\" fill=\"#7CD250\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"156\" clip-path=\"url(#cl3_2)\" fill=\"#7AD151\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"157\" clip-path=\"url(#cl3_2)\" fill=\"#71CF57\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"158\" clip-path=\"url(#cl3_2)\" fill=\"#62CB5F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"159\" clip-path=\"url(#cl3_2)\" fill=\"#75D054\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"160\" clip-path=\"url(#cl3_2)\" fill=\"#7FD34E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"161\" clip-path=\"url(#cl3_2)\" fill=\"#98D83E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"162\" clip-path=\"url(#cl3_2)\" fill=\"#7ED34F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"155.58,173.97 159.58,174.26 160.11,175.87 157.87,180.11 156.19,181.83 153.19,181.72 152.82,186.68 150.30,185.47 147.65,183.28 142.72,184.05 139.15,183.51 142.11,182.34 148.41,175.64 155.58,173.97\" id=\"163\" clip-path=\"url(#cl3_2)\" fill=\"#8DD645\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"164\" clip-path=\"url(#cl3_2)\" fill=\"#99D83D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"165\" clip-path=\"url(#cl3_2)\" fill=\"#86D549\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"166\" clip-path=\"url(#cl3_2)\" fill=\"#85D44A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"167\" clip-path=\"url(#cl3_2)\" fill=\"#8ED645\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"168\" clip-path=\"url(#cl3_2)\" fill=\"#98D83E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"169\" clip-path=\"url(#cl3_2)\" fill=\"#9ED93A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"170\" clip-path=\"url(#cl3_2)\" fill=\"#BCDF27\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"171\" clip-path=\"url(#cl3_2)\" fill=\"#91D742\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"245.29,95.77 255.49,98.43 252.04,99.77 256.31,102.28 251.58,104.26 249.14,104.76 249.59,101.70 245.19,100.16 240.80,101.78 239.91,104.97 237.20,106.96 233.58,105.99 229.41,106.27 225.69,104.04 223.85,105.19 221.88,105.38 221.49,108.22 215.34,107.53 214.39,109.94 211.20,109.90 208.75,112.96 204.82,117.75 198.43,123.83 199.57,125.37 198.02,127.09 194.28,126.93 191.07,131.03 190.27,136.96 192.50,139.30 190.29,144.57 186.24,147.58 183.86,150.15 181.51,147.27 171.79,152.24 165.66,153.08 160.28,150.49 160.27,145.54 162.43,135.10 167.03,132.41 178.36,129.14 186.94,124.85 194.85,118.92 204.43,110.69 210.27,107.51 219.18,102.16 225.84,100.24 230.86,100.40 234.89,96.77 240.28,96.81 245.29,95.77\" id=\"172\" clip-path=\"url(#cl3_2)\" fill=\"#AEDC30\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"173\" clip-path=\"url(#cl3_2)\" fill=\"#1E9C89\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"174\" clip-path=\"url(#cl3_2)\" fill=\"#31688E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"175\" clip-path=\"url(#cl3_2)\" fill=\"#277F8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"176\" clip-path=\"url(#cl3_2)\" fill=\"#20928C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"177\" clip-path=\"url(#cl3_2)\" fill=\"#1FA188\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"178\" clip-path=\"url(#cl3_2)\" fill=\"#25AC82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"179\" clip-path=\"url(#cl3_2)\" fill=\"#29AF7F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"180\" clip-path=\"url(#cl3_2)\" fill=\"#25AB82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"198.27,186.38 196.43,183.36 196.95,181.74 195.93,179.22 194.29,177.53 195.78,176.30 194.87,173.92 198.31,172.60 205.98,170.53 212.07,169.00 216.82,169.80 217.17,170.93 221.81,170.98 227.76,171.49 236.61,171.34 239.12,171.80 240.41,173.22 240.81,175.28 242.34,177.03 242.49,178.89 239.59,179.89 241.32,182.04 241.60,184.13 244.54,188.20 244.11,189.53 241.59,190.12 237.14,194.10 238.64,196.22 237.47,195.96 232.35,194.18 228.59,194.87 226.09,194.40 223.00,195.42 220.33,193.75 218.17,194.39 217.87,194.10 215.48,191.77 211.61,191.48 211.15,190.00 207.62,189.45 206.80,190.66 204.03,189.67 204.42,188.37 200.59,187.93 198.27,186.38\" id=\"181\" clip-path=\"url(#cl3_2)\" fill=\"#3ABA76\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"182\" clip-path=\"url(#cl3_2)\" fill=\"#23888E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"183\" clip-path=\"url(#cl3_2)\" fill=\"#20928C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"184\" clip-path=\"url(#cl3_2)\" fill=\"#2B758E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"185\" clip-path=\"url(#cl3_2)\" fill=\"#29798E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"186\" clip-path=\"url(#cl3_2)\" fill=\"#27808E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"239.43,219.17 241.18,221.14 243.37,220.76 247.81,221.47 256.22,221.60 258.91,220.32 265.46,219.06 269.83,220.73 273.25,221.16 270.57,223.24 268.94,226.76 271.18,229.49 266.09,228.94 260.32,230.58 260.51,233.01 255.20,233.56 250.92,231.91 246.31,233.31 241.94,233.21 241.34,229.99 238.34,228.46 239.26,227.76 238.60,227.19 239.49,225.64 241.60,224.10 238.69,222.04 238.08,220.28 239.43,219.17\" id=\"187\" clip-path=\"url(#cl3_2)\" fill=\"#481668\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"188\" clip-path=\"url(#cl3_2)\" fill=\"#24878E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"189\" clip-path=\"url(#cl3_2)\" fill=\"#2E6F8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"190\" clip-path=\"url(#cl3_2)\" fill=\"#20938C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 59.37,224.03 61.94,223.47 62.39,225.99 65.72,226.21 66.92,225.65 70.14,226.04 70.81,228.61 67.69,229.78 66.21,233.64 65.01,234.31 63.94,236.64 61.29,236.89 62.55,240.02 59.80,243.20 61.32,244.81 60.05,246.12 57.21,247.87 57.15,249.56 54.32,250.72 51.42,249.82 48.16,250.19 50.45,246.31 51.01,243.19 48.56,242.56 47.87,240.57 49.58,237.33 52.58,235.68 53.76,233.69 56.11,230.79 56.82,228.68 56.40,226.82 56.83,225.14\" id=\"191\" clip-path=\"url(#cl3_2)\" fill=\"#35B779\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.01,275.86 325.56,278.94 324.87,280.45 321.96,281.22 322.02,279.89 323.54,279.15 321.83,278.63 322.58,275.24 325.01,275.86\" id=\"192\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"238.65,201.67 240.90,200.62 244.27,201.11 247.71,201.08 250.33,202.21 252.09,201.44 256.01,200.91 257.21,199.77 259.47,199.73 261.16,200.16 263.02,201.53 265.03,203.51 268.59,206.28 269.09,208.38 268.82,210.44 270.14,212.61 272.76,213.44 275.25,212.59 277.91,213.35 278.25,214.59 275.71,215.70 273.94,215.29 273.25,221.16 269.83,220.73 265.46,219.06 258.91,220.32 256.22,221.60 247.81,221.47 243.37,220.76 241.18,221.14 239.43,219.17 238.34,218.34 239.60,217.51 238.18,216.92 236.46,218.02 233.10,216.64 232.58,214.66 229.13,213.55 228.46,212.02 225.40,210.15 229.81,209.23 233.00,205.96 235.41,202.70 238.65,201.67\" id=\"193\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"329.59,216.26 322.71,214.74 317.11,212.13 320.89,211.16 324.16,206.90 320.54,205.15 327.79,202.76 327.29,201.72 322.77,202.75 322.24,200.61 324.51,199.12 329.48,198.48 329.72,196.83 327.61,194.27 328.77,191.64 328.18,190.25 320.09,189.16 317.13,189.38 313.23,187.34 309.58,188.30 302.60,186.97 302.43,186.03 300.01,184.07 295.94,184.04 295.10,182.59 296.07,181.58 292.12,179.07 287.12,179.75 285.56,179.58 284.58,180.70 282.68,180.58 280.72,177.63 279.18,176.12 280.01,175.65 283.99,175.65 285.61,174.55 283.87,173.36 280.41,172.68 280.48,171.83 278.31,171.06 274.57,168.14 275.27,166.85 274.27,164.69 269.46,163.76 267.15,164.40 266.24,163.28 261.13,162.28 259.13,159.61 258.31,157.40 255.94,156.41 257.58,154.90 255.45,150.68 258.00,147.97 257.19,147.20 261.45,144.53 256.57,142.54 263.92,136.48 266.86,133.73 267.63,131.39 261.01,128.61 261.72,125.66 257.44,122.52 258.76,118.65 253.25,113.86 255.39,110.46 249.51,107.80 249.14,104.76 251.58,104.26 256.31,102.28 258.91,100.62 265.02,102.89 273.99,103.31 288.63,107.12 292.36,108.92 294.36,111.76 291.99,114.38 287.04,116.01 270.15,113.80 267.86,114.51 274.83,117.35 275.93,119.36 278.07,123.82 283.40,124.85 286.82,125.79 286.29,123.62 283.21,121.89 284.70,120.07 294.78,122.11 297.21,120.78 293.03,117.79 298.45,112.81 301.69,112.75 305.85,113.92 305.71,110.76 301.19,108.50 300.92,105.78 296.74,103.40 306.36,103.75 310.02,105.91 306.45,106.92 308.26,109.29 311.93,110.45 316.19,108.90 314.73,106.09 319.40,103.19 326.20,98.01 328.57,97.84 328.32,100.84 332.41,100.66 332.98,98.89\" id=\"194\" clip-path=\"url(#cl3_2)\" fill=\"#3A538B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 227.76,171.49 221.81,170.98 222.87,168.94 229.38,167.40 234.39,168.17 236.55,168.88 236.14,170.16 236.61,171.34\" id=\"195\" clip-path=\"url(#cl3_2)\" fill=\"#3A538B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"329.59,216.26 322.71,214.74 317.11,212.13 320.89,211.16 324.16,206.90 320.54,205.15 327.79,202.76 327.29,201.72 322.77,202.75 322.24,200.61 324.51,199.12 329.48,198.48 329.72,196.83 327.61,194.27 328.77,191.64 328.18,190.25 320.09,189.16 317.13,189.38 313.23,187.34 309.58,188.30 302.60,186.97 302.43,186.03 300.01,184.07 295.94,184.04 295.10,182.59 296.07,181.58 292.12,179.07 287.12,179.75 285.56,179.58 284.58,180.70 282.68,180.58 280.72,177.63 279.18,176.12 280.01,175.65 283.99,175.65 285.61,174.55 283.87,173.36 280.41,172.68 280.48,171.83 278.31,171.06 274.57,168.14 275.27,166.85 274.27,164.69 269.46,163.76 267.15,164.40 266.24,163.28 261.13,162.28 259.13,159.61 258.31,157.40 255.94,156.41 257.58,154.90 255.45,150.68 258.00,147.97 257.19,147.20 261.45,144.53 256.57,142.54 263.92,136.48 266.86,133.73 267.63,131.39 261.01,128.61 261.72,125.66 257.44,122.52 258.76,118.65 253.25,113.86 255.39,110.46 249.51,107.80 249.14,104.76 251.58,104.26 256.31,102.28 258.91,100.62 265.02,102.89 273.99,103.31 288.63,107.12 292.36,108.92 294.36,111.76 291.99,114.38 287.04,116.01 270.15,113.80 267.86,114.51 274.83,117.35 275.93,119.36 278.07,123.82 283.40,124.85 286.82,125.79 286.29,123.62 283.21,121.89 284.70,120.07 294.78,122.11 297.21,120.78 293.03,117.79 298.45,112.81 301.69,112.75 305.85,113.92 305.71,110.76 301.19,108.50 300.92,105.78 296.74,103.40 306.36,103.75 310.02,105.91 306.45,106.92 308.26,109.29 311.93,110.45 316.19,108.90 314.73,106.09 319.40,103.19 326.20,98.01 328.57,97.84 328.32,100.84 332.41,100.66 332.98,98.89\" id=\"196\" clip-path=\"url(#cl3_2)\" fill=\"#404688\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 227.76,171.49 221.81,170.98 222.87,168.94 229.38,167.40 234.39,168.17 236.55,168.88 236.14,170.16 236.61,171.34\" id=\"197\" clip-path=\"url(#cl3_2)\" fill=\"#404688\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"329.59,216.26 322.71,214.74 317.11,212.13 320.89,211.16 324.16,206.90 320.54,205.15 327.79,202.76 327.29,201.72 322.77,202.75 322.24,200.61 324.51,199.12 329.48,198.48 329.72,196.83 327.61,194.27 328.77,191.64 328.18,190.25 320.09,189.16 317.13,189.38 313.23,187.34 309.58,188.30 302.60,186.97 302.43,186.03 300.01,184.07 295.94,184.04 295.10,182.59 296.07,181.58 292.12,179.07 287.12,179.75 285.56,179.58 284.58,180.70 282.68,180.58 280.72,177.63 279.18,176.12 280.01,175.65 283.99,175.65 285.61,174.55 283.87,173.36 280.41,172.68 280.48,171.83 278.31,171.06 274.57,168.14 275.27,166.85 274.27,164.69 269.46,163.76 267.15,164.40 266.24,163.28 261.13,162.28 259.13,159.61 258.31,157.40 255.94,156.41 257.58,154.90 255.45,150.68 258.00,147.97 257.19,147.20 261.45,144.53 256.57,142.54 263.92,136.48 266.86,133.73 267.63,131.39 261.01,128.61 261.72,125.66 257.44,122.52 258.76,118.65 253.25,113.86 255.39,110.46 249.51,107.80 249.14,104.76 251.58,104.26 256.31,102.28 258.91,100.62 265.02,102.89 273.99,103.31 288.63,107.12 292.36,108.92 294.36,111.76 291.99,114.38 287.04,116.01 270.15,113.80 267.86,114.51 274.83,117.35 275.93,119.36 278.07,123.82 283.40,124.85 286.82,125.79 286.29,123.62 283.21,121.89 284.70,120.07 294.78,122.11 297.21,120.78 293.03,117.79 298.45,112.81 301.69,112.75 305.85,113.92 305.71,110.76 301.19,108.50 300.92,105.78 296.74,103.40 306.36,103.75 310.02,105.91 306.45,106.92 308.26,109.29 311.93,110.45 316.19,108.90 314.73,106.09 319.40,103.19 326.20,98.01 328.57,97.84 328.32,100.84 332.41,100.66 332.98,98.89\" id=\"198\" clip-path=\"url(#cl3_2)\" fill=\"#39558C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 227.76,171.49 221.81,170.98 222.87,168.94 229.38,167.40 234.39,168.17 236.55,168.88 236.14,170.16 236.61,171.34\" id=\"199\" clip-path=\"url(#cl3_2)\" fill=\"#39558C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"239.43,219.17 241.18,221.14 243.37,220.76 247.81,221.47 256.22,221.60 258.91,220.32 265.46,219.06 269.83,220.73 273.25,221.16 270.57,223.24 268.94,226.76 271.18,229.49 266.09,228.94 260.32,230.58 260.51,233.01 255.20,233.56 250.92,231.91 246.31,233.31 241.94,233.21 241.34,229.99 238.34,228.46 239.26,227.76 238.60,227.19 239.49,225.64 241.60,224.10 238.69,222.04 238.08,220.28 239.43,219.17\" id=\"200\" clip-path=\"url(#cl3_2)\" fill=\"#440154\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"329.59,216.26 322.71,214.74 317.11,212.13 320.89,211.16 324.16,206.90 320.54,205.15 327.79,202.76 327.29,201.72 322.77,202.75 322.24,200.61 324.51,199.12 329.48,198.48 329.72,196.83 327.61,194.27 328.77,191.64 328.18,190.25 320.09,189.16 317.13,189.38 313.23,187.34 309.58,188.30 302.60,186.97 302.43,186.03 300.01,184.07 295.94,184.04 295.10,182.59 296.07,181.58 292.12,179.07 287.12,179.75 285.56,179.58 284.58,180.70 282.68,180.58 280.72,177.63 279.18,176.12 280.01,175.65 283.99,175.65 285.61,174.55 283.87,173.36 280.41,172.68 280.48,171.83 278.31,171.06 274.57,168.14 275.27,166.85 274.27,164.69 269.46,163.76 267.15,164.40 266.24,163.28 261.13,162.28 259.13,159.61 258.31,157.40 255.94,156.41 257.58,154.90 255.45,150.68 258.00,147.97 257.19,147.20 261.45,144.53 256.57,142.54 263.92,136.48 266.86,133.73 267.63,131.39 261.01,128.61 261.72,125.66 257.44,122.52 258.76,118.65 253.25,113.86 255.39,110.46 249.51,107.80 249.14,104.76 251.58,104.26 256.31,102.28 258.91,100.62 265.02,102.89 273.99,103.31 288.63,107.12 292.36,108.92 294.36,111.76 291.99,114.38 287.04,116.01 270.15,113.80 267.86,114.51 274.83,117.35 275.93,119.36 278.07,123.82 283.40,124.85 286.82,125.79 286.29,123.62 283.21,121.89 284.70,120.07 294.78,122.11 297.21,120.78 293.03,117.79 298.45,112.81 301.69,112.75 305.85,113.92 305.71,110.76 301.19,108.50 300.92,105.78 296.74,103.40 306.36,103.75 310.02,105.91 306.45,106.92 308.26,109.29 311.93,110.45 316.19,108.90 314.73,106.09 319.40,103.19 326.20,98.01 328.57,97.84 328.32,100.84 332.41,100.66 332.98,98.89\" id=\"201\" clip-path=\"url(#cl3_2)\" fill=\"#365C8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 227.76,171.49 221.81,170.98 222.87,168.94 229.38,167.40 234.39,168.17 236.55,168.88 236.14,170.16 236.61,171.34\" id=\"202\" clip-path=\"url(#cl3_2)\" fill=\"#365C8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"329.59,216.26 322.71,214.74 317.11,212.13 320.89,211.16 324.16,206.90 320.54,205.15 327.79,202.76 327.29,201.72 322.77,202.75 322.24,200.61 324.51,199.12 329.48,198.48 329.72,196.83 327.61,194.27 328.77,191.64 328.18,190.25 320.09,189.16 317.13,189.38 313.23,187.34 309.58,188.30 302.60,186.97 302.43,186.03 300.01,184.07 295.94,184.04 295.10,182.59 296.07,181.58 292.12,179.07 287.12,179.75 285.56,179.58 284.58,180.70 282.68,180.58 280.72,177.63 279.18,176.12 280.01,175.65 283.99,175.65 285.61,174.55 283.87,173.36 280.41,172.68 280.48,171.83 278.31,171.06 274.57,168.14 275.27,166.85 274.27,164.69 269.46,163.76 267.15,164.40 266.24,163.28 261.13,162.28 259.13,159.61 258.31,157.40 255.94,156.41 257.58,154.90 255.45,150.68 258.00,147.97 257.19,147.20 261.45,144.53 256.57,142.54 263.92,136.48 266.86,133.73 267.63,131.39 261.01,128.61 261.72,125.66 257.44,122.52 258.76,118.65 253.25,113.86 255.39,110.46 249.51,107.80 249.14,104.76 251.58,104.26 256.31,102.28 258.91,100.62 265.02,102.89 273.99,103.31 288.63,107.12 292.36,108.92 294.36,111.76 291.99,114.38 287.04,116.01 270.15,113.80 267.86,114.51 274.83,117.35 275.93,119.36 278.07,123.82 283.40,124.85 286.82,125.79 286.29,123.62 283.21,121.89 284.70,120.07 294.78,122.11 297.21,120.78 293.03,117.79 298.45,112.81 301.69,112.75 305.85,113.92 305.71,110.76 301.19,108.50 300.92,105.78 296.74,103.40 306.36,103.75 310.02,105.91 306.45,106.92 308.26,109.29 311.93,110.45 316.19,108.90 314.73,106.09 319.40,103.19 326.20,98.01 328.57,97.84 328.32,100.84 332.41,100.66 332.98,98.89\" id=\"203\" clip-path=\"url(#cl3_2)\" fill=\"#3A548C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 227.76,171.49 221.81,170.98 222.87,168.94 229.38,167.40 234.39,168.17 236.55,168.88 236.14,170.16 236.61,171.34\" id=\"204\" clip-path=\"url(#cl3_2)\" fill=\"#3A548C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"329.59,216.26 322.71,214.74 317.11,212.13 320.89,211.16 324.16,206.90 320.54,205.15 327.79,202.76 327.29,201.72 322.77,202.75 322.24,200.61 324.51,199.12 329.48,198.48 329.72,196.83 327.61,194.27 328.77,191.64 328.18,190.25 320.09,189.16 317.13,189.38 313.23,187.34 309.58,188.30 302.60,186.97 302.43,186.03 300.01,184.07 295.94,184.04 295.10,182.59 296.07,181.58 292.12,179.07 287.12,179.75 285.56,179.58 284.58,180.70 282.68,180.58 280.72,177.63 279.18,176.12 280.01,175.65 283.99,175.65 285.61,174.55 283.87,173.36 280.41,172.68 280.48,171.83 278.31,171.06 274.57,168.14 275.27,166.85 274.27,164.69 269.46,163.76 267.15,164.40 266.24,163.28 261.13,162.28 259.13,159.61 258.31,157.40 255.94,156.41 257.58,154.90 255.45,150.68 258.00,147.97 257.19,147.20 261.45,144.53 256.57,142.54 263.92,136.48 266.86,133.73 267.63,131.39 261.01,128.61 261.72,125.66 257.44,122.52 258.76,118.65 253.25,113.86 255.39,110.46 249.51,107.80 249.14,104.76 251.58,104.26 256.31,102.28 258.91,100.62 265.02,102.89 273.99,103.31 288.63,107.12 292.36,108.92 294.36,111.76 291.99,114.38 287.04,116.01 270.15,113.80 267.86,114.51 274.83,117.35 275.93,119.36 278.07,123.82 283.40,124.85 286.82,125.79 286.29,123.62 283.21,121.89 284.70,120.07 294.78,122.11 297.21,120.78 293.03,117.79 298.45,112.81 301.69,112.75 305.85,113.92 305.71,110.76 301.19,108.50 300.92,105.78 296.74,103.40 306.36,103.75 310.02,105.91 306.45,106.92 308.26,109.29 311.93,110.45 316.19,108.90 314.73,106.09 319.40,103.19 326.20,98.01 328.57,97.84 328.32,100.84 332.41,100.66 332.98,98.89\" id=\"205\" clip-path=\"url(#cl3_2)\" fill=\"#3B528B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"236.61,171.34 227.76,171.49 221.81,170.98 222.87,168.94 229.38,167.40 234.39,168.17 236.55,168.88 236.14,170.16 236.61,171.34\" id=\"206\" clip-path=\"url(#cl3_2)\" fill=\"#3B528B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"325.93,297.84 322.65,297.95 323.26,295.14 323.29,293.35 323.78,291.31 331.19,291.92 333.74,290.28 334.98,288.40 335.14,280.03\" id=\"207\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"239.43,219.17 241.18,221.14 243.37,220.76 247.81,221.47 256.22,221.60 258.91,220.32 265.46,219.06 269.83,220.73 273.25,221.16 270.57,223.24 268.94,226.76 271.18,229.49 266.09,228.94 260.32,230.58 260.51,233.01 255.20,233.56 250.92,231.91 246.31,233.31 241.94,233.21 241.34,229.99 238.34,228.46 239.26,227.76 238.60,227.19 239.49,225.64 241.60,224.10 238.69,222.04 238.08,220.28 239.43,219.17\" id=\"208\" clip-path=\"url(#cl3_2)\" fill=\"#471365\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"229.13,213.55 232.58,214.66 233.10,216.64 236.46,218.02 238.18,216.92 239.60,217.51 238.34,218.34 239.43,219.17 238.08,220.28 238.69,222.04 241.60,224.10 239.49,225.64 238.60,227.19 239.26,227.76 238.34,228.46 235.64,228.56 233.67,228.86 233.46,228.49 234.14,227.91 234.74,226.72 233.92,226.76 232.76,225.86 231.80,225.64 231.02,224.87 229.93,224.58 229.09,223.90 228.07,224.17 227.31,225.78 225.93,226.14 226.40,225.72 224.18,224.72 222.28,224.20 221.43,223.53 219.90,222.70 221.25,222.49 222.07,220.21 219.32,218.36 220.72,216.24 218.68,216.25 220.84,214.44 219.05,213.07 217.70,211.21 221.94,209.95 225.40,210.15 228.46,212.02 229.13,213.55\" id=\"209\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.87,194.10 218.17,194.39 220.33,193.75 223.00,195.42 226.09,194.40 228.59,194.87 232.35,194.18 237.47,195.96 236.07,197.21 235.14,199.13 234.03,199.63 228.25,198.22 226.51,198.52 225.28,199.64 222.77,200.24 222.19,199.94 219.58,200.68 217.45,200.82 217.01,201.78 212.47,202.35 210.49,201.83 207.79,200.59 207.32,198.94 207.77,198.34 208.56,197.30 210.91,197.39 212.73,196.91 212.89,196.47 213.90,196.24 214.27,195.16 215.48,194.96 216.30,194.11 217.87,194.10\" id=\"210\" clip-path=\"url(#cl3_2)\" fill=\"#2A788E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.87,194.10 218.17,194.39 220.33,193.75 223.00,195.42 226.09,194.40 228.59,194.87 232.35,194.18 237.47,195.96 236.07,197.21 235.14,199.13 234.03,199.63 228.25,198.22 226.51,198.52 225.28,199.64 222.77,200.24 222.19,199.94 219.58,200.68 217.45,200.82 217.01,201.78 212.47,202.35 210.49,201.83 207.79,200.59 207.32,198.94 207.77,198.34 208.56,197.30 210.91,197.39 212.73,196.91 212.89,196.47 213.90,196.24 214.27,195.16 215.48,194.96 216.30,194.11 217.87,194.10\" id=\"211\" clip-path=\"url(#cl3_2)\" fill=\"#375A8C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.87,194.10 218.17,194.39 220.33,193.75 223.00,195.42 226.09,194.40 228.59,194.87 232.35,194.18 237.47,195.96 236.07,197.21 235.14,199.13 234.03,199.63 228.25,198.22 226.51,198.52 225.28,199.64 222.77,200.24 222.19,199.94 219.58,200.68 217.45,200.82 217.01,201.78 212.47,202.35 210.49,201.83 207.79,200.59 207.32,198.94 207.77,198.34 208.56,197.30 210.91,197.39 212.73,196.91 212.89,196.47 213.90,196.24 214.27,195.16 215.48,194.96 216.30,194.11 217.87,194.10\" id=\"212\" clip-path=\"url(#cl3_2)\" fill=\"#2D708E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.87,194.10 218.17,194.39 220.33,193.75 223.00,195.42 226.09,194.40 228.59,194.87 232.35,194.18 237.47,195.96 236.07,197.21 235.14,199.13 234.03,199.63 228.25,198.22 226.51,198.52 225.28,199.64 222.77,200.24 222.19,199.94 219.58,200.68 217.45,200.82 217.01,201.78 212.47,202.35 210.49,201.83 207.79,200.59 207.32,198.94 207.77,198.34 208.56,197.30 210.91,197.39 212.73,196.91 212.89,196.47 213.90,196.24 214.27,195.16 215.48,194.96 216.30,194.11 217.87,194.10\" id=\"213\" clip-path=\"url(#cl3_2)\" fill=\"#26828E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.87,194.10 218.17,194.39 220.33,193.75 223.00,195.42 226.09,194.40 228.59,194.87 232.35,194.18 237.47,195.96 236.07,197.21 235.14,199.13 234.03,199.63 228.25,198.22 226.51,198.52 225.28,199.64 222.77,200.24 222.19,199.94 219.58,200.68 217.45,200.82 217.01,201.78 212.47,202.35 210.49,201.83 207.79,200.59 207.32,198.94 207.77,198.34 208.56,197.30 210.91,197.39 212.73,196.91 212.89,196.47 213.90,196.24 214.27,195.16 215.48,194.96 216.30,194.11 217.87,194.10\" id=\"214\" clip-path=\"url(#cl3_2)\" fill=\"#24878E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"217.87,194.10 218.17,194.39 220.33,193.75 223.00,195.42 226.09,194.40 228.59,194.87 232.35,194.18 237.47,195.96 236.07,197.21 235.14,199.13 234.03,199.63 228.25,198.22 226.51,198.52 225.28,199.64 222.77,200.24 222.19,199.94 219.58,200.68 217.45,200.82 217.01,201.78 212.47,202.35 210.49,201.83 207.79,200.59 207.32,198.94 207.77,198.34 208.56,197.30 210.91,197.39 212.73,196.91 212.89,196.47 213.90,196.24 214.27,195.16 215.48,194.96 216.30,194.11 217.87,194.10\" id=\"215\" clip-path=\"url(#cl3_2)\" fill=\"#25858E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"216\" clip-path=\"url(#cl3_2)\" fill=\"#22A785\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"239.43,219.17 241.18,221.14 243.37,220.76 247.81,221.47 256.22,221.60 258.91,220.32 265.46,219.06 269.83,220.73 273.25,221.16 270.57,223.24 268.94,226.76 271.18,229.49 266.09,228.94 260.32,230.58 260.51,233.01 255.20,233.56 250.92,231.91 246.31,233.31 241.94,233.21 241.34,229.99 238.34,228.46 239.26,227.76 238.60,227.19 239.49,225.64 241.60,224.10 238.69,222.04 238.08,220.28 239.43,219.17\" id=\"217\" clip-path=\"url(#cl3_2)\" fill=\"#472D7B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"218\" clip-path=\"url(#cl3_2)\" fill=\"#218E8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"219\" clip-path=\"url(#cl3_2)\" fill=\"#21A685\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"220\" clip-path=\"url(#cl3_2)\" fill=\"#23A983\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"221\" clip-path=\"url(#cl3_2)\" fill=\"#23A983\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"222\" clip-path=\"url(#cl3_2)\" fill=\"#26AD81\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"223\" clip-path=\"url(#cl3_2)\" fill=\"#25AB82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"224\" clip-path=\"url(#cl3_2)\" fill=\"#1F9F88\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"190.07,208.14 194.59,208.56 197.43,207.51 202.24,207.43 203.32,206.63 204.24,206.69 205.24,208.31 200.79,209.56 200.15,211.49 198.19,211.96 198.13,213.31 195.94,213.19 194.10,212.39 193.02,213.18 189.15,212.97 190.43,212.55 189.27,210.49 190.07,208.14\" id=\"225\" clip-path=\"url(#cl3_2)\" fill=\"#3ABA76\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"226\" clip-path=\"url(#cl3_2)\" fill=\"#7DD250\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"227\" clip-path=\"url(#cl3_2)\" fill=\"#80D34E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"227.97,230.78 227.26,232.44 228.14,234.53 230.63,235.70 230.55,236.99 228.63,237.70 228.31,239.29 225.57,241.68 224.54,241.34 224.41,240.26 221.08,238.62 220.55,236.30 221.03,232.97 221.82,231.45 220.83,230.69 220.43,229.14 222.93,226.75 223.31,227.66 224.87,227.23 226.13,228.53 227.53,229.02 227.97,230.78\" id=\"228\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"239.43,219.17 241.18,221.14 243.37,220.76 247.81,221.47 256.22,221.60 258.91,220.32 265.46,219.06 269.83,220.73 273.25,221.16 270.57,223.24 268.94,226.76 271.18,229.49 266.09,228.94 260.32,230.58 260.51,233.01 255.20,233.56 250.92,231.91 246.31,233.31 241.94,233.21 241.34,229.99 238.34,228.46 239.26,227.76 238.60,227.19 239.49,225.64 241.60,224.10 238.69,222.04 238.08,220.28 239.43,219.17\" id=\"229\" clip-path=\"url(#cl3_2)\" fill=\"#471365\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"230\" clip-path=\"url(#cl3_2)\" fill=\"#78D152\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"231\" clip-path=\"url(#cl3_2)\" fill=\"#81D34D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"232\" clip-path=\"url(#cl3_2)\" fill=\"#76D054\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"233\" clip-path=\"url(#cl3_2)\" fill=\"#87D549\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"234\" clip-path=\"url(#cl3_2)\" fill=\"#71CF57\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"235\" clip-path=\"url(#cl3_2)\" fill=\"#85D44A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"230.08,119.85 226.77,122.96 227.52,125.65 221.62,129.25 214.08,133.08 210.91,139.37 213.74,142.55 217.73,145.07 213.70,150.17 209.12,151.21 207.01,158.87 204.14,163.15 198.55,162.64 195.55,166.26 190.07,166.37 189.17,161.98 186.12,156.69 183.86,150.15 186.24,147.58 190.29,144.57 192.50,139.30 190.27,136.96 191.07,131.03 194.28,126.93 198.02,127.09 199.57,125.37 198.43,123.83 204.82,117.75 208.75,112.96 211.20,109.90 214.39,109.94 215.34,107.53 221.49,108.22 221.88,105.38 223.85,105.19 228.28,107.26 233.73,110.13 234.68,116.83 236.10,118.51 230.08,119.85\" id=\"236\" clip-path=\"url(#cl3_2)\" fill=\"#7BD151\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"333.29,276.01 325.83,274.24 325.70,274.21 326.42,273.42 325.94,271.37 326.95,268.57 330.00,266.56 328.57,264.63 325.71,264.48 324.36,260.67 325.45,258.56 326.87,257.41 328.27,256.26 327.99,253.47 330.20,254.36 336.58,252.71\" id=\"237\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"218.68,216.25 220.72,216.24 219.32,218.36 222.07,220.21 221.25,222.49 219.90,222.70 218.83,223.15 216.96,224.27 216.10,226.94 211.00,225.09 208.87,223.06 206.72,221.98 204.16,220.16 202.99,218.65 200.33,216.38 201.61,214.39 203.57,215.51 204.83,214.52 207.45,214.43 212.25,215.24 216.14,215.18 218.68,216.25\" id=\"238\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"156.25,287.41 154.41,278.35 150.67,276.25 150.75,275.04 145.90,271.96 145.83,268.18 150.08,265.48 152.08,261.41 151.72,256.66 153.32,254.14 160.26,252.29 164.49,252.96 164.03,255.46 169.46,253.73 169.80,254.69 166.46,257.06 166.18,259.35 168.21,260.62 166.97,264.91 162.56,267.34 163.49,270.08 166.77,270.21 168.16,272.61 170.52,273.42 169.84,277.26 166.58,278.65 164.44,280.23 159.82,282.09 160.31,284.18 159.55,286.30 156.25,287.41\" id=\"239\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"323.64,231.11 332.46,232.63 336.58,252.71 330.20,254.36 327.99,253.47 328.27,256.26 326.87,257.41 325.45,258.56 322.71,256.38 324.64,254.43 321.00,254.99 315.64,254.02 311.97,257.01 302.70,257.85 297.27,255.32 290.60,255.32 289.48,257.41 285.28,258.10 278.95,255.58 272.22,255.80 268.05,250.95 263.31,248.29 265.87,244.41 261.81,242.13 267.93,237.33 277.04,236.94 278.99,233.17 290.28,233.52 296.71,230.14 303.17,228.53 312.70,228.07 323.64,231.11\" id=\"240\" clip-path=\"url(#cl3_2)\" fill=\"#3D4E8A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"267.26,236.02 262.59,238.74 260.49,236.49 260.47,235.48 261.82,234.91 263.31,231.82 260.32,230.58 266.09,228.94 271.18,229.49 272.12,231.35 277.45,232.81 276.56,234.04 269.60,234.46 267.26,236.02\" id=\"241\" clip-path=\"url(#cl3_2)\" fill=\"#3D4E8A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"323.64,231.11 332.46,232.63 336.58,252.71 330.20,254.36 327.99,253.47 328.27,256.26 326.87,257.41 325.45,258.56 322.71,256.38 324.64,254.43 321.00,254.99 315.64,254.02 311.97,257.01 302.70,257.85 297.27,255.32 290.60,255.32 289.48,257.41 285.28,258.10 278.95,255.58 272.22,255.80 268.05,250.95 263.31,248.29 265.87,244.41 261.81,242.13 267.93,237.33 277.04,236.94 278.99,233.17 290.28,233.52 296.71,230.14 303.17,228.53 312.70,228.07 323.64,231.11\" id=\"242\" clip-path=\"url(#cl3_2)\" fill=\"#277F8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"267.26,236.02 262.59,238.74 260.49,236.49 260.47,235.48 261.82,234.91 263.31,231.82 260.32,230.58 266.09,228.94 271.18,229.49 272.12,231.35 277.45,232.81 276.56,234.04 269.60,234.46 267.26,236.02\" id=\"243\" clip-path=\"url(#cl3_2)\" fill=\"#277F8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"323.64,231.11 332.46,232.63 336.58,252.71 330.20,254.36 327.99,253.47 328.27,256.26 326.87,257.41 325.45,258.56 322.71,256.38 324.64,254.43 321.00,254.99 315.64,254.02 311.97,257.01 302.70,257.85 297.27,255.32 290.60,255.32 289.48,257.41 285.28,258.10 278.95,255.58 272.22,255.80 268.05,250.95 263.31,248.29 265.87,244.41 261.81,242.13 267.93,237.33 277.04,236.94 278.99,233.17 290.28,233.52 296.71,230.14 303.17,228.53 312.70,228.07 323.64,231.11\" id=\"244\" clip-path=\"url(#cl3_2)\" fill=\"#471164\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"267.26,236.02 262.59,238.74 260.49,236.49 260.47,235.48 261.82,234.91 263.31,231.82 260.32,230.58 266.09,228.94 271.18,229.49 272.12,231.35 277.45,232.81 276.56,234.04 269.60,234.46 267.26,236.02\" id=\"245\" clip-path=\"url(#cl3_2)\" fill=\"#471164\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"240.41,173.22 245.10,173.18 250.13,171.33 250.88,168.68 254.54,167.11 253.77,165.05 256.48,164.20 261.13,162.28 266.24,163.28 267.15,164.40 269.46,163.76 274.27,164.69 275.27,166.85 274.57,168.14 278.31,171.06 280.48,171.83 280.41,172.68 283.87,173.36 285.61,174.55 283.99,175.65 280.01,175.65 279.18,176.12 280.72,177.63 282.68,180.58 278.47,181.02 277.16,182.11 277.36,184.49 275.26,184.10 270.74,184.47 269.21,183.41 267.47,184.29 265.45,183.66 261.45,183.67 255.66,182.68 250.53,182.42 246.64,182.59 244.00,183.91 241.60,184.13 241.32,182.04 239.59,179.89 242.49,178.89 242.34,177.03 240.81,175.28 240.41,173.22\" id=\"246\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"282.68,180.58 284.58,180.70 285.56,179.58 287.12,179.75 292.12,179.07 296.07,181.58 295.10,182.59 295.94,184.04 300.01,184.07 302.43,186.03 302.60,186.97 309.58,188.30 313.23,187.34 317.13,189.38 320.09,189.16 328.18,190.25 328.77,191.64 327.61,194.27 329.72,196.83 329.48,198.48 324.51,199.12 322.24,200.61 322.77,202.75 318.63,203.36 315.53,205.10 310.55,205.59 306.37,207.59 307.48,210.57 310.48,211.62 316.01,211.08 315.42,212.85 309.59,213.96 302.72,217.06 299.38,216.20 300.08,213.88 293.70,212.69 294.48,211.73 299.38,209.93 297.53,208.89 288.75,207.98 288.00,206.21 283.07,206.96 281.55,209.67 277.91,213.35 275.25,212.59 272.76,213.44 270.14,212.61 271.46,212.05 272.16,210.38 273.42,208.81 272.89,207.96 273.97,207.55 274.62,208.20 277.88,208.25 279.26,207.85 278.16,207.39 278.41,206.67 276.29,205.50 275.15,203.52 273.04,202.80 273.15,201.17 270.51,199.95 268.28,199.83 264.12,198.45 260.65,199.00 259.47,199.73 257.21,199.77 256.01,200.91 252.09,201.44 250.33,202.21 247.71,201.08 244.27,201.11 240.90,200.62 238.65,201.67 238.19,200.40 235.14,199.13 236.07,197.21 237.47,195.96 238.64,196.22 237.14,194.10 241.59,190.12 244.11,189.53 244.54,188.20 241.60,184.13 244.00,183.91 246.64,182.59 250.53,182.42 255.66,182.68 261.45,183.67 265.45,183.66 267.47,184.29 269.21,183.41 270.74,184.47 275.26,184.10 277.36,184.49 277.16,182.11 278.47,181.02 282.68,180.58\" id=\"247\" clip-path=\"url(#cl3_2)\" fill=\"#46337F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"282.68,180.58 284.58,180.70 285.56,179.58 287.12,179.75 292.12,179.07 296.07,181.58 295.10,182.59 295.94,184.04 300.01,184.07 302.43,186.03 302.60,186.97 309.58,188.30 313.23,187.34 317.13,189.38 320.09,189.16 328.18,190.25 328.77,191.64 327.61,194.27 329.72,196.83 329.48,198.48 324.51,199.12 322.24,200.61 322.77,202.75 318.63,203.36 315.53,205.10 310.55,205.59 306.37,207.59 307.48,210.57 310.48,211.62 316.01,211.08 315.42,212.85 309.59,213.96 302.72,217.06 299.38,216.20 300.08,213.88 293.70,212.69 294.48,211.73 299.38,209.93 297.53,208.89 288.75,207.98 288.00,206.21 283.07,206.96 281.55,209.67 277.91,213.35 275.25,212.59 272.76,213.44 270.14,212.61 271.46,212.05 272.16,210.38 273.42,208.81 272.89,207.96 273.97,207.55 274.62,208.20 277.88,208.25 279.26,207.85 278.16,207.39 278.41,206.67 276.29,205.50 275.15,203.52 273.04,202.80 273.15,201.17 270.51,199.95 268.28,199.83 264.12,198.45 260.65,199.00 259.47,199.73 257.21,199.77 256.01,200.91 252.09,201.44 250.33,202.21 247.71,201.08 244.27,201.11 240.90,200.62 238.65,201.67 238.19,200.40 235.14,199.13 236.07,197.21 237.47,195.96 238.64,196.22 237.14,194.10 241.59,190.12 244.11,189.53 244.54,188.20 241.60,184.13 244.00,183.91 246.64,182.59 250.53,182.42 255.66,182.68 261.45,183.67 265.45,183.66 267.47,184.29 269.21,183.41 270.74,184.47 275.26,184.10 277.36,184.49 277.16,182.11 278.47,181.02 282.68,180.58\" id=\"248\" clip-path=\"url(#cl3_2)\" fill=\"#482072\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"282.68,180.58 284.58,180.70 285.56,179.58 287.12,179.75 292.12,179.07 296.07,181.58 295.10,182.59 295.94,184.04 300.01,184.07 302.43,186.03 302.60,186.97 309.58,188.30 313.23,187.34 317.13,189.38 320.09,189.16 328.18,190.25 328.77,191.64 327.61,194.27 329.72,196.83 329.48,198.48 324.51,199.12 322.24,200.61 322.77,202.75 318.63,203.36 315.53,205.10 310.55,205.59 306.37,207.59 307.48,210.57 310.48,211.62 316.01,211.08 315.42,212.85 309.59,213.96 302.72,217.06 299.38,216.20 300.08,213.88 293.70,212.69 294.48,211.73 299.38,209.93 297.53,208.89 288.75,207.98 288.00,206.21 283.07,206.96 281.55,209.67 277.91,213.35 275.25,212.59 272.76,213.44 270.14,212.61 271.46,212.05 272.16,210.38 273.42,208.81 272.89,207.96 273.97,207.55 274.62,208.20 277.88,208.25 279.26,207.85 278.16,207.39 278.41,206.67 276.29,205.50 275.15,203.52 273.04,202.80 273.15,201.17 270.51,199.95 268.28,199.83 264.12,198.45 260.65,199.00 259.47,199.73 257.21,199.77 256.01,200.91 252.09,201.44 250.33,202.21 247.71,201.08 244.27,201.11 240.90,200.62 238.65,201.67 238.19,200.40 235.14,199.13 236.07,197.21 237.47,195.96 238.64,196.22 237.14,194.10 241.59,190.12 244.11,189.53 244.54,188.20 241.60,184.13 244.00,183.91 246.64,182.59 250.53,182.42 255.66,182.68 261.45,183.67 265.45,183.66 267.47,184.29 269.21,183.41 270.74,184.47 275.26,184.10 277.36,184.49 277.16,182.11 278.47,181.02 282.68,180.58\" id=\"249\" clip-path=\"url(#cl3_2)\" fill=\"#46307E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"282.68,180.58 284.58,180.70 285.56,179.58 287.12,179.75 292.12,179.07 296.07,181.58 295.10,182.59 295.94,184.04 300.01,184.07 302.43,186.03 302.60,186.97 309.58,188.30 313.23,187.34 317.13,189.38 320.09,189.16 328.18,190.25 328.77,191.64 327.61,194.27 329.72,196.83 329.48,198.48 324.51,199.12 322.24,200.61 322.77,202.75 318.63,203.36 315.53,205.10 310.55,205.59 306.37,207.59 307.48,210.57 310.48,211.62 316.01,211.08 315.42,212.85 309.59,213.96 302.72,217.06 299.38,216.20 300.08,213.88 293.70,212.69 294.48,211.73 299.38,209.93 297.53,208.89 288.75,207.98 288.00,206.21 283.07,206.96 281.55,209.67 277.91,213.35 275.25,212.59 272.76,213.44 270.14,212.61 271.46,212.05 272.16,210.38 273.42,208.81 272.89,207.96 273.97,207.55 274.62,208.20 277.88,208.25 279.26,207.85 278.16,207.39 278.41,206.67 276.29,205.50 275.15,203.52 273.04,202.80 273.15,201.17 270.51,199.95 268.28,199.83 264.12,198.45 260.65,199.00 259.47,199.73 257.21,199.77 256.01,200.91 252.09,201.44 250.33,202.21 247.71,201.08 244.27,201.11 240.90,200.62 238.65,201.67 238.19,200.40 235.14,199.13 236.07,197.21 237.47,195.96 238.64,196.22 237.14,194.10 241.59,190.12 244.11,189.53 244.54,188.20 241.60,184.13 244.00,183.91 246.64,182.59 250.53,182.42 255.66,182.68 261.45,183.67 265.45,183.66 267.47,184.29 269.21,183.41 270.74,184.47 275.26,184.10 277.36,184.49 277.16,182.11 278.47,181.02 282.68,180.58\" id=\"250\" clip-path=\"url(#cl3_2)\" fill=\"#481D6F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"282.68,180.58 284.58,180.70 285.56,179.58 287.12,179.75 292.12,179.07 296.07,181.58 295.10,182.59 295.94,184.04 300.01,184.07 302.43,186.03 302.60,186.97 309.58,188.30 313.23,187.34 317.13,189.38 320.09,189.16 328.18,190.25 328.77,191.64 327.61,194.27 329.72,196.83 329.48,198.48 324.51,199.12 322.24,200.61 322.77,202.75 318.63,203.36 315.53,205.10 310.55,205.59 306.37,207.59 307.48,210.57 310.48,211.62 316.01,211.08 315.42,212.85 309.59,213.96 302.72,217.06 299.38,216.20 300.08,213.88 293.70,212.69 294.48,211.73 299.38,209.93 297.53,208.89 288.75,207.98 288.00,206.21 283.07,206.96 281.55,209.67 277.91,213.35 275.25,212.59 272.76,213.44 270.14,212.61 271.46,212.05 272.16,210.38 273.42,208.81 272.89,207.96 273.97,207.55 274.62,208.20 277.88,208.25 279.26,207.85 278.16,207.39 278.41,206.67 276.29,205.50 275.15,203.52 273.04,202.80 273.15,201.17 270.51,199.95 268.28,199.83 264.12,198.45 260.65,199.00 259.47,199.73 257.21,199.77 256.01,200.91 252.09,201.44 250.33,202.21 247.71,201.08 244.27,201.11 240.90,200.62 238.65,201.67 238.19,200.40 235.14,199.13 236.07,197.21 237.47,195.96 238.64,196.22 237.14,194.10 241.59,190.12 244.11,189.53 244.54,188.20 241.60,184.13 244.00,183.91 246.64,182.59 250.53,182.42 255.66,182.68 261.45,183.67 265.45,183.66 267.47,184.29 269.21,183.41 270.74,184.47 275.26,184.10 277.36,184.49 277.16,182.11 278.47,181.02 282.68,180.58\" id=\"251\" clip-path=\"url(#cl3_2)\" fill=\"#443983\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"282.68,180.58 284.58,180.70 285.56,179.58 287.12,179.75 292.12,179.07 296.07,181.58 295.10,182.59 295.94,184.04 300.01,184.07 302.43,186.03 302.60,186.97 309.58,188.30 313.23,187.34 317.13,189.38 320.09,189.16 328.18,190.25 328.77,191.64 327.61,194.27 329.72,196.83 329.48,198.48 324.51,199.12 322.24,200.61 322.77,202.75 318.63,203.36 315.53,205.10 310.55,205.59 306.37,207.59 307.48,210.57 310.48,211.62 316.01,211.08 315.42,212.85 309.59,213.96 302.72,217.06 299.38,216.20 300.08,213.88 293.70,212.69 294.48,211.73 299.38,209.93 297.53,208.89 288.75,207.98 288.00,206.21 283.07,206.96 281.55,209.67 277.91,213.35 275.25,212.59 272.76,213.44 270.14,212.61 271.46,212.05 272.16,210.38 273.42,208.81 272.89,207.96 273.97,207.55 274.62,208.20 277.88,208.25 279.26,207.85 278.16,207.39 278.41,206.67 276.29,205.50 275.15,203.52 273.04,202.80 273.15,201.17 270.51,199.95 268.28,199.83 264.12,198.45 260.65,199.00 259.47,199.73 257.21,199.77 256.01,200.91 252.09,201.44 250.33,202.21 247.71,201.08 244.27,201.11 240.90,200.62 238.65,201.67 238.19,200.40 235.14,199.13 236.07,197.21 237.47,195.96 238.64,196.22 237.14,194.10 241.59,190.12 244.11,189.53 244.54,188.20 241.60,184.13 244.00,183.91 246.64,182.59 250.53,182.42 255.66,182.68 261.45,183.67 265.45,183.66 267.47,184.29 269.21,183.41 270.74,184.47 275.26,184.10 277.36,184.49 277.16,182.11 278.47,181.02 282.68,180.58\" id=\"252\" clip-path=\"url(#cl3_2)\" fill=\"#3A548C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"253\" clip-path=\"url(#cl3_2)\" fill=\"#ACDC31\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"254\" clip-path=\"url(#cl3_2)\" fill=\"#A4DB36\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"255\" clip-path=\"url(#cl3_2)\" fill=\"#B1DD2E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"256\" clip-path=\"url(#cl3_2)\" fill=\"#B4DE2C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"257\" clip-path=\"url(#cl3_2)\" fill=\"#9AD93D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"258\" clip-path=\"url(#cl3_2)\" fill=\"#A8DB34\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"259\" clip-path=\"url(#cl3_2)\" fill=\"#AADC32\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"260\" clip-path=\"url(#cl3_2)\" fill=\"#AEDC30\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"167.73,202.82 167.81,203.68 166.79,204.83 169.11,205.76 171.87,205.96 171.16,207.91 168.62,208.66 164.65,207.96 163.14,209.86 160.49,209.94 159.67,209.16 156.29,210.70 153.59,210.85 151.42,209.74 149.97,207.57 147.20,208.23 147.75,206.06 152.28,203.51 152.37,202.29 154.73,202.81 156.37,202.04 160.93,202.21 162.22,201.21 167.73,202.82\" id=\"261\" clip-path=\"url(#cl3_2)\" fill=\"#C0DF25\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"304.88,262.63 305.32,262.59 306.02,261.36 310.51,261.30 315.88,259.64 312.08,261.89 312.70,262.81 312.00,262.66 310.87,263.07 309.92,262.99 309.64,263.19 309.43,262.69 308.93,262.40 307.72,262.38 306.10,262.85 304.88,262.63\" id=\"262\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"312.70,262.81 312.96,263.21 306.90,265.42 303.73,264.85 301.94,262.89 304.88,262.63 306.10,262.85 307.72,262.38 308.93,262.40 309.43,262.69 309.64,263.19 309.92,262.99 310.87,263.07 312.00,262.66 312.70,262.81\" id=\"263\" clip-path=\"url(#cl3_2)\" fill=\"#38B977\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"312.70,262.81 312.96,263.21 306.90,265.42 303.73,264.85 301.94,262.89 304.88,262.63 306.10,262.85 307.72,262.38 308.93,262.40 309.43,262.69 309.64,263.19 309.92,262.99 310.87,263.07 312.00,262.66 312.70,262.81\" id=\"264\" clip-path=\"url(#cl3_2)\" fill=\"#65CB5E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"312.70,262.81 312.96,263.21 306.90,265.42 303.73,264.85 301.94,262.89 304.88,262.63 306.10,262.85 307.72,262.38 308.93,262.40 309.43,262.69 309.64,263.19 309.92,262.99 310.87,263.07 312.00,262.66 312.70,262.81\" id=\"265\" clip-path=\"url(#cl3_2)\" fill=\"#3FBC73\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"312.70,262.81 312.96,263.21 306.90,265.42 303.73,264.85 301.94,262.89 304.88,262.63 306.10,262.85 307.72,262.38 308.93,262.40 309.43,262.69 309.64,263.19 309.92,262.99 310.87,263.07 312.00,262.66 312.70,262.81\" id=\"266\" clip-path=\"url(#cl3_2)\" fill=\"#28AE80\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"312.70,262.81 312.96,263.21 306.90,265.42 303.73,264.85 301.94,262.89 304.88,262.63 306.10,262.85 307.72,262.38 308.93,262.40 309.43,262.69 309.64,263.19 309.92,262.99 310.87,263.07 312.00,262.66 312.70,262.81\" id=\"267\" clip-path=\"url(#cl3_2)\" fill=\"#25AB82\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"268\" clip-path=\"url(#cl3_2)\" fill=\"#228B8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"269\" clip-path=\"url(#cl3_2)\" fill=\"#1F948C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"270\" clip-path=\"url(#cl3_2)\" fill=\"#21918C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.79,200.59 207.31,202.54 204.27,202.53 205.27,203.57 203.32,206.63 202.24,207.43 197.43,207.51 194.59,208.56 190.07,208.14 182.35,206.77 181.33,205.09 175.84,205.81 175.08,206.71 171.87,205.96 169.11,205.76 166.79,204.83 167.81,203.68 167.73,202.82 169.40,202.60 171.94,204.00 172.89,202.75 177.63,203.06 181.59,202.28 184.16,202.47 185.74,203.48 186.33,202.68 185.89,199.56 187.88,198.99 189.97,196.82 193.78,198.41 196.92,196.50 198.81,196.17 202.84,197.66 205.35,197.43 207.77,198.34 207.32,198.94 207.79,200.59\" id=\"271\" clip-path=\"url(#cl3_2)\" fill=\"#42BE71\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"272\" clip-path=\"url(#cl3_2)\" fill=\"#218E8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"273\" clip-path=\"url(#cl3_2)\" fill=\"#287D8E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"274\" clip-path=\"url(#cl3_2)\" fill=\"#26818E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"275\" clip-path=\"url(#cl3_2)\" fill=\"#218F8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.77,198.34 205.35,197.43 202.84,197.66 198.81,196.17 196.92,196.50 193.78,198.41 189.97,196.82 187.19,194.74 184.64,193.55 184.33,191.54 183.59,190.12 187.47,189.16 189.51,188.02 193.28,187.16 194.65,186.29 195.95,186.85 198.27,186.38 200.59,187.93 204.42,188.37 204.03,189.67 206.80,190.66 207.62,189.45 211.15,190.00 211.61,191.48 215.48,191.77 217.87,194.10 216.30,194.11 215.48,194.96 214.27,195.16 213.90,196.24 212.89,196.47 212.73,196.91 210.91,197.39 208.56,197.30 207.77,198.34\" id=\"276\" clip-path=\"url(#cl3_2)\" fill=\"#21918C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"277\" clip-path=\"url(#cl3_2)\" fill=\"#2DB27D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"278\" clip-path=\"url(#cl3_2)\" fill=\"#20A486\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"279\" clip-path=\"url(#cl3_2)\" fill=\"#1F968B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"280\" clip-path=\"url(#cl3_2)\" fill=\"#1F988B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"281\" clip-path=\"url(#cl3_2)\" fill=\"#22A785\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.79,200.59 207.31,202.54 204.27,202.53 205.27,203.57 203.32,206.63 202.24,207.43 197.43,207.51 194.59,208.56 190.07,208.14 182.35,206.77 181.33,205.09 175.84,205.81 175.08,206.71 171.87,205.96 169.11,205.76 166.79,204.83 167.81,203.68 167.73,202.82 169.40,202.60 171.94,204.00 172.89,202.75 177.63,203.06 181.59,202.28 184.16,202.47 185.74,203.48 186.33,202.68 185.89,199.56 187.88,198.99 189.97,196.82 193.78,198.41 196.92,196.50 198.81,196.17 202.84,197.66 205.35,197.43 207.77,198.34 207.32,198.94 207.79,200.59\" id=\"282\" clip-path=\"url(#cl3_2)\" fill=\"#56C667\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"283\" clip-path=\"url(#cl3_2)\" fill=\"#33B67A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"284\" clip-path=\"url(#cl3_2)\" fill=\"#5CC863\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"285\" clip-path=\"url(#cl3_2)\" fill=\"#4BC16D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"175.54,167.78 175.29,169.57 179.93,170.78 179.60,172.43 184.64,171.68 187.52,170.46 192.73,172.40 194.87,173.92 195.78,176.30 194.29,177.53 195.93,179.22 196.95,181.74 196.43,183.36 198.27,186.38 195.95,186.85 194.65,186.29 193.28,187.16 189.51,188.02 187.47,189.16 183.59,190.12 184.33,191.54 184.64,193.55 187.19,194.74 189.97,196.82 187.88,198.99 185.89,199.56 186.33,202.68 185.74,203.48 184.16,202.47 181.59,202.28 177.63,203.06 172.89,202.75 171.94,204.00 169.40,202.60 167.73,202.82 162.22,201.21 160.93,202.21 156.37,202.04 157.72,198.66 161.04,195.49 153.66,194.36 151.48,193.03 152.25,190.96 151.48,189.85 152.82,186.68 153.19,181.72 156.19,181.83 157.87,180.11 160.11,175.87 159.58,174.26 160.76,173.31 164.86,173.20 165.53,174.26 169.30,172.08 168.57,170.30 168.92,167.66 172.37,168.39 175.54,167.78\" id=\"286\" clip-path=\"url(#cl3_2)\" fill=\"#68CD5B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"287\" clip-path=\"url(#cl3_2)\" fill=\"#DDE318\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"288\" clip-path=\"url(#cl3_2)\" fill=\"#DDE318\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"289\" clip-path=\"url(#cl3_2)\" fill=\"#DFE318\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"290\" clip-path=\"url(#cl3_2)\" fill=\"#DFE318\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"291\" clip-path=\"url(#cl3_2)\" fill=\"#DFE318\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"292\" clip-path=\"url(#cl3_2)\" fill=\"#DFE318\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"293\" clip-path=\"url(#cl3_2)\" fill=\"#E5E419\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"294\" clip-path=\"url(#cl3_2)\" fill=\"#E5E419\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"295\" clip-path=\"url(#cl3_2)\" fill=\"#E6E419\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"296\" clip-path=\"url(#cl3_2)\" fill=\"#E6E419\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.79,200.59 207.31,202.54 204.27,202.53 205.27,203.57 203.32,206.63 202.24,207.43 197.43,207.51 194.59,208.56 190.07,208.14 182.35,206.77 181.33,205.09 175.84,205.81 175.08,206.71 171.87,205.96 169.11,205.76 166.79,204.83 167.81,203.68 167.73,202.82 169.40,202.60 171.94,204.00 172.89,202.75 177.63,203.06 181.59,202.28 184.16,202.47 185.74,203.48 186.33,202.68 185.89,199.56 187.88,198.99 189.97,196.82 193.78,198.41 196.92,196.50 198.81,196.17 202.84,197.66 205.35,197.43 207.77,198.34 207.32,198.94 207.79,200.59\" id=\"297\" clip-path=\"url(#cl3_2)\" fill=\"#46C06F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"298\" clip-path=\"url(#cl3_2)\" fill=\"#CEE11D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"299\" clip-path=\"url(#cl3_2)\" fill=\"#CEE11D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"300\" clip-path=\"url(#cl3_2)\" fill=\"#EBE51B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"301\" clip-path=\"url(#cl3_2)\" fill=\"#EBE51B\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"181.39,161.10 179.96,162.80 178.67,162.26 174.69,165.48 175.54,167.78 172.37,168.39 168.92,167.66 167.59,165.03 168.55,160.31 169.60,159.10 171.22,157.77 175.25,157.62 177.09,156.41 180.94,155.22 180.35,157.57 178.73,159.03 179.03,160.33 181.39,161.10\" id=\"302\" clip-path=\"url(#cl3_2)\" fill=\"#C4E022\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"189.03,165.20 185.68,168.89 181.14,166.16 180.81,164.22 187.87,162.86 189.03,165.20\" id=\"303\" clip-path=\"url(#cl3_2)\" fill=\"#C4E022\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"48.39,287.85 54.97,287.35 60.55,286.20 63.61,283.75 71.55,282.04 72.72,278.29 76.49,278.00 79.79,276.24 88.27,275.71 89.86,273.80 88.44,272.66 87.50,267.25 87.87,264.18 86.34,260.87 92.93,258.38 99.77,257.78 104.12,255.87 110.35,254.58 120.90,254.06 131.11,253.97 134.07,254.80 140.18,253.01 146.74,253.14 149.07,254.35 153.32,254.14 151.72,256.66 152.08,261.41 150.08,265.48 145.83,268.18 145.90,271.96 150.75,275.04 150.67,276.25 154.41,278.35 156.25,287.41 157.96,291.89 158.11,294.24\" id=\"304\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"323.45,290.58 321.93,292.67 321.08,296.53 312.53,296.36 306.87,289.22 306.26,289.69 309.68,294.96 258.36,293.08 256.15,289.05 257.65,285.93 256.51,283.80 258.71,281.37 267.33,281.18 273.69,282.42 280.28,283.80 283.37,284.54 288.20,282.85 290.70,281.36 296.35,280.83 301.02,281.37 303.12,283.82 304.40,282.15 309.75,283.21 314.83,283.37 317.81,282.02 323.45,290.58\" id=\"305\" clip-path=\"url(#cl3_2)\" fill=\"#EEEEEE\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"306\" clip-path=\"url(#cl3_2)\" fill=\"#47C06F\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"307\" clip-path=\"url(#cl3_2)\" fill=\"#38B977\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"308\" clip-path=\"url(#cl3_2)\" fill=\"#28AE80\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"309\" clip-path=\"url(#cl3_2)\" fill=\"#54C568\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"207.79,200.59 207.31,202.54 204.27,202.53 205.27,203.57 203.32,206.63 202.24,207.43 197.43,207.51 194.59,208.56 190.07,208.14 182.35,206.77 181.33,205.09 175.84,205.81 175.08,206.71 171.87,205.96 169.11,205.76 166.79,204.83 167.81,203.68 167.73,202.82 169.40,202.60 171.94,204.00 172.89,202.75 177.63,203.06 181.59,202.28 184.16,202.47 185.74,203.48 186.33,202.68 185.89,199.56 187.88,198.99 189.97,196.82 193.78,198.41 196.92,196.50 198.81,196.17 202.84,197.66 205.35,197.43 207.77,198.34 207.32,198.94 207.79,200.59\" id=\"310\" clip-path=\"url(#cl3_2)\" fill=\"#40BD72\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"311\" clip-path=\"url(#cl3_2)\" fill=\"#5CC863\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"312\" clip-path=\"url(#cl3_2)\" fill=\"#4CC26C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"313\" clip-path=\"url(#cl3_2)\" fill=\"#4FC46A\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"314\" clip-path=\"url(#cl3_2)\" fill=\"#35B779\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"56.83,225.14 58.56,221.65 57.20,219.35 66.47,216.38 72.85,217.73 80.28,218.19 85.88,219.39 90.60,219.41 99.58,220.08 101.22,222.10 111.00,224.83 113.36,223.87 119.19,226.36 125.99,226.00 125.63,228.85 119.36,231.89 111.65,232.62 110.70,234.25 106.40,236.82 103.07,240.74 104.66,243.67 100.64,245.73 98.52,248.90 93.72,249.69 88.43,253.33 80.72,253.05 74.99,252.67 70.69,254.25 67.81,256.03 64.97,255.45 63.26,253.63 62.47,250.65 57.15,249.56 57.21,247.87 60.05,246.12 61.32,244.81 59.80,243.20 62.55,240.02 61.29,236.89 63.94,236.64 65.01,234.31 66.21,233.64 67.69,229.78 70.81,228.61 70.14,226.04 66.92,225.65 65.72,226.21 62.39,225.99 61.94,223.47 59.37,224.03 56.83,225.14\" id=\"315\" clip-path=\"url(#cl3_2)\" fill=\"#67CC5C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"316\" clip-path=\"url(#cl3_2)\" fill=\"#228B8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"317\" clip-path=\"url(#cl3_2)\" fill=\"#355F8D\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"318\" clip-path=\"url(#cl3_2)\" fill=\"#24878E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"319\" clip-path=\"url(#cl3_2)\" fill=\"#26828E\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <polygon points=\"242.40,155.26 242.59,152.55 241.03,153.16 238.06,151.59 237.42,148.98 242.72,147.62 248.03,146.84 252.80,147.47 257.19,147.20 258.00,147.97 255.45,150.68 257.58,154.90 255.94,156.41 252.24,156.50 248.12,154.89 246.09,154.37 242.40,155.26\" id=\"320\" clip-path=\"url(#cl3_2)\" fill=\"#20928C\" fill-opacity=\"1\" stroke-width=\"1.06698\" stroke=\"#BEBEBE\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>\n    <defs>\n      <clipPath id=\"cl3_3\">\n        <rect x=\"0.00\" y=\"0.00\" width=\"432.00\" height=\"360.00\"/>\n      <\/clipPath>\n    <\/defs>\n    <image xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"368.84\" y=\"151.63\" width=\"17.28\" height=\"86.40\" id=\"321\" clip-path=\"url(#cl3)\" xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAFaCAYAAACjTSvQAAAABmJLR0QA/wD/AP+gvaeTAAAEn0lEQVR4nO3dQZIiOQxGYSnxTFC36M2cug84B5gFjqJIzwI2Tf6PLSzedwJCIcmynZn07d9/VukP2/r5tb37R3wqAwMMDDAwwMAAAwMMDDAwYOzL+e7ZVlVjLwPzbJaBQWN/9y/4QPdSssccbG0pRbO6xjIwQdtjki57THSyx2TfZWDAtMcQMyZwwAP2mBfsMcDJN+jqGjfjcjBm1dir3/07Ps7joMrAHK0a+zIwz7ZaZkzyOAw3MM9mnQ0MsccElhIwMOBSlhJwuY66Vo2bgTn4KXsMssdEDniRyzW4n/laSkdtxgDnmOh+HrN8cPPZ1rsZkzzOY8yYxFUpcI4Bm5vI7MdVKetyVYpO9WVgksdeyVI68FKfGZjAvRL4rpsZk7lXQu6VAvdK4PEAtIF5Nj3aJC7X0dZ/11hmTGSPCa7eKzEzJri/LOrke3Cq3YxJvqtclYjNNzpbSklPm290Kpfr6OomkvgiV9Tlch09PpNiYJ59u1wDd9dsLDPmoM2Y7OSZb3atm8s1cVWKvgxMsl1svpFXtOBS7pWQGRN57BBttSwlYsYEV18vZsMvSgZtKUVbO8cgMya4lid42fTCDSxXpcR7JXAqVyVkxgSzzmYMGbvN9+D+tIOldOBNJNjKjIlme7QJVg17b2YpBT09wYt8OPEFMwbYY4KLeyVmKQFLKWl311F7r5R57IC8JYhmWUrAjMmmPQZ5HgPMmKCravjHopmrUtD1ZcZE7e46a5tvNKv84gUxY4DNN5lOvmiUpRS5XINRTr6RGQPsMUn7fEzksQNxr5R1LTOGuIkErkrJxeaLDAywxwB7THS2lIiBSdpjB2TGJG1gkIFJpj0GmTHAwAAnX+BeCVhKwMAkXTXsMJkZk7glYAYGuFyD0Q54R9NSQpYSMGPAaANzsMpSQpZS4uQL7ptI55hnyyeqmIEBBiaZzjHIOQZYSsBSApYSsJQStwSg7THRucwYZPMFllLiSxbMUgJmDPAmMvIED9ljgMt14l4JtKWEzBhgjwmWDw4xewywlIJVlhKylIAZA+wxiZMvs5QS75WYGZNMewwyY4A9JvDu+gV7DLCUgKWUeEsAfFOfmTHAwAADk0x7DDJjgIEBo/0riwPvlYiH4cxNZLDcKzEzBpgxie8SMEsJjDJlIjMm+Cp7DDIwiU87ACdfZsYkPhnOPHYAnuBFbSkRAwNclZJ2EwnajEk8833BwCTTOSbyC9AvWErAVQmYMWCUzffIo83s7GMgzB4DHPCiacZE01UJuSoBSwlYSokDHvDMl5kxwOYLbL7J9Pokerx9YmSOvNRHllLwuIk0Mgde0TIPqoAZk1zsMeBixhAzBhgY4IAXnB3wgAMeM2MS3z5hZkzU7pUyD6qQpZS4XAMHPDL9Dh4ZtZsxB1cv9ZEZA8wY4KoUtYGJ2sBkDnhkGhhiYBIfmWcGBhiYyBO8zOUaOOAxAwPGMjBHl+l5DBm19nf/ho9kj4naHhO5XAMHPOaqlFwv9phklqWEDAwwMEk7+Wa92XyJy3Vy9V4JGRjg596AgQEGBhgYYGCAgQEGBhgYMKrr97t/xKf5a53++x+KfyCvD13OCAAAAABJRU5ErkJggg==\"/>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"386.12\" y=\"236.54\" id=\"322\" font-size=\"6.90pt\" font-family=\"Arial Narrow\">5.5<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"386.12\" y=\"223.08\" id=\"323\" font-size=\"6.90pt\" font-family=\"Arial Narrow\">6.0<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"386.12\" y=\"209.62\" id=\"324\" font-size=\"6.90pt\" font-family=\"Arial Narrow\">6.5<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"386.12\" y=\"196.16\" id=\"325\" font-size=\"6.90pt\" font-family=\"Arial Narrow\">7.0<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"386.12\" y=\"182.70\" id=\"326\" font-size=\"6.90pt\" font-family=\"Arial Narrow\">7.5<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"386.12\" y=\"169.24\" id=\"327\" font-size=\"6.90pt\" font-family=\"Arial Narrow\">8.0<\/text>\n    <\/g>\n    <line x1=\"368.84\" y1=\"233.32\" x2=\"372.30\" y2=\"233.32\" id=\"328\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"368.84\" y1=\"219.86\" x2=\"372.30\" y2=\"219.86\" id=\"329\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"368.84\" y1=\"206.40\" x2=\"372.30\" y2=\"206.40\" id=\"330\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"368.84\" y1=\"192.95\" x2=\"372.30\" y2=\"192.95\" id=\"331\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"368.84\" y1=\"179.49\" x2=\"372.30\" y2=\"179.49\" id=\"332\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"368.84\" y1=\"166.03\" x2=\"372.30\" y2=\"166.03\" id=\"333\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"382.67\" y1=\"233.32\" x2=\"386.12\" y2=\"233.32\" id=\"334\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"382.67\" y1=\"219.86\" x2=\"386.12\" y2=\"219.86\" id=\"335\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"382.67\" y1=\"206.40\" x2=\"386.12\" y2=\"206.40\" id=\"336\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"382.67\" y1=\"192.95\" x2=\"386.12\" y2=\"192.95\" id=\"337\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"382.67\" y1=\"179.49\" x2=\"386.12\" y2=\"179.49\" id=\"338\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <line x1=\"382.67\" y1=\"166.03\" x2=\"386.12\" y2=\"166.03\" id=\"339\" clip-path=\"url(#cl3_3)\" stroke-width=\"0.375\" stroke=\"#FFFFFF\" stroke-opacity=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"butt\" fill=\"#FFFFFF\" fill-opacity=\"1\"/>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"32.75\" y=\"63.87\" id=\"340\" font-size=\"9.00pt\" font-family=\"Arial Narrow\">Average score of 'happy', scale 0-10<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"32.75\" y=\"42.78\" id=\"341\" font-size=\"13.50pt\" font-weight=\"bold\" font-family=\"Arial Narrow\">Subjective happiness 2002-2016<\/text>\n    <\/g>\n    <g clip-path=\"url(#cl3_3)\">\n      <text x=\"272.06\" y=\"327.58\" id=\"342\" font-size=\"6.75pt\" font-style=\"italic\" font-family=\"Arial Narrow\">ESS surveys 2002-2016<\/text>\n    <\/g>\n  <\/g>\n<\/svg>\n","css":".tooltip_svg_3 {position:absolute;pointer-events:none;z-index:999;padding:5px;background:black;color:white;border-radius:2px 2px 2px 2px;}\n.hover_svg_3{fill:orange;stroke:gray;}\n.clicked_svg_3{fill:orange;stroke:gray;}","ui_html":"<div class='ggiraph-toolbar'><div class='ggiraph-toolbar-block shinyonly'><a class='ggiraph-toolbar-icon neutral' title='lasso selection' href='javascript:lasso_on(\"svg_3\", true, \"array_selected_svg_3\", \"clicked_svg_3\");'><svg width='15pt' height='15pt' viewBox='0 0 230 230'><g><ellipse ry='65.5' rx='86.5' cy='94' cx='115.5' stroke-width='20' fill='transparent'/><ellipse ry='11.500001' rx='10.5' cy='153' cx='91.5' stroke-width='20' fill='transparent'/><line y2='210.5' x2='105' y1='164.5' x1='96' stroke-width='20'/><\/g><\/svg><\/a><a class='ggiraph-toolbar-icon drop' title='lasso anti-selection' href='javascript:lasso_on(\"svg_3\", false, \"array_selected_svg_3\", \"clicked_svg_3\");'><svg width='15pt' height='15pt' viewBox='0 0 230 230'><g><ellipse ry='65.5' rx='86.5' cy='94' cx='115.5' stroke-width='20' fill='transparent'/><ellipse ry='11.500001' rx='10.5' cy='153' cx='91.5' stroke-width='20' fill='transparent'/><line y2='210.5' x2='105' y1='164.5' x1='96' stroke-width='20'/><\/g><\/svg><\/a><\/div><\/div>","uid":"svg_3","width":"75%","funname":"init_prop_svg_3","sel_array_name":"array_selected_svg_3","selected_class":"clicked_svg_3","tooltip_opacity":0.9,"tooltip_offx":10,"tooltip_offy":0,"zoom_max":1,"selection_type":"multiple"},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Europe seems to be divided into two areas and a border zone running diagonally from South West to North East. With Portugal and Israel exceptions to that pattern.
 
 This divide might be a result of different cultural traditions and norms refleced in how people score personal happiness. Therefore, comparing absolute scores between the countries might actually be misleading.
@@ -570,11 +567,13 @@ p_happy <- MakeIndicatorHeatSet(
    txt_subtitle = "Average score of 'happy', scale 0-10",
    txt_caption = "ESS surveys 2002-2016")
 
-MyPrintInteractive(p_happy, create_interactive_plot) 
+MyPrintInteractive(p_happy, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-10-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-125b6a722e0ee5c65ab6">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-10.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Note that mean across columns and rows is a simple average over the scores shown on the table.
 
 Since each ESS survey often has had different number of countries the averages over columns cannot be used for any meaningful trend evaluation.
@@ -596,9 +595,11 @@ cntry_in_50pct <- (ds_participations %>%
 
 trends_happy_50  <- MakeIndicatorCountryPlot(
     ds = ds_happy_ave %>% 
-      filter(cntry_name %in% cntry_in_50pct), 
+      filter(cntry_name %in% cntry_in_50pct) %>%
+      mutate(explain_txt = cntry_name), 
     id_term = "var_ave",
     cntry_term = "cntry_name",
+    cntry_term_long = "explain_txt",
     year_term = "ess_year",
     txt_head = "Subjective happiness",
     txt_subhead = "Countries in 50% of surveys or more",
@@ -606,12 +607,14 @@ trends_happy_50  <- MakeIndicatorCountryPlot(
     show_summary = TRUE,
     plevel = p_val)
 
-MyPrintInteractive(trends_happy_50$ci, create_interactive_plot, 
+MyPrintInteractive(trends_happy_50$ci, plot_wo_widget, 
                    hover_css = "stroke-width:3px;") 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-11-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-4c7cfa9557ad80774790">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-11.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 For comparison we show the graph where all included countries have been in all surveys. In this case the average line is a bit more meaningful - but we miss quite a few interesting countries.
 
 ``` r
@@ -623,22 +626,26 @@ cntry_in_100pct <- (ds_participations %>%
 
 trends_happy_100  <- MakeIndicatorCountryPlot(
   ds = ds_happy_ave %>% 
-    filter(cntry_name %in% cntry_in_100pct), 
-    id_term = "var_ave",
-    cntry_term = "cntry_name",
-    year_term = "ess_year",
-    txt_head = "Subjective happiness",
-    txt_subhead = "Countries in all surveys",
-    txt_caption = "ESS surveys 2002-2016",
-    show_summary = TRUE,
-    plevel = p_val)
+    filter(cntry_name %in% cntry_in_100pct) %>%
+    mutate(explain_txt = cntry_name), 
+  id_term = "var_ave",
+  cntry_term = "cntry_name",
+  cntry_term_long = "explain_txt",
+  year_term = "ess_year",
+  txt_head = "Subjective happiness",
+  txt_subhead = "Countries in all surveys",
+  txt_caption = "ESS surveys 2002-2016",
+  show_summary = TRUE,
+  plevel = p_val)
 
-MyPrintInteractive(trends_happy_100$ci, create_interactive_plot, 
+MyPrintInteractive(trends_happy_100$ci, plot_wo_widget, 
                    hover_css = "stroke-width:3px;") 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-12-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-bfd52963c1e12e0cb957">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-12.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 There are quite varied happiness histories on display. In one end countries like Finland, Swizerland, Norway and Denmark are almost monotonically in the high end of the scale.
 
 And then there are countries like Hungary, Poland, Ireland and Portugal where happiness has taken big swiup and down.
@@ -670,11 +677,13 @@ p <- ggplot(data = ds_happy_avgsum %>% filter(ess_year=="Mean", cntry_name != "M
   labs(color="ESS Year") +
   coord_flip()
 
-MyPrintInteractive(p, create_interactive_plot) 
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-13-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-2df2990971af13f30f20">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-13.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 For some countries there is quite wide variation in the scores between surveys. But in general it looks like those on the high end of happiness have had less variation than those on the lower end.
 
 ``` r
@@ -695,11 +704,13 @@ p <- ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd, fill=n)) +
         plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) 
 
-MyPrintInteractive(p, create_interactive_plot) 
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-14-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-60b0ce6d3ce993e51add">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-14.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ### Significance and meaning of changes
 
 There is a visual suggestion that subjective happiness may have improved for several countries over the past couple of surveys.
@@ -743,27 +754,29 @@ knitr::kable(happy_res$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Ireland        |  7.863|  7.331|  7.550|  -0.312|         0.071|         0.075| negligible |   0.000| \*\*\*   |   0.219|         0.071|         0.075| negligible |   0.000| \*\*\*   |
-| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.676|          |  -0.047|         0.079|         0.083| negligible |   0.394|          |
-| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.826|          |   0.045|         0.010|         0.014| negligible |   0.390|          |
-| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.544|          |  -0.016|        -0.014|        -0.010| negligible |   0.796|          |
-| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.392|          |   0.065|         0.365|         0.369| small      |   0.258|          |
-| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.034| \*       |   0.072|        -0.021|        -0.017| negligible |   0.082| +        |
-| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.042| \*       |   0.084|        -0.043|        -0.039| negligible |   0.056| +        |
-| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.012| \*       |   0.080|        -0.039|        -0.035| negligible |   0.180|          |
-| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.034| \*       |
+| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.654|          |  -0.047|         0.079|         0.083| negligible |   0.430|          |
+| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.804|          |   0.045|         0.010|         0.014| negligible |   0.398|          |
+| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.544|          |  -0.016|        -0.014|        -0.010| negligible |   0.770|          |
+| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.394|          |   0.065|         0.365|         0.369| small      |   0.238|          |
+| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.022| \*       |   0.072|        -0.021|        -0.017| negligible |   0.094| +        |
+| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.042| \*       |   0.084|        -0.043|        -0.039| negligible |   0.060| +        |
+| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.010| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.140|          |
+| Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.020| \*       |
 | Spain          |  7.457|  7.437|  7.747|   0.290|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |   0.310|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |
 | Portugal       |  6.953|  6.973|  7.437|   0.484|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |   0.465|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |
 | Germany        |  7.189|  7.586|  7.757|   0.568|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |   0.171|        -0.077|        -0.074| negligible |   0.000| \*\*\*   |
 | Slovenia       |  6.906|  7.116|  7.477|   0.571|        -0.230|        -0.225| small      |   0.000| \*\*\*   |   0.361|        -0.230|        -0.225| small      |   0.000| \*\*\*   |
 | Hungary        |  6.325|  6.384|  6.901|   0.577|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |   0.518|        -0.067|        -0.062| negligible |   0.000| \*\*\*   |
-| Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.006| \*\*     |
+| Poland         |  6.422|  7.270|  7.475|   1.053|        -0.436|        -0.432| small      |   0.000| \*\*\*   |   0.204|        -0.436|        -0.432| small      |   0.002| \*\*     |
 
 ``` r
-MyPrintInteractive(happy_res$plot, create_interactive_plot) 
+MyPrintInteractive(happy_res$plot, plot_wo_widget) 
 ```
 
-![Tab. 2: Changes of subjective happiness 2002 vs 2016 and 2014 vs 2016 with p-values for significance of the change, Cohen's d values for effect size](EuropeanSocialSurvey_files/figure-markdown_github/table2-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-b07779b1f6a183775c83">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-16.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 The box-plots are in line with t-test results shown in table Tab. 2. But only a couple of the changes was meaningful according to COhen's d measure, and even the the effect was only small.
 
 But perhaps that is acceptable in a survey like this. The situation would be quite different if we were looking for an impact coming from a controlled experiment.
@@ -779,7 +792,7 @@ cowplot::plot_grid(
   ncol = 2)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 ``` r
 cowplot::plot_grid(
@@ -790,7 +803,7 @@ cowplot::plot_grid(
   ncol = 2)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-16-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-17-2.png)
 
 Skew can be strong, as can be seen in the histograms above..
 
@@ -825,7 +838,7 @@ cowplot::plot_grid(
   ncol = 2)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
 ``` r
 cowplot::plot_grid(
@@ -840,7 +853,7 @@ cowplot::plot_grid(
   ncol = 2)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-17-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-18-2.png)
 
 It is clear that the distributions are more normal-like and skew reduced.
 
@@ -888,7 +901,7 @@ cowplot::plot_grid(
   ncol = 2)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
 #### Trends of transformed and scaled happiness
 
@@ -904,9 +917,11 @@ ds_happy_scaled <- dataset_scaled %>%
 # plot trends
 trends_happy_50_scaled  <- MakeIndicatorCountryPlot(
     ds = ds_happy_scaled %>% 
-      filter(cntry_name %in% cntry_in_50pct), 
+      filter(cntry_name %in% cntry_in_50pct) %>%
+      mutate(explain_txt = cntry_name), 
     id_term = "var_ave",
     cntry_term = "cntry_name",
+    cntry_term_long = "explain_txt",
     year_term = "ess_year",
     txt_head = "Subjective happiness",
     txt_subhead = "Scaled and normalized - Countries in 50% of surveys or more",
@@ -914,14 +929,14 @@ trends_happy_50_scaled  <- MakeIndicatorCountryPlot(
     show_summary = TRUE,
     plevel = p_val)
 
-MyPrintInteractive(trends_happy_50_scaled$ci, create_interactive_plot, 
+MyPrintInteractive(trends_happy_50_scaled$ci, plot_wo_widget, 
                    hover_css = "stroke-width:3px;") 
 ```
 
-    ## Warning: Removed 131 rows containing missing values (geom_text_repel).
+<!--html_preserve-->
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-21-1.png)
-
+<script type="application/json" data-for="htmlwidget-0a3a87ad3c291ba0ab63">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-22.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Some notes
 
 -   in the beginning and in the end the scorea are widely spread
@@ -942,39 +957,36 @@ happy_res_scaled <- GetComparisonBoxPlot(
     filter(!is.na(happy_invln)),
   cntry_list = cntry_in_100pct,
   skip_plot = TRUE)
+
+p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
+                     filter(cntry_name %in% (happy_res$table %>%
+                                               filter(p_0216 <= p_val))$cntry_name), 
+                   ind_name = "d0216",
+                   txt_title = "Significant change in subjective happiness",
+                   txt_subtitle = "2002 vs 2016, countries in all surveys, standardized, p=0.05",
+                   txt_caption = "ESS 2002-2016")
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-    ## Joining, by = "cntry_name"
+<!--html_preserve-->
 
-    ## Warning: Column `cntry_name` joining factors with different levels,
-    ## coercing to character vector
-
+<script type="application/json" data-for="htmlwidget-e044839294723e62ea43">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-23.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-CreateEuroMap(mymap=mymap, 
-              ds = happy_res_scaled$table %>%
-                filter(cntry_name %in% (happy_res$table %>%
-                                          filter(p_0216 <= p_val))$cntry_name), 
-              ind_name = "d0216",
-              txt_title = "Significant change in subjective happiness",
-              txt_subtitle = "2002 vs 2016, countries in all surveys, standardized, p=0.05",
-              txt_caption = "ESS 2002-2016")
+p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
+                     filter(cntry_name %in% (happy_res$table %>%
+                                               filter(p_1416 <= p_val))$cntry_name), 
+                   ind_name = "d1416",
+                   txt_title = "Significant change in subjective happiness",
+                   txt_subtitle = "2014 vs 2016, countries in all surveys, standardized, p=0.05",
+                   txt_caption = "ESS 2002-2016")
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-22-1.png)
+<!--html_preserve-->
 
-``` r
-CreateEuroMap(mymap=mymap, 
-              ds = happy_res_scaled$table %>%
-                filter(cntry_name %in% (happy_res$table %>%
-                                          filter(p_1416 <= p_val))$cntry_name), 
-              ind_name = "d1416",
-              txt_title = "Significant change in subjective happiness",
-              txt_subtitle = "2014 vs 2016, countries in all surveys, standardized, p=0.05",
-              txt_caption = "ESS 2002-2016")
-```
-
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-22-2.png)
-
+<script type="application/json" data-for="htmlwidget-0bf323c66272d6ede1aa">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-23.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Given that the effect size as calculated by Cohen's d has been mostly "insignificant", interpretation of the charts is a bit clouded.
 
 Thwen again, this is not a controlled study where we try to judge if treatment A was more effective than treatment B for selecting which drug to invest in..
@@ -1257,11 +1269,12 @@ ind_plots <- lapply(
   }, 
   ds=ds_subset_50)
 
+# no need to make these plots interactive - print as they are
 for (i in 1:length(ind_plots))
-  MyPrintInteractive(ind_plots[[i]], FALSE)
+  print(ind_plots[[i]])
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-3.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-4.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-5.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-6.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-7.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-8.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-9.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-10.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-11.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-12.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-13.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-14.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-15.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-16.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-17.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-18.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-19.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-20.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-21.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-22.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-23.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-24.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-26-25.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-3.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-4.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-5.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-6.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-7.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-8.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-9.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-10.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-11.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-12.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-13.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-14.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-15.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-16.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-17.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-18.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-19.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-20.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-21.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-22.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-23.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-24.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-27-25.png)
 
 Mostly the distributions at this level do not seem significantly skewed.
 
@@ -1594,62 +1607,81 @@ ds_unhcr <- GetUnhcrData(
   max_year = max(dataset$ess_year), 
   read_rds = TRUE)
 
-ggplot(data= ds_unhcr, aes(x=ess_year, y=value, fill=pop_type)) +
-  geom_bar(stat="identity") +
+p <- ggplot(data= ds_unhcr, 
+            aes(x=ess_year, y=value, fill=pop_type, color=pop_type)) +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(ess_year, pop_type))) +
   labs(title="People of concern in Europe",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("")
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/get_unhcr_data-1.png) So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-77178797a2f788123470">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_get_unhcr_data.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
 
 Some insigt - perhaps - from two snapshots, i.e. 2013 and 2016.
 
 ``` r
-ggplot(data= ds_unhcr %>% filter(ess_year==2013), 
+p <- ggplot(data= ds_unhcr %>% filter(ess_year==2013), 
        aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name,'-', pop_type))) +
   labs(title="People of concern in Europe 2013",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-30-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e7569e7cef0852a9b858">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-31.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
+p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
   labs(title="People of concern in Europe 2016",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-30-2.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-7a8999aee1f29aa92c0e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-31.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Huge increase in "internally displaced persons" in Ukraine - yes, there was and still is that crisis regarding Crimea
 
 Trying log10 scaler for y-axiz to get better view.
 
 ``` r
-ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
+p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=(value+1), fill=pop_type)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
   labs(title="People of concern in Europe 2016",
        subtitle="Countries participating in ESS - log10 scale",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-31-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a32b3ecdda9f31a09006">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-32.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 # top 4 and all others
 
@@ -1705,19 +1737,23 @@ unhcr_indicator_table <- unhcr_indicator_table %>%
   bind_rows(ds_pop$indicators)
 
 
-ggplot(data=unhcr_data %>% filter(ess_year==2016), 
+p <- ggplot(data=unhcr_data %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value+1, fill=indicator)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
   labs(title="People of concern in Europe 2016",
        subtitle="% of population, log10 scale yaxis showing 1% more than real",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-32-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-55ab51d0528f0e638271">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-33.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 # merge data
 ds_ss_avg <- ds_ss_avg %>%
@@ -1744,17 +1780,21 @@ Cross check with World Bank data
 ``` r
 # check WB vs UNHCR data
 
-ggplot(data = ds_ss_avg %>% 
+p <- ggplot(data = ds_ss_avg %>% 
          filter(indicator %in% c("UNHCR.Refugee.PCT","REFG.PCT"),
                 ess_year==2016),
        aes(x=reorder(cntry_name, -value), y=value, fill=indicator)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar_interactive(stat = "identity", position = "dodge", aes(tooltip=paste(cntry_name, indicator, round(value,2)))) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) + 
   xlab("") + ylab("")
+
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-33-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-07242ae959ad587c411a">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-34.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Looks good and reassuring.
 
 ### Pct indicators
@@ -1840,9 +1880,9 @@ GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
     "if (!is.na(this_ind$lblmin)){",
     paste0("p",prefix,id,"$ci <- p",prefix,id,"$ci +"),
     "ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +",
-    "theme(axis.title.y = element_text(size = 9))",
+    "theme(axis.title.y = element_text(size = 7))",
     "}",
-    paste0("MyPrintInteractive(p",prefix,id,"$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') "),
+    paste0("MyPrintInteractive(p",prefix,id,"$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') "),
     " ",
     "```", 
     " "
@@ -1855,7 +1895,7 @@ if (params$explore_indicator_graphs){
     ascript <- c(ascript, GetIndicatorPlotJs(indicator_short, length(ascript), "ind"))
   }
 } else {
-  ascript <- c("", "Exploratory graphs skipped due to keep the document shorter.", " ")
+  ascript <- c("", "Exploratory graphs skipped to keep the document shorter.", " ")
 }
 
 tmp_indicators_rmd <- "tmp_indicators.rmd"
@@ -1876,160 +1916,238 @@ close(fileConn)
 
 #### happy
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-59-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-686fb5cf5853d054c0f2">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-60.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### health
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-60-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-41b9011e889c7018eecb">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-61.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### imbgeco
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-61-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e3c1537ba2702469e345">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-62.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### impcntr
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-62-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-01f593c2a12ce148d428">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-63.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### imueclt
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-63-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-994397be7b91b5d558f9">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-64.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### imwbcnt
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-64-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-6f6e1f76e0b76e4e5739">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-65.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### polintr
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-65-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-63733fc9588b06d4737d">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-66.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### pplhlp
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-66-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-cf6cb3f4d709c5a37445">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-67.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### stfeco
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-67-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-7813430e45f535192687">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-68.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### stfedu
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-68-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-d83a50979b2acc8121d2">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-69.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### stfhlth
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-69-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a8463b2229ec2fc5cf22">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-70.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### trstep
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-70-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3e7bcfd2c41ae8d2b64a">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-71.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### trstlgl
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-71-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-4fa1703a9c509abf565e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-72.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### trstplc
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-72-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-c59aad658a983de2fdf1">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-73.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### trstun
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-73-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-322b0708326b2cd98643">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-74.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### eisced2
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-74-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1056857d4a955e2d6a87">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-75.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### stfgov2
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-75-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-68d41398e2c3b8c1a3f3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-76.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### euftf2
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-76-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-536e74e6286088e24a13">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-77.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SH.XPD.GHED.GD.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-77-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a1767b29b2868d08e399">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-78.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### NY.GDP.MKTP.KD
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-78-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-539a201147bb09f857a2">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-79.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### NY.GDP.MKTP.KD.ZG
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-79-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-eadaecd6fe1e35cc34bf">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-80.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### NY.GDP.PCAP.KD
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-80-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-0578525cecb2f115bdd1">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-81.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### NY.GDP.PCAP.KD.ZG
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-81-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-73f1a16885b3ab27fe07">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-82.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SE.XPD.TOTL.GD.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-82-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-238216d1401aef8f416d">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-83.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### IT.NET.USER.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-83-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-13f9525526342ebc0caf">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-84.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SM.POP.TOTL.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-84-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-ad201925069b4b2d5b89">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-85.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SL.TLF.CACT.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-85-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e7cdd84032e62b8cffdb">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-86.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### BX.TRF.PWKR.DT.GD.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-86-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a486381b875d8e6ab2ee">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-87.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SP.POP.TOTL
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-87-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-856ba3f544a4929971a6">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-88.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SM.POP.REFG
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-88-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-24f55a4f0380bda8c1c2">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-89.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SP.RUR.TOTL.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-89-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1d0e98ce83d1f379f024">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-90.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### GC.TAX.TOTL.GD.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-90-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a31c6e30e2f64ad59e35">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-91.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### SP.URB.TOTL.IN.ZS
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-91-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-4830a2627812de13666c">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-92.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### REFG.PCT
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-92-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3c4587db220846f25303">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-93.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### UNHCR.Refugee.PCT
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-93-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1fa216076003e780bdf8">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-94.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### UNHCR.Asylum-.PCT
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-94-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-5123af09af03a9f0778e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-95.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### UNHCR.Interna.PCT
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-95-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-42ba27fa53964ad46dc4">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-96.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### UNHCR.Statele.PCT
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-96-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-75aee8f5711ab9f2bb89">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-97.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### UNHCR.Other.PCT
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-97-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-61aa5569d3ae1f4b0d8d">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-98.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ### By country
 
 ``` r
@@ -2043,9 +2161,16 @@ GetCountryPlotJs <- function(cntry) {
     "p_ess  <- MakeIndicatorCountryPlot(",
     "  ds = ds_ss_avg_ind_cntry %>% ",
     "    filter(indicator %in% (indicator_table %>% ",
-    "                             filter(source=='ESS'))$indicator),",
+    "                             filter(source=='ESS'))$indicator) %>% ",
+    "left_join(indicator_table %>% ",
+    paste0("            mutate(long_name = gsub('",   # need to get rid of quotation mark!!
+           "\\'",
+           "','',name, fixed=TRUE)) %>% "),
+    "            select(indicator, long_name),",
+    "          by='indicator'),",
     paste0("  id_term = '",cntry,"',"),
     "  cntry_term = 'indicator',",
+    "  cntry_term_long = 'long_name',",
     "  year_term = 'ess_year',",
     paste0("  txt_head = '",cntry,"',"),
     "  txt_subhead = 'ESS survey indicators',",
@@ -2057,9 +2182,14 @@ GetCountryPlotJs <- function(cntry) {
     "p_wb_a  <- MakeIndicatorCountryPlot(",
     "  ds = ds_ss_avg_ind_cntry %>% ",
     "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
-    "                             filter(max > pct_max_split))$indicator),",
+    "                             filter(max > pct_max_split))$indicator) %>%",
+    "left_join(indicator_table %>% ",
+    "            mutate(long_name = name) %>% ",
+    "            select(indicator, long_name),",
+    "          by='indicator'),",
     paste0("  id_term = '",cntry,"',"),
     "  cntry_term = 'indicator',",
+    "  cntry_term_long = 'long_name',",
     "  year_term = 'ess_year',",
     paste0("  txt_head = '",cntry,"',"),
     "  txt_subhead = 'World Bank Development Indices & UNHCR',",
@@ -2071,9 +2201,14 @@ GetCountryPlotJs <- function(cntry) {
     "p_wb_b  <- MakeIndicatorCountryPlot(",
     "  ds = ds_ss_avg_ind_cntry %>% ",
     "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
-    "                             filter(max <= pct_max_split))$indicator),",
+    "                             filter(max <= pct_max_split))$indicator) %>%",
+    "left_join(indicator_table %>% ",
+    "            mutate(long_name = name) %>% ",
+    "            select(indicator, long_name),",
+    "          by='indicator'),",
     paste0("  id_term = '",cntry,"',"),
     "  cntry_term = 'indicator',",
+    "  cntry_term_long = 'long_name',",
     "  year_term = 'ess_year',",
     paste0("  txt_head = '",cntry,"',"),
     "  txt_subhead = 'World Bank Development Indices & UNHCR',",
@@ -2082,9 +2217,9 @@ GetCountryPlotJs <- function(cntry) {
     "  label_size_coef = lbl_coef,",
     "  plevel = p_val)",
     " ",
-    "MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
-    "MyPrintInteractive(p_wb_a$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
-    "MyPrintInteractive(p_wb_b$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_ess$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_a$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_b$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
     "```", 
     " "
   )
@@ -2120,116 +2255,396 @@ close(fileConn)
 
 #### Austria
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-98-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-98-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-98-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1e67915517f20ec7238d">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-99.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-43bac009e55b11357a66">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-99.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-763fa9c897d02f0823ba">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-99.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Belgium
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-99-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-99-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-99-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-c1c1d026d734fe5b4541">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-100.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-2a8ff10805ddf09a6162">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-100.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-edb4c90a47d2312b116a">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-100.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Bulgaria
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-100-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-100-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-100-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a826a066ced66b3884a5">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-101.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-5cd96282ec23be3438de">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-101.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-7ffb3999f118cc549936">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-101.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Cyprus
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-101-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-101-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-101-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-ad54f1d8cc4e3c2ddb94">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-102.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-5b48ec8db2eda569c8d3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-102.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-b52403293d493b21b453">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-102.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Czechia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-102-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-102-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-102-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-43c0cb6cac16c994ccc1">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-103.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-392d37f796d9a6626383">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-103.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-5ee531ddd16a8d1fc142">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-103.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Denmark
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-103-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-103-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-103-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-fd05dd0dbb403832da50">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-104.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-44bb06de5f1f7473a578">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-104.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-11117b9f8ce99a4c9ff1">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-104.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Estonia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-104-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-104-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-104-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-174159c8258f527f2037">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-105.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-abbdb4e12ebf6be75320">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-105.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-728fcc662e3c10a7ee88">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-105.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Finland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-105-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-105-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-105-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-b160140bbd70a9eef62b">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-106.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-14a9cbf8ff968526013f">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-106.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-a1bbfb7632d9351a6b43">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-106.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### France
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-106-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-106-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-106-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1f9314bb208ad3ef522c">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-107.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-aeb24750f7953a2677a1">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-107.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-158e4f973d16e3d5b408">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-107.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Germany
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-107-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-107-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-107-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1820d4f8d3e1eb8da76b">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-108.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-27b4384b8070fe33fc0e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-108.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-0164a19287295d64d34d">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-108.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Greece
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-108-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-108-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-108-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-5af5cb38ecec53b124ef">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-109.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-2583917bbf68d8d3dad6">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-109.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-a9099bad888d65ef387f">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-109.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Hungary
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-109-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-109-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-109-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e1896af69eed0cab8c3b">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-110.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-cc4f3cef2ed2e8031ff9">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-110.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-4be2554710cef3051314">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-110.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Ireland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-110-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-110-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-110-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-262f9621e8906ad92127">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-111.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-eb8fc0990c4e26a5bfce">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-111.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-566614b6166255025024">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-111.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Israel
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-111-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-111-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-111-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e4efdab374755cdf493c">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-112.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-e4ed428f65474ac30b70">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-112.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-de39e6a11c10efc5154a">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-112.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Italy
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-112-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-112-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-112-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-6a0149bb2f9e6dbf3894">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-113.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-996b1336ce2e1c9aef38">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-113.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-48a27d07abebab8e0f21">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-113.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Lithuania
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-113-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-113-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-113-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1e4f6a72dc662dba1a71">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-114.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-ba6a293ee92c402cdbc0">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-114.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-94d0fd9224b24417ee25">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-114.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Netherlands
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-114-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-114-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-114-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3689ca6647f7d7237b5b">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-115.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-5dd756766a93f9eed9ff">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-115.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-7f28b80a6e18979b65d3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-115.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Norway
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-115-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-115-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-115-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-514504745881a055d635">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-116.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-ae653d10e4e481a1aa18">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-116.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-0012e9d405c6ee7d613a">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-116.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Poland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-116-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-116-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-116-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e7d75afd515a752395b6">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-117.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-b84be94632af5a9880d1">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-117.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-02996a092c14c1a40925">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-117.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Portugal
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-117-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-117-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-117-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-32de99c9cbbf65f9cc7e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-118.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-ca30adf9245eb440ca5f">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-118.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-997f91d6bd4b3f830aef">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-118.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Russia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-118-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-118-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-118-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-8111321c5ee03e3ec2b5">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-119.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-868ceefb933b11acb4f3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-119.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-5cc81d40b0531ae672e3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-119.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Slovakia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-119-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-119-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-119-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-75312c1b34abaefe9918">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-120.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-e7afb299c0ccea4f6d9e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-120.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-005a70fc7d175d36d072">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-120.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Slovenia
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-120-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-120-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-120-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3fe456196077de929373">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-121.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-690002b72d447507089b">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-121.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-666081633fa63efb54e9">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-121.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Spain
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-121-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-121-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-121-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-5f9374b63d9cd75b84ad">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-122.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-9b0377e68d8492056a30">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-122.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-c3d3414954b5c604402d">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-122.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Sweden
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-122-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-122-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-122-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3359522dc84763ad53f3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-123.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-6f12839a61720836f074">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-123.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-9863e762323f4ddcce3a">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-123.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Switzerland
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-123-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-123-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-123-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-9ff157200a2e67bb1827">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-124.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-dc30e13f0253b7087355">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-124.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-fa94b1ccaaf3c61dd723">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-124.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### Ukraine
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-124-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-124-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-124-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-b7aaaedb772e60a07a03">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-125.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-8f7b5d572d35f435a9f4">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-125.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-14be6621707ea3bb7609">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-125.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 #### United Kingdom
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-125-1.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-125-2.png)![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-125-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-c893aad47bd73ba7c1c6">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-126.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-7115426993f388d52879">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-126.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-e98884c509e201422fae">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-126.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Linear Modeling
 ---------------
 
@@ -2272,7 +2687,7 @@ p_pairs <- ggpairs(
 print(p_pairs)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-37-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-38-1.png)
 
 ``` r
 the_correlations <- rcorr(as.matrix(ds_subset_50_ave %>% 
@@ -2601,20 +3016,20 @@ the_mod <- PredAndCheck("happy", ds_train, ds_test, "- train 2002-2014, test 201
     ## Multiple R-squared:  0.8993, Adjusted R-squared:  0.8914 
     ## F-statistic: 113.2 on 12 and 152 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-42-1.png)
 
     ## [1] "For happy"
     ## [1] "Mean squared prediction error: 0.138"
     ## [1] "                    R-squared: 0.757"
     ## [1] "           Adjusted R-squared: 0.361"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-42-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-42-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -2635,7 +3050,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-41-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-42-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -2660,9 +3075,6 @@ ess_set <- GetObservationsSet(
 
     ## Joining, by = "cntry_name"
 
-    ## Warning: Column `cntry_name` joining factors with different levels,
-    ## coercing to character vector
-
 ``` r
 print(ess_set$summary)
 ```
@@ -2676,23 +3088,29 @@ print(ess_set$summary)
     ##  Max.   : NA                                         Max.   : NA
 
 ``` r
-MyPrintInteractive(ess_set$map, FALSE) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-43-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-659ff77a09bb5a8048a5">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-44.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-43-2.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-783d5002bcd768d246e5">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-44.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-43-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-e51677dcd7e93357e533">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-44.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 tab.3_cap <- table_nums(name="tab_3",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
@@ -2707,20 +3125,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
-| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.750|          |   0.005|         0.008|         0.012| negligible |   0.958|          |
-| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.894|          |  -0.017|         0.061|         0.065| negligible |   0.754|          |
-| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.008| \*\*     |   0.185|        -0.047|        -0.043| negligible |   0.002| \*\*     |
-| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.002| \*\*     |   0.181|        -0.057|        -0.053| negligible |   0.040| \*       |
-| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.466|          |
-| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.116|          |
-| Finland        |  5.676|  5.933|  6.110|   0.434|        -0.191|        -0.187| negligible |   0.000| \*\*\*   |   0.178|        -0.191|        -0.187| negligible |   0.002| \*\*     |
-| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.046| \*       |
-| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.308|          |
-| Hungary        |  4.147|  4.368|  4.616|   0.469|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |   0.248|        -0.085|        -0.081| negligible |   0.004| \*\*     |
-| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.034| \*       |
-| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |
-| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.044| \*       |
-| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.036| \*       |
+| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.752|          |   0.005|         0.008|         0.012| negligible |   0.898|          |
+| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.928|          |  -0.017|         0.061|         0.065| negligible |   0.784|          |
+| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.010| \*\*     |   0.185|        -0.047|        -0.043| negligible |   0.000| \*\*\*   |
+| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.000| \*\*\*   |   0.181|        -0.057|        -0.053| negligible |   0.056| +        |
+| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.506|          |
+| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.122|          |
+| Finland        |  5.676|  5.933|  6.110|   0.434|        -0.191|        -0.187| negligible |   0.000| \*\*\*   |   0.178|        -0.191|        -0.187| negligible |   0.004| \*\*     |
+| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.042| \*       |
+| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.276|          |
+| Hungary        |  4.147|  4.368|  4.616|   0.469|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |   0.248|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |
+| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.040| \*       |
+| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.002| \*\*     |
+| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.052| +        |
+| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.026| \*       |
 | Norway         |  6.013|  6.048|  6.984|   0.971|        -0.307|        -0.303| small      |   0.000| \*\*\*   |   0.936|        -0.307|        -0.303| small      |   0.000| \*\*\*   |
 
 #### Modeling
@@ -2767,20 +3185,20 @@ the_mod <- PredAndCheck("pplhlp",
     ## Multiple R-squared:  0.8554, Adjusted R-squared:  0.845 
     ## F-statistic: 82.25 on 11 and 153 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-1.png)
 
     ## [1] "For pplhlp"
     ## [1] "Mean squared prediction error: 0.249"
     ## [1] "                    R-squared: 0.681"
     ## [1] "           Adjusted R-squared: 0.255"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                            |
 |:---------|------------:|---------:|-------:|-------:|:----------------------------------------------------------------|
@@ -2800,7 +3218,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-44-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -2829,9 +3247,6 @@ ess_set <- GetObservationsSet(
 
     ## Joining, by = "cntry_name"
 
-    ## Warning: Column `cntry_name` joining factors with different levels,
-    ## coercing to character vector
-
 ``` r
 print(ess_set$summary)
 ```
@@ -2845,23 +3260,29 @@ print(ess_set$summary)
     ##  Max.   : NA                                         Max.   : NA
 
 ``` r
-MyPrintInteractive(ess_set$map, FALSE) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-493d47e1b55b07c0b2af">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-46.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-2.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-740e19546a9965409af8">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-46.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-45-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-7e1a9db23bfcbdc1290e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-46.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 tab.4_cap <- table_nums(name="tab_4",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
@@ -2878,19 +3299,19 @@ knitr::kable(ess_set$sig$table, digits = 3,
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.972|  5.369|  4.934|  -1.038|         0.422|         0.426| small      |   0.000| \*\*\*   |  -0.435|         0.422|         0.426| small      |   0.000| \*\*\*   |
 | Poland         |  5.634|  4.604|  4.909|  -0.725|         0.247|         0.252| small      |   0.000| \*\*\*   |   0.305|         0.247|         0.252| small      |   0.000| \*\*\*   |
-| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.068| +        |
-| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.022| \*       |
+| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.062| +        |
+| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.012| \*       |
 | Germany        |  5.170|  4.680|  4.812|  -0.358|         0.125|         0.128| negligible |   0.000| \*\*\*   |   0.132|         0.125|         0.128| negligible |   0.046| \*       |
-| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.034| \*       |  -0.096|         0.042|         0.046| negligible |   0.300|          |
-| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.116|          |   0.205|         0.047|         0.051| negligible |   0.000| \*\*\*   |
-| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   1.000|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
-| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.940|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
-| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.572|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
-| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.214|          |   0.125|        -0.032|        -0.028| negligible |   0.088| +        |
-| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.246|          |  -0.047|        -0.014|        -0.010| negligible |   0.650|          |
-| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.008| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.646|          |
-| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.002| \*\*     |
-| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.026| \*       |
+| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.036| \*       |  -0.096|         0.042|         0.046| negligible |   0.274|          |
+| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.134|          |   0.205|         0.047|         0.051| negligible |   0.000| \*\*\*   |
+| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   0.968|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
+| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.970|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
+| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.564|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
+| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.172|          |   0.125|        -0.032|        -0.028| negligible |   0.074| +        |
+| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.248|          |  -0.047|        -0.014|        -0.010| negligible |   0.626|          |
+| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.006| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.700|          |
+| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.010| \*\*     |
+| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.024| \*       |
 
 #### Modeling
 
@@ -2941,20 +3362,20 @@ the_mod <- PredAndCheck("trstun",
     ## Multiple R-squared:  0.8745, Adjusted R-squared:  0.8619 
     ## F-statistic: 69.23 on 15 and 149 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-1.png)
 
     ## [1] "For trstun"
     ## [1] "Mean squared prediction error: 0.239"
     ## [1] "                    R-squared: 0.809"
     ## [1] "           Adjusted R-squared: 0.2"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -2978,7 +3399,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-46-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -3001,9 +3422,6 @@ ess_set <- GetObservationsSet(
 
     ## Joining, by = "cntry_name"
 
-    ## Warning: Column `cntry_name` joining factors with different levels,
-    ## coercing to character vector
-
 ``` r
 print(ess_set$summary)
 ```
@@ -3017,23 +3435,29 @@ print(ess_set$summary)
     ##  Max.   : NA                                         Max.   : NA
 
 ``` r
-MyPrintInteractive(ess_set$map, FALSE) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-99a335714b6f4eb3b4f3">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-48.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-2.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-f7f3ee51cbc26557bc2b">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-48.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-47-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-8648f27b0d092c0a7a64">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-48.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 tab.5_cap <- table_nums(name="tab_5",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
@@ -3049,20 +3473,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.625|  4.867|  4.367|  -1.258|         0.523|         0.528| medium     |   0.000| \*\*\*   |  -0.501|         0.523|         0.528| medium     |   0.000| \*\*\*   |
-| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.002| \*\*     |
+| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.006| \*\*     |
 | Portugal       |  4.835|  3.501|  4.103|  -0.733|         0.145|         0.150| negligible |   0.000| \*\*\*   |   0.601|         0.145|         0.150| negligible |   0.000| \*\*\*   |
 | Slovenia       |  4.620|  3.389|  3.944|  -0.676|         0.248|         0.253| small      |   0.000| \*\*\*   |   0.555|         0.248|         0.253| small      |   0.000| \*\*\*   |
-| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.060| +        |
+| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.066| +        |
 | Spain          |  4.767|  3.886|  4.245|  -0.522|         0.177|         0.182| negligible |   0.000| \*\*\*   |   0.359|         0.177|         0.182| negligible |   0.000| \*\*\*   |
-| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.814|          |
-| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.006| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.004| \*\*     |
-| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.058| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
-| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.020| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
-| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.138|          |   0.188|         0.033|         0.038| negligible |   0.004| \*\*     |
-| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.304|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
+| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.776|          |
+| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.006| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.008| \*\*     |
+| Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.096| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
+| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.038| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
+| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.150|          |   0.188|         0.033|         0.038| negligible |   0.018| \*       |
+| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.320|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
 | Finland        |  4.878|  4.673|  5.173|   0.295|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |   0.501|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |
-| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.088| +        |
-| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.356|          |
+| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.094| +        |
+| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.390|          |
 
 As can be seen above, the big positive changes in UK and Portugal as well as Finland and Slovenia from 2014 to 2016 were significant as per weighted t-test.
 
@@ -3116,20 +3540,20 @@ the_mod <- PredAndCheck("trstep",
     ## Multiple R-squared:  0.7582, Adjusted R-squared:  0.7391 
     ## F-statistic: 39.71 on 12 and 152 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-1.png)
 
     ## [1] "For trstep"
     ## [1] "Mean squared prediction error: 0.354"
     ## [1] "                    R-squared: 0.69"
     ## [1] "           Adjusted R-squared: 0.187"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -3150,7 +3574,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-48-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -3173,9 +3597,6 @@ ess_set <- GetObservationsSet(
 
     ## Joining, by = "cntry_name"
 
-    ## Warning: Column `cntry_name` joining factors with different levels,
-    ## coercing to character vector
-
 ``` r
 print(ess_set$summary)
 ```
@@ -3189,23 +3610,29 @@ print(ess_set$summary)
     ##  Max.   : NA                                         Max.   : NA
 
 ``` r
-MyPrintInteractive(ess_set$map, FALSE) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-d5e02d59ee7877099885">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-50.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-2.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-3b0502a7216e0a8f1214">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-50.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-49-3.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-5a3fad1cab4faa2f1b56">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-50.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 tab.6_cap <- table_nums(name="tab_6",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
@@ -3224,15 +3651,15 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | Spain          |  2.402|  2.379|  2.112|  -0.291|         0.212|         0.217| small      |   0.000| \*\*\*   |  -0.268|         0.212|         0.217| small      |   0.000| \*\*\*   |
 | United Kingdom |  2.575|  2.685|  2.304|  -0.271|         0.525|         0.529| medium     |   0.000| \*\*\*   |  -0.381|         0.525|         0.529| medium     |   0.000| \*\*\*   |
 | Norway         |  2.304|  2.181|  2.036|  -0.268|         0.233|         0.237| small      |   0.000| \*\*\*   |  -0.144|         0.233|         0.237| small      |   0.000| \*\*\*   |
-| Germany        |  2.390|  2.233|  2.162|  -0.228|         0.171|         0.174| negligible |   0.000| \*\*\*   |  -0.071|         0.171|         0.174| negligible |   0.000| \*\*\*   |
+| Germany        |  2.390|  2.233|  2.162|  -0.228|         0.171|         0.174| negligible |   0.000| \*\*\*   |  -0.071|         0.171|         0.174| negligible |   0.002| \*\*     |
 | France         |  2.559|  2.594|  2.357|  -0.202|         0.121|         0.125| negligible |   0.000| \*\*\*   |  -0.236|         0.121|         0.125| negligible |   0.000| \*\*\*   |
 | Belgium        |  2.482|  2.580|  2.293|  -0.189|         0.136|         0.140| negligible |   0.000| \*\*\*   |  -0.286|         0.136|         0.140| negligible |   0.000| \*\*\*   |
 | Netherlands    |  2.467|  2.505|  2.323|  -0.144|         0.095|         0.099| negligible |   0.000| \*\*\*   |  -0.182|         0.095|         0.099| negligible |   0.000| \*\*\*   |
 | Finland        |  2.603|  2.697|  2.511|  -0.092|         0.093|         0.097| negligible |   0.000| \*\*\*   |  -0.186|         0.093|         0.097| negligible |   0.000| \*\*\*   |
-| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.002| \*\*     |   0.039|         0.120|         0.124| negligible |   0.130|          |
-| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.456|          |  -0.041|        -0.025|        -0.020| negligible |   0.232|          |
-| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.148|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
-| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.014| \*       |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
+| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.000| \*\*\*   |   0.039|         0.120|         0.124| negligible |   0.132|          |
+| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.452|          |  -0.041|        -0.025|        -0.020| negligible |   0.250|          |
+| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.138|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
+| Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.014| \*       |  -0.117|        -0.060|        -0.055| negligible |   0.002| \*\*     |
 | Poland         |  2.409|  2.455|  2.591|   0.182|        -0.218|        -0.213| small      |   0.000| \*\*\*   |   0.135|        -0.218|        -0.213| small      |   0.000| \*\*\*   |
 | Hungary        |  3.101|  3.318|  3.558|   0.457|        -0.210|        -0.205| small      |   0.000| \*\*\*   |   0.240|        -0.210|        -0.205| small      |   0.000| \*\*\*   |
 
@@ -3280,20 +3707,20 @@ the_mod <- PredAndCheck("impcntr",
     ## Multiple R-squared:  0.7648, Adjusted R-squared:  0.7445 
     ## F-statistic: 37.76 on 13 and 151 DF,  p-value: < 2.2e-16
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-1.png)
 
     ## [1] "For impcntr"
     ## [1] "Mean squared prediction error: 0.327"
     ## [1] "                    R-squared: 0.778"
     ## [1] "           Adjusted R-squared: 0.333"
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-2.png)
 
 ``` r
 ShowCoeffSummary(the_mod$coeffs, indicator_table)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-3.png)
 
 | variable |  coefficient|  std\_err|  t\_val|  p\_val| name                                                                 |
 |:---------|------------:|---------:|-------:|-------:|:---------------------------------------------------------------------|
@@ -3315,7 +3742,7 @@ ShowCoeffSummary(the_mod$coeffs, indicator_table)
 print(the_mod$paircc)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-50-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-51-4.png)
 
 ``` r
 the_mod_sum <- summary(the_mod$model)
@@ -3464,11 +3891,13 @@ p_var <- ggplot(data=data.frame(PoV=PoV, CumPoV=CumPoV, n=1:length(CumPoV)), aes
        subtitle="Individual and cumulative variance explained (using 'prcomp')") + 
   xlab("Principal Component")
 
-MyPrintInteractive(p_var, create_interactive_plot) 
+MyPrintInteractive(p_var, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-68e76b7385d8efc00846">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-53.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 knitr::kable(pc$rotation, digits = 2, caption = "Primary componets vs indicators")
 ```
@@ -3508,7 +3937,7 @@ ggpairs(data=comp) +
        subtitle="Zero correlations - as expected")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-52-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-2.png)
 
 ### K-means clustering
 
@@ -3544,7 +3973,7 @@ ggplot(data = data.frame(n=1:k.max, wss=wss), aes(x=n, y=wss)) +
   ylab("Total within-clusters sum of squares")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-1.png)
 
 ``` r
 # NbClust - vote on kmeans ==> use this as the outcome
@@ -3559,7 +3988,7 @@ nb <- NbClust(kmeans_data,
               alphaBeale = 0.1)
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-2.png)
 
     ## *** : The Hubert index is a graphical method of determining the number of clusters.
     ##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
@@ -3567,7 +3996,7 @@ nb <- NbClust(kmeans_data,
     ##                 index second differences plot. 
     ## 
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-3.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-3.png)
 
     ## *** : The D index is a graphical method of determining the number of clusters. 
     ##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
@@ -3614,7 +4043,7 @@ ggplot(data=data.frame(n=nb$Best.nc[1,]), aes(n)) +
        subtitle="As majority vote determined by 'NbClust' function")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-53-4.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-4.png)
 
 ``` r
 n_clusters <- length(unique(nb$Best.partition))
@@ -3644,7 +4073,7 @@ autoplot(pam_obj, frame.type = 'norm', label=TRUE, label.size=2.5, label.alpha=0
        subtitle="Each classification identified")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-1.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-1.png)
 
 ``` r
 autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster', 
@@ -3655,7 +4084,7 @@ autoplot(prcomp(scaled_data), data=ds_clusters, colour='cluster',
        subtitle="Eigenvectors of original indicators shown")
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-54-2.png)
+![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-2.png)
 
 ### Countries split to classes
 
@@ -3675,17 +4104,18 @@ cntry_clusters <- ds_clusters %>%
   filter(!duplicated(cntry_name)) %>%
   arrange(cluster)
 
-p <- CreateEuroMap(mymap=mymap, 
-                   ds = cntry_clusters, 
+p <- CreateEuroMap(dsin = cntry_clusters %>% ungroup(), 
                    ind_name = "cluster",
                    txt_title = "Countries clustered by indicators",
                    txt_subtitle = "Based on the cluster a country most often has been in",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, FALSE) 
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-1.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-a980bc505f809df7021e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-56.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 # how does clustering changed annually
 
@@ -3693,16 +4123,22 @@ clustered_years <- ds_clusters %>%
   group_by(ess_year, cluster) %>% 
   summarise(n=n())
 
-ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
-  geom_bar(stat = "identity", position = "fill") +
+p <- ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
+  geom_bar_interactive(stat = "identity", 
+                       position = "fill",
+                       aes(tooltip=paste0(ess_year, ' - cluster ', cluster, '\nn=', n))) +
   geom_hline(yintercept = c(0.25, 0.5, 0.75), linetype="dashed") + 
   labs(title="Relative size of groups",
        subtitle = "As classified by country/survey granularity",
-       txt_caption = "ESS surveys 2002-2016") 
+       txt_caption = "ESS surveys 2002-2016") +
+  xlab("") + ylab("")
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-55-2.png)
+<!--html_preserve-->
 
+<script type="application/json" data-for="htmlwidget-1d0d3183c964065c798f">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-56.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Looking into details of how do the two grups differ we can see that in most of the indicators countries in cluster 2 give higher scores which roughly translate to “more” or “better” — with a couple of noteworthy exceptions
 
 -   health – low value is good and high value is poor health
@@ -3711,72 +4147,79 @@ Looking into details of how do the two grups differ we can see that in most of t
 ``` r
 # compare the indicators between classes
 
-# ESS
-ggplot(data=ds_ss_avg %>% 
-         filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
-         group_by(indicator) %>%
-         mutate(value_s = scale(value)) %>%
-         ungroup() %>%
-         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
-       aes(x=indicator, y=value_s, fill=cluster)) +
-  geom_boxplot() + 
+p <- ggplot(data=ds_ss_avg %>% 
+              filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
+              group_by(indicator) %>%
+              mutate(value_s = scale(value)) %>%
+              ungroup() %>%
+              left_join(cntry_clusters %>%  
+                          select(cntry_name, cluster), 
+                        by="cntry_name"),
+            aes(x=indicator, y=value_s, fill=cluster)) +
+  geom_boxplot_interactive(aes(tooltip = paste(indicator,'\nclust ', cluster))) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="Variables scaled to same range")
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-    ## Warning: Column `cntry_name` joining character vector and factor, coercing
-    ## into character vector
+<!--html_preserve-->
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-56-1.png)
-
+<script type="application/json" data-for="htmlwidget-ba4cdd219a9c12504249">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-57.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Using the same classification on selected World Bank and UNHCR seems to be supportive of the grouping even though no formal clustering based on these values has been conducted - at least not yet.
 
 ``` r
 # World Bank
-ggplot(data=ds_ss_avg %>% 
+p <- ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>%
                                   filter(indicator %in% pct_indicators,
                                          source=="WB"))$indicator) %>%
-         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  
+                     select(cntry_name, cluster), 
+                   by="cntry_name"),
        aes(x=indicator, y=value, fill=cluster)) +
-  geom_boxplot() + 
+  geom_boxplot_interactive(aes(tooltip = paste(indicator,'\nclust ', cluster))) + 
+  # geom_boxplot_interactive() + 
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="WB Variables", 
        caption = "World Bank") +
   coord_flip()
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-    ## Warning: Column `cntry_name` joining character vector and factor, coercing
-    ## into character vector
+<!--html_preserve-->
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-1.png)
-
+<script type="application/json" data-for="htmlwidget-6661de3365bcad112fc0">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-58.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 ``` r
 # UNHCR
-ggplot(data=ds_ss_avg %>% 
+p <- ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% 
                                   filter(indicator %in% pct_indicators,
                                          source=="UNHCR"))$indicator,
                 !is.na(value)) %>%
-         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  
+                     select(cntry_name, cluster), 
+                   by="cntry_name"),
        aes(x=indicator, y=value+1, fill=cluster)) +
-  geom_boxplot() + 
+  geom_boxplot_interactive(aes(tooltip = paste(indicator,'\nclust ', cluster))) + 
+#  geom_boxplot_interactive() + 
   scale_y_log10() +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="UNHCR Variables on logarithmic scale (offset +1%)",
        caption="UNHCR") +
   coord_flip()
+MyPrintInteractive(p, plot_wo_widget) 
 ```
 
-    ## Warning: Column `cntry_name` joining character vector and factor, coercing
-    ## into character vector
+<!--html_preserve-->
 
-![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-57-2.png)
-
+<script type="application/json" data-for="htmlwidget-438777f2ccb7f91a040e">{"x":{"url":"EuropeanSocialSurvey_files/figure-markdown_github//widgets/widget_unnamed-chunk-58.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
 Visual box plot comparisons of selected UNHCR and WB indicators seem to support the clustering clustering based on ESS data.
 
 -   Cluster 2 countries appear more urbanized than cluster 1
@@ -3857,7 +4300,7 @@ Technical notes
 
 Caption and figure numbering is produced as described by Norbert Köhler in his blog post ["R Markdown: How to number and reference tables"](https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/)
 
-Top matter definitios
+Top matter definitions
 
 -   Azure - handles javascript, no problem with document size
     -   output:
@@ -3865,7 +4308,7 @@ Top matter definitios
             -   toc: yes
             -   toc\_depth: 4
     -   params:
-        -   interactive\_graphs: TRUE
+        -   html\_wo\_widget: TRUE
         -   explore\_indicator\_graphs: TRUE
         -   explore\_country\_graphs: TRUE
 -   RPubs - handles javascript, document size limitation
@@ -3874,7 +4317,7 @@ Top matter definitios
             -   toc: yes
             -   toc\_depth: 4
     -   params:
-        -   interactive\_graphs: TRUE
+        -   html\_wo\_widget: TRUE
         -   explore\_indicator\_graphs: FALSE
         -   explore\_country\_graphs: FALSE
 -   Github - does not handle javascript, no size limit
@@ -3883,6 +4326,6 @@ Top matter definitios
             -   toc: yes
             -   toc\_depth: 4
     -   params:
-        -   interactive\_graphs: FALSE
+        -   html\_wo\_widget: FALSE
         -   explore\_indicator\_graphs: TRUE
         -   explore\_country\_graphs: TRUE

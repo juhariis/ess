@@ -1,26 +1,28 @@
 ---
 title: "Happiness and European Parliament - Adventures in European Social Survey Data"
 author: "Juha Riissanen - juhariis@gmail.com"
-date: "2018-09-03 (updated 2018-09-11)"
+date: "2018-09-13"
 output:
   github_document:
     toc: yes
     toc_depth: 4
+always_allow_html: yes
 params:
-  interactive_graphs: FALSE
+  html_wo_widget: FALSE
   explore_indicator_graphs: TRUE
   explore_country_graphs: TRUE
 ---
 
 * * *
 
-This workbook is used to create content for the completely revised and rewritten
+This workbook is used to create content for the 
 blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). 
 (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and 
-[Azure](https://juhariis.z16.web.core.windows.net/). 
-Because Rpubs seems to have some size limitations, the exploratory graphs on indicators and 
+[Azure](https://juhariis.z16.web.core.windows.net/EuropeanSocialSurvey.html). 
+Since Rpubs seems to have some size limitations, the exploratory graphs on indicators and 
 countries are not included.
-Current Azure subscription has not these limitations so there we have all content)
+Current Azure subscription has not these limitations so there we have all content.
+But loading of the page may take some time..)
 
 * * * 
 
@@ -154,7 +156,7 @@ library(viridis)       # red-green colour blind compatible palettes
 
 
 # must set false for github_markup 
-create_interactive_plot <- params$interactive_graphs
+plot_wo_widget <- params$html_wo_widget
 
 source("ess_subs.r")
 
@@ -205,24 +207,14 @@ ds_participations <- dataset %>%
          n_surveys = n()) %>% 
   spread(ess_year, n)
 
-# map setup
-mymap <- SetupMyMap(data_folder = my_data_folder, 
-                    ds_participations = ds_participations)
-
 # On geographic map
-p <- CreateEuroMap(mymap=mymap, 
-                   ds = ds_participations, 
+p <- CreateEuroMap(dsin = ds_participations %>% ungroup(), 
                    ind_name = "n_surveys",
                    txt_title = "Participation in surveys",
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
+MyPrintInteractive(p, plot_wo_widget)
 
-
-# TODO: interactive mode ggiraph crashes for the map - could be a bug in the way
-# I use it with map. Will have to investigate more at a later date. But now set
-# interactive mode to FALSE
-MyPrintInteractive(p, FALSE) 
-        
 ```
 
 So, there is a band of countries starting from Finland in the north eastern corner of Europe,
@@ -231,8 +223,8 @@ which have been in all or nearly all surveys.
 
 ```{r}
 p <- ggplot(data=ds_participations, 
-            aes(x=reorder(cntry_name, n_surveys), y=n_surveys)) +
-  geom_bar(stat="identity", fill="grey") +
+            aes(x=reorder(cntry_name, n_surveys))) +
+  geom_bar_interactive(stat="identity", fill="grey", aes(y=n_surveys, tooltip=paste0(cntry_name, '\n', n_surveys))) +
   labs(
     title="Participation in surveys",
     subtitle="Number of surveys a country has participated in",
@@ -242,7 +234,7 @@ p <- ggplot(data=ds_participations,
         plot.subtitle = element_text(hjust = 0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 
-print(p)
+MyPrintInteractive(p, plot_wo_widget)
 
 # creating a caption for table so that it can be referenced in the text later on
 # ref https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/
@@ -384,18 +376,17 @@ So there are no big conclusions to be drawn at this stage.
 Next we investigate the average scores by country on geographic map to 
 see if there are any patterns.
 
-```{r}
+```{r, warning=FALSE}
 
 ds_happy_avgsum <- MakeAverageSummary(ds = ds_happy_ave, value_term = "var_ave")
 
-p <- CreateEuroMap(mymap=mymap, 
-                   ds = ds_happy_avgsum %>%
+p <- CreateEuroMap(dsin = ds_happy_avgsum %>%
                      filter(cntry_name != "Mean"), 
                    ind_name = "var_ave",
                    txt_title = "Subjective happiness 2002-2016",
                    txt_subtitle = "Average score of 'happy', scale 0-10",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, FALSE) 
+MyPrintInteractive(p, TRUE) 
 
 ```
 
@@ -427,7 +418,7 @@ p_happy <- MakeIndicatorHeatSet(
    txt_subtitle = "Average score of 'happy', scale 0-10",
    txt_caption = "ESS surveys 2002-2016")
 
-MyPrintInteractive(p_happy, create_interactive_plot) 
+MyPrintInteractive(p_happy, plot_wo_widget) 
 
 ```
 
@@ -462,9 +453,11 @@ cntry_in_50pct <- (ds_participations %>%
 
 trends_happy_50  <- MakeIndicatorCountryPlot(
     ds = ds_happy_ave %>% 
-      filter(cntry_name %in% cntry_in_50pct), 
+      filter(cntry_name %in% cntry_in_50pct) %>%
+      mutate(explain_txt = cntry_name), 
     id_term = "var_ave",
     cntry_term = "cntry_name",
+    cntry_term_long = "explain_txt",
     year_term = "ess_year",
     txt_head = "Subjective happiness",
     txt_subhead = "Countries in 50% of surveys or more",
@@ -472,7 +465,7 @@ trends_happy_50  <- MakeIndicatorCountryPlot(
     show_summary = TRUE,
     plevel = p_val)
 
-MyPrintInteractive(trends_happy_50$ci, create_interactive_plot, 
+MyPrintInteractive(trends_happy_50$ci, plot_wo_widget, 
                    hover_css = "stroke-width:3px;") 
 
 
@@ -492,17 +485,19 @@ cntry_in_100pct <- (ds_participations %>%
 
 trends_happy_100  <- MakeIndicatorCountryPlot(
   ds = ds_happy_ave %>% 
-    filter(cntry_name %in% cntry_in_100pct), 
-    id_term = "var_ave",
-    cntry_term = "cntry_name",
-    year_term = "ess_year",
-    txt_head = "Subjective happiness",
-    txt_subhead = "Countries in all surveys",
-    txt_caption = "ESS surveys 2002-2016",
-    show_summary = TRUE,
-    plevel = p_val)
+    filter(cntry_name %in% cntry_in_100pct) %>%
+    mutate(explain_txt = cntry_name), 
+  id_term = "var_ave",
+  cntry_term = "cntry_name",
+  cntry_term_long = "explain_txt",
+  year_term = "ess_year",
+  txt_head = "Subjective happiness",
+  txt_subhead = "Countries in all surveys",
+  txt_caption = "ESS surveys 2002-2016",
+  show_summary = TRUE,
+  plevel = p_val)
 
-MyPrintInteractive(trends_happy_100$ci, create_interactive_plot, 
+MyPrintInteractive(trends_happy_100$ci, plot_wo_widget, 
                    hover_css = "stroke-width:3px;") 
 
 ```
@@ -545,7 +540,7 @@ p <- ggplot(data = ds_happy_avgsum %>% filter(ess_year=="Mean", cntry_name != "M
   labs(color="ESS Year") +
   coord_flip()
 
-MyPrintInteractive(p, create_interactive_plot) 
+MyPrintInteractive(p, plot_wo_widget) 
 
 ```
 
@@ -571,7 +566,7 @@ p <- ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd, fill=n)) +
         plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) 
 
-MyPrintInteractive(p, create_interactive_plot) 
+MyPrintInteractive(p, plot_wo_widget) 
 
 ```
 
@@ -616,9 +611,14 @@ tab.2_cap <- table_nums(name="tab_2",
 knitr::kable(happy_res$table, digits = 3,
              col.names = gsub("_", " ", colnames(happy_res$table)))
 
-MyPrintInteractive(happy_res$plot, create_interactive_plot) 
+```
+
+```{r}
+
+MyPrintInteractive(happy_res$plot, plot_wo_widget) 
 
 ```
+
 
 The box-plots are in line with t-test results shown in table `r f.ref("tab_2")`.
 But only a couple of the changes was meaningful according to COhen's d measure, and even the
@@ -759,7 +759,7 @@ cowplot::plot_grid(
 
 Calculate the results from the scaled data
 
-```{r}
+```{r, warning=FALSE}
 # filtering and weighting to get by year and by country scores
 ds_happy_scaled <- dataset_scaled %>% 
   group_by(ess_year, cntry_name) %>% 
@@ -769,9 +769,11 @@ ds_happy_scaled <- dataset_scaled %>%
 # plot trends
 trends_happy_50_scaled  <- MakeIndicatorCountryPlot(
     ds = ds_happy_scaled %>% 
-      filter(cntry_name %in% cntry_in_50pct), 
+      filter(cntry_name %in% cntry_in_50pct) %>%
+      mutate(explain_txt = cntry_name), 
     id_term = "var_ave",
     cntry_term = "cntry_name",
+    cntry_term_long = "explain_txt",
     year_term = "ess_year",
     txt_head = "Subjective happiness",
     txt_subhead = "Scaled and normalized - Countries in 50% of surveys or more",
@@ -779,7 +781,7 @@ trends_happy_50_scaled  <- MakeIndicatorCountryPlot(
     show_summary = TRUE,
     plevel = p_val)
 
-MyPrintInteractive(trends_happy_50_scaled$ci, create_interactive_plot, 
+MyPrintInteractive(trends_happy_50_scaled$ci, plot_wo_widget, 
                    hover_css = "stroke-width:3px;") 
 
 
@@ -794,7 +796,7 @@ Some notes
 Next showing changes using scaled range for the countries with 
 significant changes according to `r f.ref("tab_2")`
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 
 ds_happy_average_scaled <- MakeAverageSummary(
   ds = ds_happy_scaled, 
@@ -808,23 +810,24 @@ happy_res_scaled <- GetComparisonBoxPlot(
   cntry_list = cntry_in_100pct,
   skip_plot = TRUE)
 
-CreateEuroMap(mymap=mymap, 
-              ds = happy_res_scaled$table %>%
-                filter(cntry_name %in% (happy_res$table %>%
-                                          filter(p_0216 <= p_val))$cntry_name), 
-              ind_name = "d0216",
-              txt_title = "Significant change in subjective happiness",
-              txt_subtitle = "2002 vs 2016, countries in all surveys, standardized, p=0.05",
-              txt_caption = "ESS 2002-2016")
+p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
+                     filter(cntry_name %in% (happy_res$table %>%
+                                               filter(p_0216 <= p_val))$cntry_name), 
+                   ind_name = "d0216",
+                   txt_title = "Significant change in subjective happiness",
+                   txt_subtitle = "2002 vs 2016, countries in all surveys, standardized, p=0.05",
+                   txt_caption = "ESS 2002-2016")
+MyPrintInteractive(p, plot_wo_widget) 
 
-CreateEuroMap(mymap=mymap, 
-              ds = happy_res_scaled$table %>%
-                filter(cntry_name %in% (happy_res$table %>%
-                                          filter(p_1416 <= p_val))$cntry_name), 
-              ind_name = "d1416",
-              txt_title = "Significant change in subjective happiness",
-              txt_subtitle = "2014 vs 2016, countries in all surveys, standardized, p=0.05",
-              txt_caption = "ESS 2002-2016")
+p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
+                     filter(cntry_name %in% (happy_res$table %>%
+                                               filter(p_1416 <= p_val))$cntry_name), 
+                   ind_name = "d1416",
+                   txt_title = "Significant change in subjective happiness",
+                   txt_subtitle = "2014 vs 2016, countries in all surveys, standardized, p=0.05",
+                   txt_caption = "ESS 2002-2016")
+MyPrintInteractive(p, plot_wo_widget) 
+
 
 ```
 
@@ -978,8 +981,9 @@ ind_plots <- lapply(
   }, 
   ds=ds_subset_50)
 
+# no need to make these plots interactive - print as they are
 for (i in 1:length(ind_plots))
-  MyPrintInteractive(ind_plots[[i]], FALSE)
+  print(ind_plots[[i]])
 
 ```
 
@@ -1210,12 +1214,15 @@ ds_unhcr <- GetUnhcrData(
   max_year = max(dataset$ess_year), 
   read_rds = TRUE)
 
-ggplot(data= ds_unhcr, aes(x=ess_year, y=value, fill=pop_type)) +
-  geom_bar(stat="identity") +
+p <- ggplot(data= ds_unhcr, 
+            aes(x=ess_year, y=value, fill=pop_type, color=pop_type)) +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(ess_year, pop_type))) +
   labs(title="People of concern in Europe",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("")
+MyPrintInteractive(p, plot_wo_widget)
 
 ```
 So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
@@ -1223,23 +1230,27 @@ So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thin
 Some insigt - perhaps - from two snapshots, i.e. 2013 and 2016.
 
 ```{r}
-ggplot(data= ds_unhcr %>% filter(ess_year==2013), 
+p <- ggplot(data= ds_unhcr %>% filter(ess_year==2013), 
        aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name,'-', pop_type))) +
   labs(title="People of concern in Europe 2013",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 
-ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
+p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
   labs(title="People of concern in Europe 2016",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 
 ```
 
@@ -1251,16 +1262,17 @@ Trying log10 scaler for y-axiz to get better view.
 ```{r}
 
 
-ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
+p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=(value+1), fill=pop_type)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
   labs(title="People of concern in Europe 2016",
        subtitle="Countries participating in ESS - log10 scale",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
-
+MyPrintInteractive(p, plot_wo_widget)
 ```
 
 
@@ -1321,15 +1333,17 @@ unhcr_indicator_table <- unhcr_indicator_table %>%
   bind_rows(ds_pop$indicators)
 
 
-ggplot(data=unhcr_data %>% filter(ess_year==2016), 
+p <- ggplot(data=unhcr_data %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value+1, fill=indicator)) +
-  geom_bar(stat="identity") +
+  geom_bar_interactive(stat="identity", 
+                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
   labs(title="People of concern in Europe 2016",
        subtitle="% of population, log10 scale yaxis showing 1% more than real",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+MyPrintInteractive(p, plot_wo_widget)
 
 # merge data
 ds_ss_avg <- ds_ss_avg %>%
@@ -1350,13 +1364,15 @@ Cross check with World Bank data
 
 # check WB vs UNHCR data
 
-ggplot(data = ds_ss_avg %>% 
+p <- ggplot(data = ds_ss_avg %>% 
          filter(indicator %in% c("UNHCR.Refugee.PCT","REFG.PCT"),
                 ess_year==2016),
        aes(x=reorder(cntry_name, -value), y=value, fill=indicator)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar_interactive(stat = "identity", position = "dodge", aes(tooltip=paste(cntry_name, indicator, round(value,2)))) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) + 
   xlab("") + ylab("")
+
+MyPrintInteractive(p, plot_wo_widget)
   
 ```
 
@@ -1437,9 +1453,9 @@ GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
     "if (!is.na(this_ind$lblmin)){",
     paste0("p",prefix,id,"$ci <- p",prefix,id,"$ci +"),
     "ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +",
-    "theme(axis.title.y = element_text(size = 9))",
+    "theme(axis.title.y = element_text(size = 7))",
     "}",
-    paste0("MyPrintInteractive(p",prefix,id,"$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') "),
+    paste0("MyPrintInteractive(p",prefix,id,"$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') "),
     " ",
     "```", 
     " "
@@ -1452,7 +1468,7 @@ if (params$explore_indicator_graphs){
     ascript <- c(ascript, GetIndicatorPlotJs(indicator_short, length(ascript), "ind"))
   }
 } else {
-  ascript <- c("", "Exploratory graphs skipped due to keep the document shorter.", " ")
+  ascript <- c("", "Exploratory graphs skipped to keep the document shorter.", " ")
 }
 
 tmp_indicators_rmd <- "tmp_indicators.rmd"
@@ -1485,9 +1501,16 @@ GetCountryPlotJs <- function(cntry) {
     "p_ess  <- MakeIndicatorCountryPlot(",
     "  ds = ds_ss_avg_ind_cntry %>% ",
     "    filter(indicator %in% (indicator_table %>% ",
-    "                             filter(source=='ESS'))$indicator),",
+    "                             filter(source=='ESS'))$indicator) %>% ",
+    "left_join(indicator_table %>% ",
+    paste0("            mutate(long_name = gsub('",   # need to get rid of quotation mark!!
+           "\\'",
+           "','',name, fixed=TRUE)) %>% "),
+    "            select(indicator, long_name),",
+    "          by='indicator'),",
     paste0("  id_term = '",cntry,"',"),
     "  cntry_term = 'indicator',",
+    "  cntry_term_long = 'long_name',",
     "  year_term = 'ess_year',",
     paste0("  txt_head = '",cntry,"',"),
     "  txt_subhead = 'ESS survey indicators',",
@@ -1499,9 +1522,14 @@ GetCountryPlotJs <- function(cntry) {
     "p_wb_a  <- MakeIndicatorCountryPlot(",
     "  ds = ds_ss_avg_ind_cntry %>% ",
     "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
-    "                             filter(max > pct_max_split))$indicator),",
+    "                             filter(max > pct_max_split))$indicator) %>%",
+    "left_join(indicator_table %>% ",
+    "            mutate(long_name = name) %>% ",
+    "            select(indicator, long_name),",
+    "          by='indicator'),",
     paste0("  id_term = '",cntry,"',"),
     "  cntry_term = 'indicator',",
+    "  cntry_term_long = 'long_name',",
     "  year_term = 'ess_year',",
     paste0("  txt_head = '",cntry,"',"),
     "  txt_subhead = 'World Bank Development Indices & UNHCR',",
@@ -1513,9 +1541,14 @@ GetCountryPlotJs <- function(cntry) {
     "p_wb_b  <- MakeIndicatorCountryPlot(",
     "  ds = ds_ss_avg_ind_cntry %>% ",
     "    filter(indicator %in% (indicator_table[idx_pct,] %>% ",
-    "                             filter(max <= pct_max_split))$indicator),",
+    "                             filter(max <= pct_max_split))$indicator) %>%",
+    "left_join(indicator_table %>% ",
+    "            mutate(long_name = name) %>% ",
+    "            select(indicator, long_name),",
+    "          by='indicator'),",
     paste0("  id_term = '",cntry,"',"),
     "  cntry_term = 'indicator',",
+    "  cntry_term_long = 'long_name',",
     "  year_term = 'ess_year',",
     paste0("  txt_head = '",cntry,"',"),
     "  txt_subhead = 'World Bank Development Indices & UNHCR',",
@@ -1524,9 +1557,9 @@ GetCountryPlotJs <- function(cntry) {
     "  label_size_coef = lbl_coef,",
     "  plevel = p_val)",
     " ",
-    "MyPrintInteractive(p_ess$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
-    "MyPrintInteractive(p_wb_a$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
-    "MyPrintInteractive(p_wb_b$ci, create_interactive_plot, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_ess$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_a$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_b$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
     "```", 
     " "
   )
@@ -1857,7 +1890,7 @@ Favoring more immigration is associated with higher happiness and
 
 #### ESS results
 
-```{r}
+```{r, warning=FALSE}
 ess_set <- GetObservationsSet(
   ds = ds_ss_avg,
   ds_obs = ds_subset_50,
@@ -1866,9 +1899,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, FALSE) 
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 tab.3_cap <- table_nums(name="tab_3",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -1912,7 +1945,7 @@ Trust in the UN seems to be an important factor, so let's drill deeper.
 
 #### ESS results
 
-```{r}
+```{r, warning=FALSE}
 ess_set <- GetObservationsSet(
   ds = ds_ss_avg,
   ds_obs = ds_subset_50,
@@ -1921,9 +1954,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, FALSE) 
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 tab.4_cap <- table_nums(name="tab_4",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -1953,8 +1986,7 @@ The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
 
 #### EES Results
 
-```{r}
-
+```{r, warning=FALSE}
 
 ess_set <- GetObservationsSet(
   ds = ds_ss_avg,
@@ -1964,9 +1996,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, FALSE) 
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 tab.5_cap <- table_nums(name="tab_5",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -2008,7 +2040,7 @@ The model explains `r round(100*the_mod_sum$adj.r.squared,1)`% of variation.
 
 #### EES Results
 
-```{r}
+```{r, warning=FALSE}
 
 ess_set <- GetObservationsSet(
   ds = ds_ss_avg,
@@ -2018,9 +2050,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, FALSE) 
-MyPrintInteractive(ess_set$heat, create_interactive_plot) 
-MyPrintInteractive(ess_set$sig$plot, create_interactive_plot) 
+MyPrintInteractive(ess_set$map, plot_wo_widget) 
+MyPrintInteractive(ess_set$heat, plot_wo_widget) 
+MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
 tab.6_cap <- table_nums(name="tab_6",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -2096,7 +2128,7 @@ p_var <- ggplot(data=data.frame(PoV=PoV, CumPoV=CumPoV, n=1:length(CumPoV)), aes
        subtitle="Individual and cumulative variance explained (using 'prcomp')") + 
   xlab("Principal Component")
 
-MyPrintInteractive(p_var, create_interactive_plot) 
+MyPrintInteractive(p_var, plot_wo_widget) 
 
 knitr::kable(pc$rotation, digits = 2, caption = "Primary componets vs indicators")
 
@@ -2212,7 +2244,7 @@ And then there is the rest of Europe in the other cluster.
 (I did at some point of time the same clustering excercise using scaled indicators 
 and came up with the same clusters as with PCA)
 
-```{r}
+```{r, warning=FALSE}
 
 # classify countries based on the clusters they have most often been based on survey scores
 
@@ -2223,13 +2255,12 @@ cntry_clusters <- ds_clusters %>%
   filter(!duplicated(cntry_name)) %>%
   arrange(cluster)
 
-p <- CreateEuroMap(mymap=mymap, 
-                   ds = cntry_clusters, 
+p <- CreateEuroMap(dsin = cntry_clusters %>% ungroup(), 
                    ind_name = "cluster",
                    txt_title = "Countries clustered by indicators",
                    txt_subtitle = "Based on the cluster a country most often has been in",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, FALSE) 
+MyPrintInteractive(p, plot_wo_widget) 
 
 # how does clustering changed annually
 
@@ -2237,12 +2268,16 @@ clustered_years <- ds_clusters %>%
   group_by(ess_year, cluster) %>% 
   summarise(n=n())
 
-ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
-  geom_bar(stat = "identity", position = "fill") +
+p <- ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
+  geom_bar_interactive(stat = "identity", 
+                       position = "fill",
+                       aes(tooltip=paste0(ess_year, ' - cluster ', cluster, '\nn=', n))) +
   geom_hline(yintercept = c(0.25, 0.5, 0.75), linetype="dashed") + 
   labs(title="Relative size of groups",
        subtitle = "As classified by country/survey granularity",
-       txt_caption = "ESS surveys 2002-2016") 
+       txt_caption = "ESS surveys 2002-2016") +
+  xlab("") + ylab("")
+MyPrintInteractive(p, plot_wo_widget) 
 
 ```
 
@@ -2253,23 +2288,25 @@ roughly translate to “more” or “better” — with a couple of noteworthy 
 * health – low value is good and high value is poor health
 * impcntrl – low value means more immigration and high less immigration from poor countriesThere seems 
 
-```{r}
+```{r, warning=FALSE}
 
 # compare the indicators between classes
 
-# ESS
-ggplot(data=ds_ss_avg %>% 
-         filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
-         group_by(indicator) %>%
-         mutate(value_s = scale(value)) %>%
-         ungroup() %>%
-         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
-       aes(x=indicator, y=value_s, fill=cluster)) +
-  geom_boxplot() + 
+p <- ggplot(data=ds_ss_avg %>% 
+              filter(indicator %in% (indicator_table %>% filter(source=="ESS"))$indicator) %>%
+              group_by(indicator) %>%
+              mutate(value_s = scale(value)) %>%
+              ungroup() %>%
+              left_join(cntry_clusters %>%  
+                          select(cntry_name, cluster), 
+                        by="cntry_name"),
+            aes(x=indicator, y=value_s, fill=cluster)) +
+  geom_boxplot_interactive(aes(tooltip = paste(indicator,'\nclust ', cluster))) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="Variables scaled to same range")
+MyPrintInteractive(p, plot_wo_widget) 
 
 ```
 
@@ -2277,36 +2314,45 @@ Using the same classification on selected World Bank and UNHCR seems to be suppo
 of the grouping even though no formal clustering based on these values has been 
 conducted - at least not yet.
 
-```{r}
+```{r, warning=FALSE}
 # World Bank
-ggplot(data=ds_ss_avg %>% 
+p <- ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>%
                                   filter(indicator %in% pct_indicators,
                                          source=="WB"))$indicator) %>%
-         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  
+                     select(cntry_name, cluster), 
+                   by="cntry_name"),
        aes(x=indicator, y=value, fill=cluster)) +
-  geom_boxplot() + 
+  geom_boxplot_interactive(aes(tooltip = paste(indicator,'\nclust ', cluster))) + 
+  # geom_boxplot_interactive() + 
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="WB Variables", 
        caption = "World Bank") +
   coord_flip()
+MyPrintInteractive(p, plot_wo_widget) 
+
 
 # UNHCR
-ggplot(data=ds_ss_avg %>% 
+p <- ggplot(data=ds_ss_avg %>% 
          filter(indicator %in% (indicator_table %>% 
                                   filter(indicator %in% pct_indicators,
                                          source=="UNHCR"))$indicator,
                 !is.na(value)) %>%
-         left_join(cntry_clusters %>%  select(cntry_name, cluster), by="cntry_name"),
+         left_join(cntry_clusters %>%  
+                     select(cntry_name, cluster), 
+                   by="cntry_name"),
        aes(x=indicator, y=value+1, fill=cluster)) +
-  geom_boxplot() + 
+  geom_boxplot_interactive(aes(tooltip = paste(indicator,'\nclust ', cluster))) + 
+#  geom_boxplot_interactive() + 
   scale_y_log10() +
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="UNHCR Variables on logarithmic scale (offset +1%)",
        caption="UNHCR") +
   coord_flip()
+MyPrintInteractive(p, plot_wo_widget) 
 
 ```
 
@@ -2397,7 +2443,7 @@ Csv extract of all data was used.
 Caption and figure numbering is produced as described by Norbert Köhler in 
 his blog post ["R Markdown: How to number and reference tables"](https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/)
 
-Top matter definitios
+Top matter definitions
 
 * Azure - handles javascript, no problem with document size
     * output:
@@ -2405,7 +2451,7 @@ Top matter definitios
             * toc: yes
             * toc_depth: 4
     * params:
-        * interactive_graphs: TRUE
+        * html_wo_widget: TRUE
         * explore_indicator_graphs: TRUE
         * explore_country_graphs: TRUE
         
@@ -2415,7 +2461,7 @@ Top matter definitios
             * toc: yes
             * toc_depth: 4
     * params:
-        * interactive_graphs: TRUE
+        * html_wo_widget: TRUE
         * explore_indicator_graphs: FALSE
         * explore_country_graphs: FALSE
         
@@ -2425,6 +2471,6 @@ Top matter definitios
             * toc: yes
             * toc_depth: 4
     * params:
-        * interactive_graphs: FALSE
+        * html_wo_widget: FALSE
         * explore_indicator_graphs: TRUE
         * explore_country_graphs: TRUE
