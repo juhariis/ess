@@ -20,17 +20,20 @@ MyPrintInteractive <- function(p, plot_interactive, hover_css = "") {
 
 
 GetIndicator <- function(indicator_short, indicator_table) {
-  # print(indicator_short)
+  # get original definition of the imputed/updated indicator
   last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
   indicator_short_old <- ifelse(last_char=="2", 
                                 substr(indicator_short, 1, nchar(indicator_short)-1),
                                 indicator_short)
-  
   this_ind <- indicator_table %>% 
     filter(indicator == indicator_short_old)
   return(this_ind)
 }
 
+
+#
+# Reading data in 
+# 
 
 
 # ESS Data
@@ -62,24 +65,21 @@ GetData <- function(data_folder, use_rds) {
   return(dataset)
 }
 
-# Get dates of joining EU
 GetEuDates <- function() {
-  
-  
+  # Get dates of joining EU - TBD
 }
 
-# Map data
 
 FixCountryInMap <- function(ds, from, to) {
+  # Map data
   idx <- which(ds$admin == from)
   ds$admin[idx] <- to
   return(ds)
 }
 
 
-# WB Data
-
 FixCountry <- function(ds, from, to) {
+  # WB Data
   idx <- which(ds$`Country Name` == from)
   ds$`Country Name`[idx] <- to
   return(ds)
@@ -87,9 +87,8 @@ FixCountry <- function(ds, from, to) {
 
 
 GetWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year, print_diagnostic = FALSE) {
-  
+  # World Bank
   rds_filename <- "wbdevforess.rds"
-  
   if (!read_rds)  {
     library(readxl)
     
@@ -202,6 +201,7 @@ GetWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year, 
 
 
 GetPreProcessWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year ) {
+  # some preprocessing needed
   
   wb_data <- GetWbData(data_folder, read_rds, inc_countries , min_year, max_year)
   
@@ -235,6 +235,7 @@ GetPreProcessWbData <- function(data_folder, read_rds, inc_countries, min_year, 
 
 
 GetUnhcrData <- function(data_folder, read_rds, inc_countries, min_year, max_year, print_diagnostic = FALSE) {
+  # UNHCR data 
   rds_filename <- "unhcrforess.rds"
   
   if (!read_rds)  {
@@ -283,7 +284,6 @@ GetUnhcrData <- function(data_folder, read_rds, inc_countries, min_year, max_yea
 }
 
 GetPreProcessUnhcrData <- function(ds_unhcr, ds_wb, new_indicator, new_name ) {
-  
   # calculate share of persons of concern vs population
   pers_concern <- ds_unhcr %>% 
     select(-source, -name) %>% 
@@ -326,10 +326,11 @@ library(sp)
 library(sf)
 
 CreateEuroMap <- function(dsin, ind_name, txt_title, txt_subtitle, txt_caption) {
+  # create a croropleth map 
   
   world <- sf::st_as_sf(rnaturalearth::countries110)
   
-  # known fixes
+  # known fixes vs ESS data
   world  <- FixCountryInMap(world, "Czech Republic", "Czechia")
   
   # checking that all our countries can be found in map data
@@ -402,6 +403,7 @@ CreateEuroMap <- function(dsin, ind_name, txt_title, txt_subtitle, txt_caption) 
 
 
 MakeAverageSummary <- function(ds, value_term) {
+  # create needed dataframe for heatmap - and other places
   colnames(ds)[colnames(ds) == value_term] <- "value_term"
   # add averages by country
   dsx1 <- ds %>%
@@ -426,13 +428,10 @@ MakeAverageSummary <- function(ds, value_term) {
   return(dsx)
 }
 
-MakeIndicatorHeatSet <-
-  function(dsx,
-           value_term,
-           txt_name,
-           txt_subtitle,
-           txt_caption) {
-    colnames(dsx)[colnames(dsx) == value_term] <- "value_term"
+
+MakeIndicatorHeatSet <- function(dsx, value_term, txt_name, txt_subtitle, txt_caption) {
+  # produce the heatmap
+  colnames(dsx)[colnames(dsx) == value_term] <- "value_term"
     # get the plot
     p <- ggplot(dsx, aes(ess_year, cntry_name)) +
       geom_tile_interactive(aes(fill = value_term,
@@ -455,240 +454,174 @@ MakeIndicatorHeatSet <-
         subtitle = txt_subtitle,
         caption = txt_caption
       )
-    
     return(p)
   }
 
-MakeIndicatorHeatSetOld <-
-  function(ds,
-           value_term,
-           txt_name,
-           txt_subtitle,
-           txt_caption) {
-    colnames(ds)[colnames(ds) == value_term] <- "value_term"
-    # add averages by country
-    dsx1 <- ds %>%
-      group_by(cntry_name) %>%
-      summarise(value_term = mean(value_term, na.rm = TRUE)) %>%
-      mutate(ess_year = "Mean") %>%
-      bind_rows(ds %>%
-                  ungroup() %>%
-                  mutate(ess_year = as.character(ess_year)))
-    # add averages by ess_year
-    dsx <- dsx1 %>%
-      group_by(ess_year) %>%
-      summarise(value_term = mean(value_term, na.rm = TRUE)) %>%
-      mutate(cntry_name = "Mean") %>%
-      bind_rows(dsx1)
-    # set countries into order
-    cntry_list <- (dsx %>%
-                     filter(ess_year == "Mean", cntry_name != "Mean") %>%
-                     arrange(value_term))$cntry_name
-    dsx$cntry_name <- factor(dsx$cntry_name, c("Mean", cntry_list))
-    # get the plot
-    p <- ggplot(dsx, aes(ess_year, cntry_name)) +
-      geom_tile_interactive(aes(fill = value_term,
-                                tooltip = paste(cntry_name,
-                                                round(value_term, 1))), color = "white") +
-      scale_fill_viridis() +
-      geom_text(aes(label = round(value_term, 1)), size = 2) +
-      ylab(" ") +
-      xlab("") +
-      theme(
-        legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        plot.title = element_text(size = 16,
-                                  hjust = 0),
-        axis.title = element_text(size = 14, face = "bold"),
-        axis.text = element_text(size = 7)
-      ) +
-      labs(
-        fill = "Mean",
-        title = txt_name,
-        subtitle = txt_subtitle,
-        caption = txt_caption
-      )
-    # convert from function internal to external name
-    colnames(dsx)[colnames(dsx) == "value_term"] <- value_term
-    return(list("data" = dsx, "plot" = p))
-  }
 
 #
 # Trends
 #
 
-MakeIndicatorCountryPlot <-
-  function(ds,
-           id_term,
-           cntry_term,
-           cntry_term_long="",
-           year_term,
-           txt_head,
-           txt_subhead,
-           txt_caption,
-           show_summary,
-           label_size_coef = 1,
-           plevel = 0.05) {
+MakeIndicatorCountryPlot <- function(ds, id_term, cntry_term, cntry_term_long="", year_term,
+                                     txt_head, txt_subhead, txt_caption, show_summary,
+                                     label_size_coef = 1, plevel = 0.05) {
+  # linechart for indicator vs countries or country vs indicators
+  
+  colnames(ds)[colnames(ds) == id_term] <- "id_term"           # context of the plot
+  colnames(ds)[colnames(ds) == cntry_term] <- "cntry_term"     # lines
+  if (cntry_term_long==""){                                    # long explanation, default short
+    ds$cntry_term_long <- ds$cntry_term
+  } else {    
+    colnames(ds)[colnames(ds) == cntry_term_long] <- "cntry_term_long"     
+  }
+  colnames(ds)[colnames(ds) == year_term] <- "year_term"       # x-axis
+  
+  # calculate simple overall mean, median and confidence intervals
+  # from sets of already calculated by country/by survey scores
+  
+  if (show_summary) {
+    # calculate
+    ds_ci <- ds %>%
+      group_by(year_term) %>%
+      summarise(
+        term_ave = mean(id_term, na.rm = TRUE),
+        term_sd = sd(id_term, na.rm = TRUE),
+        term_sem = sd(id_term, na.rm = TRUE) / sqrt(n()),
+        term_med = median(id_term, na.rm = TRUE),
+        n = n()
+      ) %>%
+      mutate(
+        term_lwr.ci = term_ave - qt(1 - (plevel / 2), n - 1) * term_sem,
+        term_upr.ci = term_ave + qt(1 - (plevel / 2), n - 1) * term_sem,
+        cntry_label = NA
+      )
     
-    colnames(ds)[colnames(ds) == id_term] <- "id_term"           # context of the plot
-    colnames(ds)[colnames(ds) == cntry_term] <- "cntry_term"     # lines
-    if (cntry_term_long==""){                                    # long explanation, default short
-      ds$cntry_term_long <- ds$cntry_term
-    } else {    
-      colnames(ds)[colnames(ds) == cntry_term_long] <- "cntry_term_long"     
-    }
-    colnames(ds)[colnames(ds) == year_term] <- "year_term"       # x-axis
-    
-    # calculate simple overall mean, median and confidence intervals
-    # from sets of already calculated by country/by survey scores
-    
-    if (show_summary) {
-      # calculate
-      ds_ci <- ds %>%
-        group_by(year_term) %>%
-        summarise(
-          term_ave = mean(id_term, na.rm = TRUE),
-          term_sd = sd(id_term, na.rm = TRUE),
-          term_sem = sd(id_term, na.rm = TRUE) / sqrt(n()),
-          term_med = median(id_term, na.rm = TRUE),
-          n = n()
-        ) %>%
-        mutate(
-          term_lwr.ci = term_ave - qt(1 - (plevel / 2), n - 1) * term_sem,
-          term_upr.ci = term_ave + qt(1 - (plevel / 2), n - 1) * term_sem,
-          cntry_label = NA
-        )
-      
-      # for the labels / legends
-      ci_pct <- round((1 - plevel) * 100, 0)
-      loess_color <- "gray"
-      txt_subhead <- paste0(txt_subhead)
-      txt_caption <-
-        paste0(
-          "Mean (with ", ci_pct, 
-          "% CI) in black, Median = red diamond, loess fit = ",
-          loess_color,
-          " line\n",
-          txt_caption
-        )
-    } else {
-      ds_ci <- NULL
-    }
-    
-    first_year <- min(ds$year_term)
-    last_year <- max(ds$year_term)
-    
-    # legends
-    ds <- ds %>%
-      group_by(cntry_term) %>%
-      arrange(desc(year_term)) %>%
-      filter(!is.na(id_term)) %>%
-      mutate(n_rows = n()) %>%
-      mutate(cntry_label = ifelse(row_number() == 1 |
-                                    row_number() == n_rows, cntry_term, NA)) %>%
-      arrange(year_term) %>%
-      ungroup()
-    
-    
-    p_ci <- ggplot(data = ds, aes(x = year_term, label = cntry_label))
-    
-    # if needed, add confidence intervals, mean and median, data points and loess fit
-    if (show_summary) {
-      p_ci <- p_ci +
-        # loess fit for the average
-        geom_smooth(
-          method = "loess",
-          aes(y = id_term),
-          alpha = 0.25,
-          se = FALSE,
-          size = 3,
-          color = loess_color
-        ) +
-        # median and mean with error bars
-        geom_point_interactive(
-          data = ds_ci,
-          aes(y = term_med,
-              tooltip = paste("Median", round(term_med, 2))),
-          pch = 18,
-          color = "red",
-          cex = 4
-        ) +
-        geom_point_interactive(data = ds_ci, 
-                               aes(y = term_ave,
-                                   tooltip = paste("Mean", round(term_ave, 2)))) +
-        geom_errorbar(data = ds_ci,
-                      aes(ymin = term_lwr.ci, 
-                          ymax = term_upr.ci),
-                      width = 0.25)
-    }
-    
+    # for the labels / legends
+    ci_pct <- round((1 - plevel) * 100, 0)
+    loess_color <- "gray"
+    txt_subhead <- paste0(txt_subhead)
+    txt_caption <-
+      paste0(
+        "Mean (with ", ci_pct, 
+        "% CI) in black, Median = red diamond, loess fit = ",
+        loess_color,
+        " line\n",
+        txt_caption
+      )
+  } else {
+    ds_ci <- NULL
+  }
+  
+  first_year <- min(ds$year_term)
+  last_year <- max(ds$year_term)
+  
+  # legends
+  ds <- ds %>%
+    group_by(cntry_term) %>%
+    arrange(desc(year_term)) %>%
+    filter(!is.na(id_term)) %>%
+    mutate(n_rows = n()) %>%
+    mutate(cntry_label = ifelse(row_number() == 1 |
+                                  row_number() == n_rows, cntry_term, NA)) %>%
+    arrange(year_term) %>%
+    ungroup()
+  
+  
+  p_ci <- ggplot(data = ds, aes(x = year_term, label = cntry_label))
+  
+  # if needed, add confidence intervals, mean and median, data points and loess fit
+  if (show_summary) {
     p_ci <- p_ci +
-      # individual scores linked with line
-      geom_point_interactive(aes(
+      # loess fit for the average
+      geom_smooth(
+        method = "loess",
+        aes(y = id_term),
+        alpha = 0.25,
+        se = FALSE,
+        size = 3,
+        color = loess_color
+      ) +
+      # median and mean with error bars
+      geom_point_interactive(
+        data = ds_ci,
+        aes(y = term_med,
+            tooltip = paste("Median", round(term_med, 2))),
+        pch = 18,
+        color = "red",
+        cex = 4
+      ) +
+      geom_point_interactive(data = ds_ci, 
+                             aes(y = term_ave,
+                                 tooltip = paste("Mean", round(term_ave, 2)))) +
+      geom_errorbar(data = ds_ci,
+                    aes(ymin = term_lwr.ci, 
+                        ymax = term_upr.ci),
+                    width = 0.25)
+  }
+  
+  p_ci <- p_ci +
+    # individual scores linked with line
+    geom_point_interactive(aes(
+      y = id_term,
+      color = cntry_term,
+      data_id = cntry_term,
+      tooltip = paste(cntry_term_long, round(id_term, 2)) # cntry_term
+    ),
+    alpha = 0.5) +
+    geom_line_interactive(
+      aes(
         y = id_term,
         color = cntry_term,
         data_id = cntry_term,
-        tooltip = paste(cntry_term_long, round(id_term, 2)) # cntry_term
+        tooltip = cntry_term_long # cntry_term
       ),
-      alpha = 0.5) +
-      geom_line_interactive(
-        aes(
-          y = id_term,
-          color = cntry_term,
-          data_id = cntry_term,
-          tooltip = cntry_term_long # cntry_term
-        ),
-        alpha = 0.5,
-        size = 0.3
-      ) +
-      # labels
-      geom_text_repel(
-        aes(y = id_term, color = cntry_term),
-        size = 3*label_size_coef,
-        force = 10,
-        # xlim = c(last_year, NA),
-        arrow = arrow(
-          length = unit(0.02, "npc"),
-          type = "closed",
-          ends = "last"
-        )
-      ) +
-      # need room for the country names
-      xlim(c(
-        first_year - 0.2 * (last_year - first_year),
-        last_year + 0.2 * (last_year - first_year)
-      )) +
-      # legends
-      labs(title = txt_head,
-           subtitle = txt_subhead,
-           caption = txt_caption) +
-      xlab("") + ylab("") +
-      scale_color_viridis(discrete=TRUE) +
-      theme(
-        legend.position = "None",
-        plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0),
-        plot.caption = element_text(size = 8)
+      alpha = 0.5,
+      size = 0.3
+    ) +
+    # labels
+    geom_text_repel(
+      aes(y = id_term, color = cntry_term),
+      size = 3*label_size_coef,
+      force = 10,
+      # xlim = c(last_year, NA),
+      arrow = arrow(
+        length = unit(0.02, "npc"),
+        type = "closed",
+        ends = "last"
       )
-    
-    return(list("ci" = p_ci, "ds_ci" = ds_ci))
-  }
+    ) +
+    # need room for the country names
+    xlim(c(
+      first_year - 0.2 * (last_year - first_year),
+      last_year + 0.2 * (last_year - first_year)
+    )) +
+    # legends
+    labs(title = txt_head,
+         subtitle = txt_subhead,
+         caption = txt_caption) +
+    xlab("") + ylab("") +
+    scale_color_viridis(discrete=TRUE) +
+    theme(
+      legend.position = "None",
+      plot.title = element_text(hjust = 0),
+      plot.subtitle = element_text(hjust = 0),
+      plot.caption = element_text(size = 8)
+    )
+  
+  return(list("ci" = p_ci, "ds_ci" = ds_ci))
+}
 
-# convert left skewed data in 0-10 range into normal
-# range - Note: inverts order where 10 = 0 and 0 =  
+
 ReflectLnTransform <- function(v, v_max=10){
+  # convert left skewed data in 0-10 range into normal
+  # range - Note: inverts order where 10 = 0 and 0 =  
   log(v_max+1-v)
 }
 
-# get an overview on an indicator for a country and year
-PlotIndicatorHistogram <- function(ds, 
-                                   this_cntry, 
-                                   yr, 
-                                   this_indicator,
-                                   use_transform = "",
-                                   n_bins = 10,
-                                   title_size = 10) {
-  
+PlotIndicatorHistogram <- function(ds,  this_cntry,  yr,  this_indicator,
+                                   use_transform = "", n_bins = 10, title_size = 10) {
+  # get an overview on an indicator for a country and year
+   
   if (!(this_indicator %in% colnames(ds))) stop(paste("cannot find", this_indicator))
   
   colnames(ds)[colnames(ds)==this_indicator] <- "myindicator"
@@ -745,9 +678,9 @@ PlotIndicatorHistogram <- function(ds,
       plot.caption = element_text(size = as.integer(0.8 * title_size))
     )
   
-  
   return(p)
 }
+
 
 CreateComparisonTable021416 <- function(ds_averages, ds_raw) {
   # compare significance of change in mean between two pairs of dates: 2002-2016, 2014, 2016
@@ -800,7 +733,6 @@ CreateComparisonTable021416 <- function(ds_averages, ds_raw) {
     mutate(d0216 = `2016` - `2002`,
            d1416 = `2016` - `2014`) %>%
     arrange(d0216) %>%
-#    mutate(cntry_name = as.character(cntry_name)) %>%
     left_join(
       do.call(rbind,
               lapply(the_countries,
@@ -851,7 +783,8 @@ CreateComparisonTable021416 <- function(ds_averages, ds_raw) {
 }
 
 
-GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, txt_name, txt_subtitle, txt_caption, skip_plot=FALSE) {
+GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, txt_name, 
+                                 txt_subtitle, txt_caption, skip_plot=FALSE) {
   # changes between selected surveys - only for countries which were in 2002, 2014, 2016 
   
   ds <- ds %>% filter(cntry_name %in% cntry_list)
@@ -893,8 +826,8 @@ GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, txt_name, 
   }
   
   return(list("plot"=p, "table"=indval_changes))
-  
 }
+
 
 GetObservationsSet <- function(ds, ds_obs, the_indicator, indicator_table, cntry_list){
   # packaging the steps for an indicator into one since this is needed for a few in the
@@ -924,7 +857,6 @@ GetObservationsSet <- function(ds, ds_obs, the_indicator, indicator_table, cntry
                           txt_subtitle = paste0(the_indicator, " - average score", txt_scale),
                           txt_caption = "ESS 2002-2016")
   
-  
   eu_heat <- MakeIndicatorHeatSet(
     ds = ds_averages,
     value_term = "var_ave",
@@ -953,35 +885,31 @@ not_all_na <- function(x)
 not_any_na <- function(x)
   all(!is.na(x))
 
-# Defining a helper function to make correlation matrix easy to reproduce.
-PlotOneCorrMtx <-
-  function(ds2,
-           txt_header,
-           sig_level,
-           axis_txt_size = 8) {
-    ds2 <- ds2  %>% select_if(not_any_na)
-    cormat <- rcorr(as.matrix(ds2))
-    p <- ggcorrplot(
-      cormat$r,
-      type = "upper",
-      hc.order = TRUE,
-      p.mat = cormat$P,
-      sig.level = sig_level,
-      tl.cex = axis_txt_size,
-      insig = "blank"
-    ) +
-      labs(title = txt_header,
-           subtitle = paste0("Signif level: ", sig_level)) +
-      theme(
-        plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)
-      )
-    return(list("cormat" = cormat, "p" = p))
-  }
+
+PlotOneCorrMtx <-function(ds2, txt_header, sig_level, axis_txt_size = 8) {
+  # Defining a helper function to make correlation matrix easy to reproduce.
+  ds2 <- ds2  %>% select_if(not_any_na)
+  cormat <- rcorr(as.matrix(ds2))
+  p <- ggcorrplot(
+    cormat$r,
+    type = "upper",
+    hc.order = TRUE,
+    p.mat = cormat$P,
+    sig.level = sig_level,
+    tl.cex = axis_txt_size,
+    insig = "blank") +
+    labs(title = txt_header,
+         subtitle = paste0("Signif level: ", sig_level)) +
+    theme(
+      plot.title = element_text(hjust = 0),
+      plot.subtitle = element_text(hjust = 0)
+    )
+  return(list("cormat" = cormat, "p" = p))
+}
 
 
-# get characteristics of linear easily into the plot subtitle
 GetFitCharacteristics <- function(thefit, the_member) {
+  # get characteristics of linear easily into the plot subtitle
   p_val <- summary(thefit)$coefficients[the_member, "Pr(>|t|)"]
   std_err <- summary(thefit)$coefficients[the_member, "Std. Error"]
   adj_rsq <- summary(thefit)$adj.r.squared
@@ -994,7 +922,6 @@ GetFitCharacteristics <- function(thefit, the_member) {
     round(adj_rsq, 3)
   ))
 }
-
 
 
 # https://stackoverflow.com/questions/45793683/r-determine-goodness-of-fit-of-new-data-with-predict-function-based-on-existin

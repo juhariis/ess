@@ -386,7 +386,7 @@ p <- CreateEuroMap(dsin = ds_happy_avgsum %>%
                    txt_title = "Subjective happiness 2002-2016",
                    txt_subtitle = "Average score of 'happy', scale 0-10",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, TRUE) 
+MyPrintInteractive(p, plot_interactive)
 
 ```
 
