@@ -8,7 +8,7 @@ output:
     toc_depth: 4
 always_allow_html: yes
 params:
-  html_wo_widget: FALSE
+  html_interactive: FALSE
   explore_indicator_graphs: TRUE
   explore_country_graphs: TRUE
 ---
@@ -156,7 +156,7 @@ library(viridis)       # red-green colour blind compatible palettes
 
 
 # must set false for github_markup 
-plot_wo_widget <- params$html_wo_widget
+plot_interactive <- params$html_interactive
 
 source("ess_subs.r")
 
@@ -213,7 +213,7 @@ p <- CreateEuroMap(dsin = ds_participations %>% ungroup(),
                    txt_title = "Participation in surveys",
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 
 ```
 
@@ -234,7 +234,7 @@ p <- ggplot(data=ds_participations,
         plot.subtitle = element_text(hjust = 0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
 
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 
 # creating a caption for table so that it can be referenced in the text later on
 # ref https://datascienceplus.com/r-markdown-how-to-number-and-reference-tables/
@@ -418,7 +418,7 @@ p_happy <- MakeIndicatorHeatSet(
    txt_subtitle = "Average score of 'happy', scale 0-10",
    txt_caption = "ESS surveys 2002-2016")
 
-MyPrintInteractive(p_happy, plot_wo_widget) 
+MyPrintInteractive(p_happy, plot_interactive) 
 
 ```
 
@@ -465,7 +465,7 @@ trends_happy_50  <- MakeIndicatorCountryPlot(
     show_summary = TRUE,
     plevel = p_val)
 
-MyPrintInteractive(trends_happy_50$ci, plot_wo_widget, 
+MyPrintInteractive(trends_happy_50$ci, plot_interactive, 
                    hover_css = "stroke-width:3px;") 
 
 
@@ -497,7 +497,7 @@ trends_happy_100  <- MakeIndicatorCountryPlot(
   show_summary = TRUE,
   plevel = p_val)
 
-MyPrintInteractive(trends_happy_100$ci, plot_wo_widget, 
+MyPrintInteractive(trends_happy_100$ci, plot_interactive, 
                    hover_css = "stroke-width:3px;") 
 
 ```
@@ -540,7 +540,7 @@ p <- ggplot(data = ds_happy_avgsum %>% filter(ess_year=="Mean", cntry_name != "M
   labs(color="ESS Year") +
   coord_flip()
 
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 ```
 
@@ -566,7 +566,7 @@ p <- ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd, fill=n)) +
         plot.title = element_text(hjust = 0),
         plot.subtitle = element_text(hjust = 0)) 
 
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 ```
 
@@ -615,7 +615,7 @@ knitr::kable(happy_res$table, digits = 3,
 
 ```{r}
 
-MyPrintInteractive(happy_res$plot, plot_wo_widget) 
+MyPrintInteractive(happy_res$plot, plot_interactive) 
 
 ```
 
@@ -781,7 +781,7 @@ trends_happy_50_scaled  <- MakeIndicatorCountryPlot(
     show_summary = TRUE,
     plevel = p_val)
 
-MyPrintInteractive(trends_happy_50_scaled$ci, plot_wo_widget, 
+MyPrintInteractive(trends_happy_50_scaled$ci, plot_interactive, 
                    hover_css = "stroke-width:3px;") 
 
 
@@ -817,7 +817,7 @@ p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
                    txt_title = "Significant change in subjective happiness",
                    txt_subtitle = "2002 vs 2016, countries in all surveys, standardized, p=0.05",
                    txt_caption = "ESS 2002-2016")
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
                      filter(cntry_name %in% (happy_res$table %>%
@@ -826,7 +826,7 @@ p <- CreateEuroMap(dsin = happy_res_scaled$table %>%
                    txt_title = "Significant change in subjective happiness",
                    txt_subtitle = "2014 vs 2016, countries in all surveys, standardized, p=0.05",
                    txt_caption = "ESS 2002-2016")
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 
 ```
@@ -1222,7 +1222,7 @@ p <- ggplot(data= ds_unhcr,
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("")
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 
 ```
 So, a downwarsd trend turned into a sharp rise 2014 as - some might say - a thing hit the fan..
@@ -1239,7 +1239,7 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2013),
        caption="UNHCR") +
   xlab("") + ylab("") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 
 p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value, fill=pop_type)) +
@@ -1250,7 +1250,7 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016),
        caption="UNHCR") +
   xlab("") + ylab("") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 
 ```
 
@@ -1272,7 +1272,7 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016),
   xlab("") + ylab("") + 
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 ```
 
 
@@ -1343,7 +1343,7 @@ p <- ggplot(data=unhcr_data %>% filter(ess_year==2016),
   xlab("") + ylab("") + 
   scale_y_log10() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
 
 # merge data
 ds_ss_avg <- ds_ss_avg %>%
@@ -1372,7 +1372,7 @@ p <- ggplot(data = ds_ss_avg %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) + 
   xlab("") + ylab("")
 
-MyPrintInteractive(p, plot_wo_widget)
+MyPrintInteractive(p, plot_interactive)
   
 ```
 
@@ -1455,7 +1455,7 @@ GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
     "ylab(paste(this_ind$lblmin, this_ind$min, '<-->', this_ind$lblmax, this_ind$max)) +",
     "theme(axis.title.y = element_text(size = 7))",
     "}",
-    paste0("MyPrintInteractive(p",prefix,id,"$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') "),
+    paste0("MyPrintInteractive(p",prefix,id,"$ci, plot_interactive, hover_css = 'stroke-width:3px;') "),
     " ",
     "```", 
     " "
@@ -1557,9 +1557,9 @@ GetCountryPlotJs <- function(cntry) {
     "  label_size_coef = lbl_coef,",
     "  plevel = p_val)",
     " ",
-    "MyPrintInteractive(p_ess$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
-    "MyPrintInteractive(p_wb_a$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
-    "MyPrintInteractive(p_wb_b$ci, plot_wo_widget, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_ess$ci, plot_interactive, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_a$ci, plot_interactive, hover_css = 'stroke-width:3px;') ",
+    "MyPrintInteractive(p_wb_b$ci, plot_interactive, hover_css = 'stroke-width:3px;') ",
     "```", 
     " "
   )
@@ -1899,9 +1899,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, plot_wo_widget) 
-MyPrintInteractive(ess_set$heat, plot_wo_widget) 
-MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
+MyPrintInteractive(ess_set$map, plot_interactive) 
+MyPrintInteractive(ess_set$heat, plot_interactive) 
+MyPrintInteractive(ess_set$sig$plot, plot_interactive) 
 tab.3_cap <- table_nums(name="tab_3",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -1954,9 +1954,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, plot_wo_widget) 
-MyPrintInteractive(ess_set$heat, plot_wo_widget) 
-MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
+MyPrintInteractive(ess_set$map, plot_interactive) 
+MyPrintInteractive(ess_set$heat, plot_interactive) 
+MyPrintInteractive(ess_set$sig$plot, plot_interactive) 
 tab.4_cap <- table_nums(name="tab_4",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -1996,9 +1996,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, plot_wo_widget) 
-MyPrintInteractive(ess_set$heat, plot_wo_widget) 
-MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
+MyPrintInteractive(ess_set$map, plot_interactive) 
+MyPrintInteractive(ess_set$heat, plot_interactive) 
+MyPrintInteractive(ess_set$sig$plot, plot_interactive) 
 tab.5_cap <- table_nums(name="tab_5",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -2050,9 +2050,9 @@ ess_set <- GetObservationsSet(
   cntry_list = cntry_in_100pct)
 
 print(ess_set$summary)
-MyPrintInteractive(ess_set$map, plot_wo_widget) 
-MyPrintInteractive(ess_set$heat, plot_wo_widget) 
-MyPrintInteractive(ess_set$sig$plot, plot_wo_widget) 
+MyPrintInteractive(ess_set$map, plot_interactive) 
+MyPrintInteractive(ess_set$heat, plot_interactive) 
+MyPrintInteractive(ess_set$sig$plot, plot_interactive) 
 tab.6_cap <- table_nums(name="tab_6",
                         caption = paste0(ess_set$indicator$name, "2002-2016, significance and effect size of the change"))
 ```
@@ -2128,7 +2128,7 @@ p_var <- ggplot(data=data.frame(PoV=PoV, CumPoV=CumPoV, n=1:length(CumPoV)), aes
        subtitle="Individual and cumulative variance explained (using 'prcomp')") + 
   xlab("Principal Component")
 
-MyPrintInteractive(p_var, plot_wo_widget) 
+MyPrintInteractive(p_var, plot_interactive) 
 
 knitr::kable(pc$rotation, digits = 2, caption = "Primary componets vs indicators")
 
@@ -2260,7 +2260,7 @@ p <- CreateEuroMap(dsin = cntry_clusters %>% ungroup(),
                    txt_title = "Countries clustered by indicators",
                    txt_subtitle = "Based on the cluster a country most often has been in",
                    txt_caption = "ESS surveys 2002-2016")
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 # how does clustering changed annually
 
@@ -2277,7 +2277,7 @@ p <- ggplot(data = clustered_years, aes(x=ess_year, y=n, fill=cluster)) +
        subtitle = "As classified by country/survey granularity",
        txt_caption = "ESS surveys 2002-2016") +
   xlab("") + ylab("")
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 ```
 
@@ -2306,7 +2306,7 @@ p <- ggplot(data=ds_ss_avg %>%
   xlab("") + ylab("") +
   labs(title="Differences between groups of countries",
        subtitle="Variables scaled to same range")
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 ```
 
@@ -2331,7 +2331,7 @@ p <- ggplot(data=ds_ss_avg %>%
        subtitle="WB Variables", 
        caption = "World Bank") +
   coord_flip()
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 
 # UNHCR
@@ -2352,7 +2352,7 @@ p <- ggplot(data=ds_ss_avg %>%
        subtitle="UNHCR Variables on logarithmic scale (offset +1%)",
        caption="UNHCR") +
   coord_flip()
-MyPrintInteractive(p, plot_wo_widget) 
+MyPrintInteractive(p, plot_interactive) 
 
 ```
 
@@ -2451,7 +2451,7 @@ Top matter definitions
             * toc: yes
             * toc_depth: 4
     * params:
-        * html_wo_widget: TRUE
+        * html_interactive: TRUE
         * explore_indicator_graphs: TRUE
         * explore_country_graphs: TRUE
         
@@ -2461,7 +2461,7 @@ Top matter definitions
             * toc: yes
             * toc_depth: 4
     * params:
-        * html_wo_widget: TRUE
+        * html_interactive: TRUE
         * explore_indicator_graphs: FALSE
         * explore_country_graphs: FALSE
         
@@ -2471,6 +2471,6 @@ Top matter definitions
             * toc: yes
             * toc_depth: 4
     * params:
-        * html_wo_widget: FALSE
+        * html_interactive: FALSE
         * explore_indicator_graphs: TRUE
         * explore_country_graphs: TRUE
