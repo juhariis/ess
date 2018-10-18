@@ -1,22 +1,25 @@
 ---
 title: "Happiness and European Parliament - Adventures in European Social Survey Data"
 author: "Juha Riissanen - juhariis@gmail.com"
-date: "2018-09-13"
-output:
-  github_document:
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: journal
+    code_folding: hide
     toc: yes
     toc_depth: 4
 always_allow_html: yes
 params:
-  html_interactive: FALSE
+  html_interactive: TRUE
   explore_indicator_graphs: TRUE
   explore_country_graphs: TRUE
 ---
 
 * * *
 
-This workbook is used to create content for the 
-blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). 
+This workbook was used to create content for the 
+blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/) but is being updated every now and then
+as well. 
 (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and 
 [Azure](https://juhariis.z16.web.core.windows.net/EuropeanSocialSurvey.html). 
 Since Rpubs seems to have some size limitations, the exploratory graphs on indicators and 
@@ -24,6 +27,7 @@ countries are not included.
 Current Azure subscription has not these limitations so there we have all content.
 But loading of the page may take some time..)
 
+Change notes in the very endt
 * * * 
 
 Europe is going through interesting time since turn of the century:
@@ -210,7 +214,7 @@ ds_participations <- dataset %>%
 # On geographic map
 p <- CreateEuroMap(dsin = ds_participations %>% ungroup(), 
                    ind_name = "n_surveys",
-                   txt_title = "Participation in surveys",
+                   txt_title = "ESS has some gaps in geographic and time coverage",
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
 MyPrintInteractive(p, plot_interactive)
@@ -223,16 +227,30 @@ which have been in all or nearly all surveys.
 
 ```{r}
 p <- ggplot(data=ds_participations, 
-            aes(x=reorder(cntry_name, n_surveys))) +
-  geom_bar_interactive(stat="identity", fill="grey", aes(y=n_surveys, tooltip=paste0(cntry_name, '\n', n_surveys))) +
+            aes(x=reorder(cntry_name, -n_surveys))) +
+  geom_hline(yintercept = 4.1, color="red", alpha=0.5) +
+  geom_bar_interactive(stat="identity",
+                       aes(y=n_surveys, 
+                           alpha=ifelse(n_surveys <= 4, 0.6, 0.5),
+                           fill=ifelse(n_surveys <= 4, "blue","red"),
+                           tooltip=paste0(cntry_name, '\n', n_surveys, ' surveys'))) +
   labs(
-    title="Participation in surveys",
-    subtitle="Number of surveys a country has participated in",
+    title="Some very interesting countries are only in some surveys",
+    subtitle="E.g. Italy, Greece, Turkey in four or less surveys ",
     caption="ESS surveys 2002-2016") + 
-  xlab("") + ylab("")+
+  xlab("") + ylab("# surveys participated") +
+  theme_bw() +
   theme(plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+        legend.position = "None",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.caption = element_text(color="gray"),
+        plot.subtitle = element_text(hjust = 0),
+        axis.line = element_blank(), 
+        axis.title.x = element_text(size=10, color="gray", hjust = 0),
+        axis.text.x = element_text(hjust = 1, vjust=0.5, size=8)) + 
+  coord_flip()
 
 MyPrintInteractive(p, plot_interactive)
 
@@ -273,16 +291,18 @@ p <- ggplot(data = dataset, aes(pspwght)) +
     linetype = "dashed",
     color = "black") +
   annotate(
-    "label",
+    "text",
     label = names(quantile(dataset$pspwght)),
     x = quantile(dataset$pspwght),
     y = 19000,           # fixed by experimentation
     size = 2) +
   labs(
-    title = "Weighting of survey data",
+    title = "Individual answer typically weighted by one - but not always",
     subtitle = "Distribution of 'pspwght' across all surveys, highlighting quantiles",
     caption = "ESS surveys 2002-2016") +
+  theme_bw() +
   theme(plot.title = element_text(hjust = 0),
+        panel.border = element_blank(), 
         plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
 print(p)
@@ -349,15 +369,19 @@ happy_skew <- moments::skewness(ds_happy_ave$var_ave)
 
 ggplot(data=ds_happy_ave, aes(var_ave)) +
   geom_histogram(bins = 15, fill='gray') +
-  geom_vline(xintercept = quantile(ds_happy_ave$var_ave), linetype="dashed", color="black") +
-  annotate("label", label=names(quantile(ds_happy_ave$var_ave)), 
-           x=quantile(ds_happy_ave$var_ave), y=2, size=2) +
+  geom_vline(xintercept = quantile(ds_happy_ave$var_ave), linetype="dashed", color="gray") +
+  annotate("text", label=names(quantile(ds_happy_ave$var_ave)), 
+           x=quantile(ds_happy_ave$var_ave), y=28, size=3) +
   labs(
-    title="Subjective happiness",
+    title="Subjective happiness is highly skewed",
     subtitle="Weighted by survey/country scores",
     caption="ESS surveys 2002-2016") +
-  theme(plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.title = element_text(size=6, color="gray"),
+    plot.title = element_text(hjust = 0),
+    plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
 
 summary(ds_happy_ave$var_ave)
@@ -383,7 +407,7 @@ ds_happy_avgsum <- MakeAverageSummary(ds = ds_happy_ave, value_term = "var_ave")
 p <- CreateEuroMap(dsin = ds_happy_avgsum %>%
                      filter(cntry_name != "Mean"), 
                    ind_name = "var_ave",
-                   txt_title = "Subjective happiness 2002-2016",
+                   txt_title = "North and west appear subjectively happier\nthan east and south east",
                    txt_subtitle = "Average score of 'happy', scale 0-10",
                    txt_caption = "ESS surveys 2002-2016")
 MyPrintInteractive(p, plot_interactive)
@@ -414,7 +438,7 @@ over all surveys a country has participated in).
 p_happy <- MakeIndicatorHeatSet(
    ds = ds_happy_avgsum, 
    value_term = "var_ave", 
-   txt_name = "Subjective happiness",
+   txt_name = "Lower subjective happiness in former \nSoviet block and south east",
    txt_subtitle = "Average score of 'happy', scale 0-10",
    txt_caption = "ESS surveys 2002-2016")
 
@@ -459,7 +483,7 @@ trends_happy_50  <- MakeIndicatorCountryPlot(
     cntry_term = "cntry_name",
     cntry_term_long = "explain_txt",
     year_term = "ess_year",
-    txt_head = "Subjective happiness",
+    txt_head = "Individual Countries Have Very Different 'Happiness Histories'",
     txt_subhead = "Countries in 50% of surveys or more",
     txt_caption = "ESS surveys 2002-2016",
     show_summary = TRUE,
@@ -491,7 +515,7 @@ trends_happy_100  <- MakeIndicatorCountryPlot(
   cntry_term = "cntry_name",
   cntry_term_long = "explain_txt",
   year_term = "ess_year",
-  txt_head = "Subjective happiness",
+  txt_head = "Core ESS Countries: Different 'Happiness Histories' with \nTentatively Rising Average",
   txt_subhead = "Countries in all surveys",
   txt_caption = "ESS surveys 2002-2016",
   show_summary = TRUE,
@@ -530,13 +554,16 @@ p <- ggplot(data = ds_happy_avgsum %>% filter(ess_year=="Mean", cntry_name != "M
                              tooltip = paste0(cntry_name, 
                                               "\nMean: ", round(var_ave,2))), 
                          color="black", pch=5) +
-  labs(title="Subjective happiness scores",
+  labs(title="Variations get smaller with higher happiness score",
        subtitle="All countries in order of decreasing mean (black diamond)",
        caption = "ESS surveys 2002-2016") +
   scale_color_viridis(discrete=TRUE) +
-  theme(axis.title=element_blank(),
-        plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+      axis.title=element_blank(),
+    plot.title = element_text(hjust = 0),
+    plot.subtitle = element_text(hjust = 0)) +
   labs(color="ESS Year") +
   coord_flip()
 
@@ -553,23 +580,29 @@ ds_happy_sd <- ds_happy_ave %>%
   group_by(cntry_name) %>% 
   dplyr::summarize(sd = sd(var_ave), n=n()) %>% 
   mutate(cntry_name2 = paste0(cntry_name, " (",n,")")) %>%
-  arrange(desc(sd))
+  arrange(desc(sd)) %>%
+  filter(n >= 4)
 
 p <- ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd, fill=n)) +
-  geom_bar_interactive(aes(tooltip=paste0(cntry_name, "\nSurveys: ", n, "\nSD: ", round(sd,2))),stat = "identity") + 
+  geom_bar_interactive(aes(tooltip=paste0(cntry_name, "\nSurveys: ", n, "\nSD: ", round(sd,2))),
+                       stat = "identity") + 
   coord_flip() +
-  labs(title="Standard deviation of 'happy'",
-       subtitle="All countries, number of surveys in parenthesis",
+  labs(title="Top three in variation: Italy, Greece and Poland",
+       subtitle="Countries in four or more surveys included",
        caption="ESS surveys 2002-2016") +
   scale_color_viridis(discrete=TRUE) +
-  theme(axis.title=element_blank(),
-        plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) 
+  ylab("Standard deviation of 'happy") + xlab("") +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    plot.title = element_text(hjust = 0),
+    plot.subtitle = element_text(hjust = 0)) 
 
 MyPrintInteractive(p, plot_interactive) 
 
 ```
 
+Countries in three or less surveys excluded.
 
 ### Significance and meaning of changes
 
@@ -1218,9 +1251,13 @@ p <- ggplot(data= ds_unhcr,
             aes(x=ess_year, y=value, fill=pop_type, color=pop_type)) +
   geom_bar_interactive(stat="identity", 
                        aes(tooltip=paste(ess_year, pop_type))) +
-  labs(title="People of concern in Europe",
+  labs(title="Count of UNHCR 'people of concern' in Europe\nincreasing rapidly",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
+  theme_bw() +
+  theme(
+    panel.border = element_blank()
+  ) +
   xlab("") + ylab("")
 MyPrintInteractive(p, plot_interactive)
 
@@ -1238,7 +1275,11 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2013),
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 
 p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016), 
@@ -1248,8 +1289,12 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016),
   labs(title="People of concern in Europe 2016",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
-  xlab("") + ylab("") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  xlab("") + ylab("") +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 
 ```
@@ -1271,7 +1316,11 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016),
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 ```
 
@@ -1336,13 +1385,17 @@ unhcr_indicator_table <- unhcr_indicator_table %>%
 p <- ggplot(data=unhcr_data %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value+1, fill=indicator)) +
   geom_bar_interactive(stat="identity", 
-                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
+                       aes(tooltip=paste(cntry_name, '-', indicator))) +
   labs(title="People of concern in Europe 2016",
        subtitle="% of population, log10 scale yaxis showing 1% more than real",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 
 # merge data
@@ -1369,8 +1422,12 @@ p <- ggplot(data = ds_ss_avg %>%
                 ess_year==2016),
        aes(x=reorder(cntry_name, -value), y=value, fill=indicator)) +
   geom_bar_interactive(stat = "identity", position = "dodge", aes(tooltip=paste(cntry_name, indicator, round(value,2)))) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) + 
-  xlab("") + ylab("")
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  xlab("") + ylab("") + 
+  coord_flip()
 
 MyPrintInteractive(p, plot_interactive)
   
@@ -1397,7 +1454,7 @@ knitr::kable(indicator_table[idx_pct,], digits = 3)
 
 ```{r}
 
-# save  a copies to be used by other scripts
+# save a copy to be used by other scripts
 
 saveRDS(indicator_table, file="indicator_table.rds")
 saveRDS(ds_ss_avg, file="ds_ss_avg.rds")
@@ -1446,7 +1503,7 @@ GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
     "cntry_term = 'cntry_name',",
     "year_term = 'ess_year',",
     "txt_head = as.character(this_ind$name),",
-    "txt_subhead = indicator_short,",
+    "txt_subhead = '",indicator_short,"',",
     "txt_caption = paste(as.character(this_ind$source), '2002-2016'),",
     "show_summary = TRUE,",
     "plevel = p_val)",
@@ -1747,7 +1804,7 @@ GetModelCoeffs <- function(the_mod, pred_name){
     geom_bar(stat = "identity") +
     xlab("") + ylab("") +
     labs(title=txt_title,
-         subtitle=txt_title) +
+         subtitle=txt_subtitle) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
   return(list("plot"=p, "df"=df_set, "title"= txt_title, "subtitle"=txt_subtitle))
 }
@@ -2474,3 +2531,14 @@ Top matter definitions
         * html_interactive: FALSE
         * explore_indicator_graphs: TRUE
         * explore_country_graphs: TRUE
+
+## Change Notes
+
+**2018-10-18** - started to update the look and feel 
+
+* improved visualizations and labeling of graphics 
+* changed document layout  to better handle somewhat wide tables
+* added option to show/hide code if needed - hiding it as default to help reading
+
+Partly done in the early sections of the report, hopefully will find time a bit later 
+to revise the rest as well.

@@ -31,6 +31,16 @@ GetIndicator <- function(indicator_short, indicator_table) {
 }
 
 
+GetIndicator2 <- function(indicator_short, indicator_table) {
+  # get original definition of the imputed/updated indicator
+  # last_char <- substr(indicator_short, nchar(indicator_short), nchar(indicator_short))
+  # indicator_short_old <- ifelse(last_char=="2", 
+  #                               substr(indicator_short, 1, nchar(indicator_short)-1),
+  #                               indicator_short)
+  this_ind <- indicator_table %>% 
+    filter(indicator == indicator_short)
+  return(this_ind)
+}
 #
 # Reading data in 
 # 
@@ -47,15 +57,12 @@ GetData <- function(data_folder, use_rds) {
     essdata_0107 <- read.csv(essfile_0107)
     essfile_08 <- paste0(data_folder, "ESS\\ESS8e02.0_F1.csv")
     essdata_08 <- read.csv(essfile_08)
-    common_indicators <-
-      intersect(colnames(essdata_08), colnames(essdata_0107))
-    dataset <-
-      rbind(essdata_0107[, common_indicators], essdata_08[, common_indicators])
+    common_indicators <- intersect(colnames(essdata_08), colnames(essdata_0107))
+    dataset <- rbind(essdata_0107[, common_indicators], essdata_08[, common_indicators])
     # for convenience, turning the survey ids into years when conducted
     dataset$ess_year <- 2000 + 2 * dataset$essround
     # english country names
-    dataset$cntry_name <-
-      countrycode(dataset$cntry, "iso2c", "country.name")
+    dataset$cntry_name <- countrycode(dataset$cntry, "iso2c", "country.name")
     # save for faster iteration later on
     saveRDS(dataset, paste0(data_folder, "ESS\\ess.rds"))
     rm(essdata_0107, essdata_08)
@@ -86,7 +93,7 @@ FixCountry <- function(ds, from, to) {
 }
 
 
-GetWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year, print_diagnostic = FALSE) {
+GetWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year, rds_folder, print_diagnostic = FALSE) {
   # World Bank
   rds_filename <- "wbdevforess.rds"
   if (!read_rds)  {
@@ -190,20 +197,20 @@ GetWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year, 
       ) %>%
       select(cntry_name, ess_year, indicator, name, value, source)
     
-    saveRDS(new_df, rds_filename)
+    saveRDS(new_df, paste0(rds_folder, rds_filename))
     
   } else {
-    new_df <- readRDS(rds_filename)
+    new_df <- readRDS(paste0(rds_folder, rds_filename))
   }
   
   return(new_df)
 }
 
 
-GetPreProcessWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year ) {
+GetPreProcessWbData <- function(data_folder, read_rds, inc_countries, min_year, max_year, rds_folder="" ) {
   # some preprocessing needed
   
-  wb_data <- GetWbData(data_folder, read_rds, inc_countries , min_year, max_year)
+  wb_data <- GetWbData(data_folder, read_rds, inc_countries , min_year, max_year, rds_folder)
   
   # calculate refugees by population
   ref_pop <- wb_data %>%
@@ -387,6 +394,7 @@ CreateEuroMap <- function(dsin, ind_name, txt_title, txt_subtitle, txt_caption) 
           axis.ticks=element_blank(),
           legend.title=element_blank(),
           plot.title = element_text(hjust = 0),
+          plot.caption = element_text(color="gray"),
           plot.subtitle = element_text(hjust = 0)) +
     labs(title = txt_title,
          subtitle = txt_subtitle,
@@ -599,13 +607,17 @@ MakeIndicatorCountryPlot <- function(ds, id_term, cntry_term, cntry_term_long=""
     labs(title = txt_head,
          subtitle = txt_subhead,
          caption = txt_caption) +
-    xlab("") + ylab("") +
+    xlab("") + ylab("score") +
     scale_color_viridis(discrete=TRUE) +
+    theme_bw() +
     theme(
+      panel.border = element_blank(),
       legend.position = "None",
+      axis.title = element_text(color="gray", size=7),
+      axis.text = element_text(color="gray"),
       plot.title = element_text(hjust = 0),
       plot.subtitle = element_text(hjust = 0),
-      plot.caption = element_text(size = 8)
+      plot.caption = element_text(size = 8, color="gray")
     )
   
   return(list("ci" = p_ci, "ds_ci" = ds_ci))
@@ -670,11 +682,13 @@ PlotIndicatorHistogram <- function(ds,  this_cntry,  yr,  this_indicator,
                         ", Skew: ", round(w_skewness, 2)),
       caption = "Mean and +- 1SD marked on plot, ESS surveys 2002-2016"
     ) +
+    theme_bw() +
     theme(
       axis.title = element_blank(),
       plot.title = element_text(size = title_size, hjust = 0),
       plot.subtitle = element_text(size = as.integer(0.8 * title_size), hjust = 0),
       axis.text = element_text(size = as.integer(0.7 * title_size)),
+      panel.border = element_blank(),
       plot.caption = element_text(size = as.integer(0.8 * title_size))
     )
   
@@ -815,14 +829,18 @@ GetComparisonBoxPlot <- function(indval_name, ds_avg, ds, cntry_list, txt_name,
                                  tooltip=paste0(cntry_yr,"\nMean: ", round(mean,2))),
                              shape = 23, 
                              size = 1.5, fill ="white",inherit.aes=FALSE) + 
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 6),
+      theme_bw() +
+      theme(axis.text = element_text(size = 5.5),
             axis.title=element_blank(),
+            panel.border = element_blank(),
             plot.title = element_text(hjust = 0),
-            plot.subtitle = element_text(hjust = 0)) + 
+            plot.subtitle = element_text(hjust = 0),
+            plot.caption = element_text(colour = "gray")) + 
       guides(fill=FALSE) +
       labs(title = paste(txt_name, "2002, 2014 and 2016"),
-           subtitle = "Boxplot with mean (using weighted data, for countries participating all surveys)",
-           caption = txt_caption)
+           subtitle = "Boxplot with mean (weighted, countries in all surveys)",
+           caption = txt_caption) +
+      coord_flip()
   }
   
   return(list("plot"=p, "table"=indval_changes))
