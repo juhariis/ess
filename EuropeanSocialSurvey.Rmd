@@ -3,14 +3,12 @@ title: "Happiness and European Parliament - Adventures in European Social Survey
 author: "Juha Riissanen - juhariis@gmail.com"
 date: "`r Sys.Date()`"
 output: 
-  html_document:
-    theme: journal
-    code_folding: hide
+  github_document:
     toc: yes
     toc_depth: 4
 always_allow_html: yes
 params:
-  html_interactive: TRUE
+  html_interactive: FALSE
   explore_indicator_graphs: TRUE
   explore_country_graphs: TRUE
 ---
@@ -2503,14 +2501,17 @@ his blog post ["R Markdown: How to number and reference tables"](https://datasci
 Top matter definitions
 
 * Azure - handles javascript, no problem with document size
-    * output:
-        * html_document:
-            * toc: yes
-            * toc_depth: 4
-    * params:
-        * html_interactive: TRUE
-        * explore_indicator_graphs: TRUE
-        * explore_country_graphs: TRUE
+    output: 
+      html_document:
+        theme: journal
+        code_folding: hide
+        toc: yes
+        toc_depth: 4
+    always_allow_html: yes
+    params:
+      html_interactive: TRUE
+      explore_indicator_graphs: TRUE
+      explore_country_graphs: TRUE
         
 * RPubs - handles javascript, document size limitation
     * output:
