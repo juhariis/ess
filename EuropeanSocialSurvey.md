@@ -1,7 +1,7 @@
 Happiness and European Parliament - Adventures in European Social Survey Data
 ================
 Juha Riissanen - <juhariis@gmail.com>
-2018-09-13
+2018-10-18
 
 -   [European Social Survey](#european-social-survey)
 -   [ESS Data](#ess-data)
@@ -132,12 +132,13 @@ Juha Riissanen - <juhariis@gmail.com>
     -   [World Bank](#world-bank-1)
     -   [UNHCR](#unhcr-1)
 -   [Technical notes](#technical-notes)
+-   [Change Notes](#change-notes)
 
 ------------------------------------------------------------------------
 
-This workbook is used to create content for the blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/). (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and [Azure](https://juhariis.z16.web.core.windows.net/EuropeanSocialSurvey.html). Since Rpubs seems to have some size limitations, the exploratory graphs on indicators and countries are not included. Current Azure subscription has not these limitations so there we have all content. But loading of the page may take some time..)
+This workbook was used to create content for the blog post on [investigation of European Social Study](https://hidingindata.wordpress.com/2018/06/20/happiness-and-european-parliament-adventures-in-european-social-survey-data/) but is being updated every now and then as well. (HTLM version to show off active content via [Rpubs](http://www.rpubs.com/juhariis/ess) and [Azure](https://juhariis.z16.web.core.windows.net/EuropeanSocialSurvey.html). Since Rpubs seems to have some size limitations, the exploratory graphs on indicators and countries are not included. Current Azure subscription has not these limitations so there we have all content. But loading of the page may take some time..)
 
-------------------------------------------------------------------------
+Change notes in the very endt \* \* \*
 
 Europe is going through interesting time since turn of the century: Brexit, refugee crisis, rise of populism, economic worries, rising tensions between the West and Russia - and a lot more [Timeline of 21st century](https://en.wikipedia.org/wiki/Timeline_of_the_21st_century)
 
@@ -329,7 +330,7 @@ ds_participations <- dataset %>%
 # On geographic map
 p <- CreateEuroMap(dsin = ds_participations %>% ungroup(), 
                    ind_name = "n_surveys",
-                   txt_title = "Participation in surveys",
+                   txt_title = "ESS has some gaps in geographic and time coverage",
                    txt_subtitle = "Number of surveys a country has participated in",
                    txt_caption = "ESS surveys 2002-2016")
 MyPrintInteractive(p, plot_interactive)
@@ -341,16 +342,30 @@ So, there is a band of countries starting from Finland in the north eastern corn
 
 ``` r
 p <- ggplot(data=ds_participations, 
-            aes(x=reorder(cntry_name, n_surveys))) +
-  geom_bar_interactive(stat="identity", fill="grey", aes(y=n_surveys, tooltip=paste0(cntry_name, '\n', n_surveys))) +
+            aes(x=reorder(cntry_name, -n_surveys))) +
+  geom_hline(yintercept = 4.1, color="red", alpha=0.5) +
+  geom_bar_interactive(stat="identity",
+                       aes(y=n_surveys, 
+                           alpha=ifelse(n_surveys <= 4, 0.6, 0.5),
+                           fill=ifelse(n_surveys <= 4, "blue","red"),
+                           tooltip=paste0(cntry_name, '\n', n_surveys, ' surveys'))) +
   labs(
-    title="Participation in surveys",
-    subtitle="Number of surveys a country has participated in",
+    title="Some very interesting countries are only in some surveys",
+    subtitle="E.g. Italy, Greece, Turkey in four or less surveys ",
     caption="ESS surveys 2002-2016") + 
-  xlab("") + ylab("")+
+  xlab("") + ylab("# surveys participated") +
+  theme_bw() +
   theme(plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+        legend.position = "None",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.caption = element_text(color="gray"),
+        plot.subtitle = element_text(hjust = 0),
+        axis.line = element_blank(), 
+        axis.title.x = element_text(size=10, color="gray", hjust = 0),
+        axis.text.x = element_text(hjust = 1, vjust=0.5, size=8)) + 
+  coord_flip()
 
 MyPrintInteractive(p, plot_interactive)
 ```
@@ -426,16 +441,18 @@ p <- ggplot(data = dataset, aes(pspwght)) +
     linetype = "dashed",
     color = "black") +
   annotate(
-    "label",
+    "text",
     label = names(quantile(dataset$pspwght)),
     x = quantile(dataset$pspwght),
     y = 19000,           # fixed by experimentation
     size = 2) +
   labs(
-    title = "Weighting of survey data",
+    title = "Individual answer typically weighted by one - but not always",
     subtitle = "Distribution of 'pspwght' across all surveys, highlighting quantiles",
     caption = "ESS surveys 2002-2016") +
+  theme_bw() +
   theme(plot.title = element_text(hjust = 0),
+        panel.border = element_blank(), 
         plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
 print(p)
@@ -498,15 +515,19 @@ happy_skew <- moments::skewness(ds_happy_ave$var_ave)
 
 ggplot(data=ds_happy_ave, aes(var_ave)) +
   geom_histogram(bins = 15, fill='gray') +
-  geom_vline(xintercept = quantile(ds_happy_ave$var_ave), linetype="dashed", color="black") +
-  annotate("label", label=names(quantile(ds_happy_ave$var_ave)), 
-           x=quantile(ds_happy_ave$var_ave), y=2, size=2) +
+  geom_vline(xintercept = quantile(ds_happy_ave$var_ave), linetype="dashed", color="gray") +
+  annotate("text", label=names(quantile(ds_happy_ave$var_ave)), 
+           x=quantile(ds_happy_ave$var_ave), y=28, size=3) +
   labs(
-    title="Subjective happiness",
+    title="Subjective happiness is highly skewed",
     subtitle="Weighted by survey/country scores",
     caption="ESS surveys 2002-2016") +
-  theme(plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.title = element_text(size=6, color="gray"),
+    plot.title = element_text(hjust = 0),
+    plot.subtitle = element_text(hjust = 0)) +
   xlab("") + ylab("")
 ```
 
@@ -533,7 +554,7 @@ ds_happy_avgsum <- MakeAverageSummary(ds = ds_happy_ave, value_term = "var_ave")
 p <- CreateEuroMap(dsin = ds_happy_avgsum %>%
                      filter(cntry_name != "Mean"), 
                    ind_name = "var_ave",
-                   txt_title = "Subjective happiness 2002-2016",
+                   txt_title = "North and west appear subjectively happier\nthan east and south east",
                    txt_subtitle = "Average score of 'happy', scale 0-10",
                    txt_caption = "ESS surveys 2002-2016")
 MyPrintInteractive(p, plot_interactive)
@@ -555,7 +576,7 @@ Next we will show average of `happy` by country for each survey as a heatmap ord
 p_happy <- MakeIndicatorHeatSet(
    ds = ds_happy_avgsum, 
    value_term = "var_ave", 
-   txt_name = "Subjective happiness",
+   txt_name = "Lower subjective happiness in former \nSoviet block and south east",
    txt_subtitle = "Average score of 'happy', scale 0-10",
    txt_caption = "ESS surveys 2002-2016")
 
@@ -591,7 +612,7 @@ trends_happy_50  <- MakeIndicatorCountryPlot(
     cntry_term = "cntry_name",
     cntry_term_long = "explain_txt",
     year_term = "ess_year",
-    txt_head = "Subjective happiness",
+    txt_head = "Individual Countries Have Very Different 'Happiness Histories'",
     txt_subhead = "Countries in 50% of surveys or more",
     txt_caption = "ESS surveys 2002-2016",
     show_summary = TRUE,
@@ -620,7 +641,7 @@ trends_happy_100  <- MakeIndicatorCountryPlot(
   cntry_term = "cntry_name",
   cntry_term_long = "explain_txt",
   year_term = "ess_year",
-  txt_head = "Subjective happiness",
+  txt_head = "Core ESS Countries: Different 'Happiness Histories' with \nTentatively Rising Average",
   txt_subhead = "Countries in all surveys",
   txt_caption = "ESS surveys 2002-2016",
   show_summary = TRUE,
@@ -653,13 +674,16 @@ p <- ggplot(data = ds_happy_avgsum %>% filter(ess_year=="Mean", cntry_name != "M
                              tooltip = paste0(cntry_name, 
                                               "\nMean: ", round(var_ave,2))), 
                          color="black", pch=5) +
-  labs(title="Subjective happiness scores",
+  labs(title="Variations get smaller with higher happiness score",
        subtitle="All countries in order of decreasing mean (black diamond)",
        caption = "ESS surveys 2002-2016") +
   scale_color_viridis(discrete=TRUE) +
-  theme(axis.title=element_blank(),
-        plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+      axis.title=element_blank(),
+    plot.title = element_text(hjust = 0),
+    plot.subtitle = element_text(hjust = 0)) +
   labs(color="ESS Year") +
   coord_flip()
 
@@ -675,23 +699,30 @@ ds_happy_sd <- ds_happy_ave %>%
   group_by(cntry_name) %>% 
   dplyr::summarize(sd = sd(var_ave), n=n()) %>% 
   mutate(cntry_name2 = paste0(cntry_name, " (",n,")")) %>%
-  arrange(desc(sd))
+  arrange(desc(sd)) %>%
+  filter(n >= 4)
 
 p <- ggplot(data=ds_happy_sd, aes(x=reorder(cntry_name2, sd), y=sd, fill=n)) +
-  geom_bar_interactive(aes(tooltip=paste0(cntry_name, "\nSurveys: ", n, "\nSD: ", round(sd,2))),stat = "identity") + 
+  geom_bar_interactive(aes(tooltip=paste0(cntry_name, "\nSurveys: ", n, "\nSD: ", round(sd,2))),
+                       stat = "identity") + 
   coord_flip() +
-  labs(title="Standard deviation of 'happy'",
-       subtitle="All countries, number of surveys in parenthesis",
+  labs(title="Top three in variation: Italy, Greece and Poland",
+       subtitle="Countries in four or more surveys included",
        caption="ESS surveys 2002-2016") +
   scale_color_viridis(discrete=TRUE) +
-  theme(axis.title=element_blank(),
-        plot.title = element_text(hjust = 0),
-        plot.subtitle = element_text(hjust = 0)) 
+  ylab("Standard deviation of 'happy") + xlab("") +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    plot.title = element_text(hjust = 0),
+    plot.subtitle = element_text(hjust = 0)) 
 
 MyPrintInteractive(p, plot_interactive) 
 ```
 
 ![](EuropeanSocialSurvey_files/figure-markdown_github/unnamed-chunk-14-1.png)
+
+Countries in three or less surveys excluded.
 
 ### Significance and meaning of changes
 
@@ -736,13 +767,13 @@ knitr::kable(happy_res$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Ireland        |  7.863|  7.331|  7.550|  -0.312|         0.071|         0.075| negligible |   0.000| \*\*\*   |   0.219|         0.071|         0.075| negligible |   0.000| \*\*\*   |
-| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.648|          |  -0.047|         0.079|         0.083| negligible |   0.360|          |
-| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.798|          |   0.045|         0.010|         0.014| negligible |   0.384|          |
-| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.570|          |  -0.016|        -0.014|        -0.010| negligible |   0.746|          |
-| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.388|          |   0.065|         0.365|         0.369| small      |   0.244|          |
-| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.022| \*       |   0.072|        -0.021|        -0.017| negligible |   0.090| +        |
-| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.052| +        |   0.084|        -0.043|        -0.039| negligible |   0.072| +        |
-| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.006| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.126|          |
+| Sweden         |  7.874|  7.896|  7.850|  -0.024|         0.079|         0.083| negligible |   0.652|          |  -0.047|         0.079|         0.083| negligible |   0.402|          |
+| France         |  7.410|  7.351|  7.396|  -0.014|         0.010|         0.014| negligible |   0.760|          |   0.045|         0.010|         0.014| negligible |   0.406|          |
+| Belgium        |  7.695|  7.743|  7.727|   0.033|        -0.014|        -0.010| negligible |   0.500|          |  -0.016|        -0.014|        -0.010| negligible |   0.726|          |
+| United Kingdom |  7.602|  7.583|  7.649|   0.047|         0.365|         0.369| small      |   0.412|          |   0.065|         0.365|         0.369| small      |   0.266|          |
+| Netherlands    |  7.847|  7.865|  7.937|   0.090|        -0.021|        -0.017| negligible |   0.044| \*       |   0.072|        -0.021|        -0.017| negligible |   0.080| +        |
+| Finland        |  8.031|  8.038|  8.122|   0.091|        -0.043|        -0.039| negligible |   0.046| \*       |   0.084|        -0.043|        -0.039| negligible |   0.086| +        |
+| Switzerland    |  8.043|  8.088|  8.168|   0.125|        -0.039|        -0.035| negligible |   0.008| \*\*     |   0.080|        -0.039|        -0.035| negligible |   0.168|          |
 | Norway         |  7.902|  7.957|  8.087|   0.184|        -0.055|        -0.051| negligible |   0.000| \*\*\*   |   0.129|        -0.055|        -0.051| negligible |   0.028| \*       |
 | Spain          |  7.457|  7.437|  7.747|   0.290|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |   0.310|        -0.079|        -0.075| negligible |   0.000| \*\*\*   |
 | Portugal       |  6.953|  6.973|  7.437|   0.484|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |   0.465|        -0.075|        -0.070| negligible |   0.000| \*\*\*   |
@@ -1585,9 +1616,13 @@ p <- ggplot(data= ds_unhcr,
             aes(x=ess_year, y=value, fill=pop_type, color=pop_type)) +
   geom_bar_interactive(stat="identity", 
                        aes(tooltip=paste(ess_year, pop_type))) +
-  labs(title="People of concern in Europe",
+  labs(title="Count of UNHCR 'people of concern' in Europe\nincreasing rapidly",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
+  theme_bw() +
+  theme(
+    panel.border = element_blank()
+  ) +
   xlab("") + ylab("")
 MyPrintInteractive(p, plot_interactive)
 ```
@@ -1605,7 +1640,11 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2013),
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
   xlab("") + ylab("") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 ```
 
@@ -1619,8 +1658,12 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016),
   labs(title="People of concern in Europe 2016",
        subtitle="Countries participating in ESS",
        caption="UNHCR") +
-  xlab("") + ylab("") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  xlab("") + ylab("") +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 ```
 
@@ -1640,7 +1683,11 @@ p <- ggplot(data= ds_unhcr %>% filter(ess_year==2016),
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 ```
 
@@ -1704,13 +1751,17 @@ unhcr_indicator_table <- unhcr_indicator_table %>%
 p <- ggplot(data=unhcr_data %>% filter(ess_year==2016), 
        aes(x=reorder(cntry_name, -value), y=value+1, fill=indicator)) +
   geom_bar_interactive(stat="identity", 
-                       aes(tooltip=paste(cntry_name, '-', pop_type))) +
+                       aes(tooltip=paste(cntry_name, '-', indicator))) +
   labs(title="People of concern in Europe 2016",
        subtitle="% of population, log10 scale yaxis showing 1% more than real",
        caption="UNHCR") +
   xlab("") + ylab("") + 
   scale_y_log10() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  coord_flip()
 MyPrintInteractive(p, plot_interactive)
 ```
 
@@ -1747,8 +1798,12 @@ p <- ggplot(data = ds_ss_avg %>%
                 ess_year==2016),
        aes(x=reorder(cntry_name, -value), y=value, fill=indicator)) +
   geom_bar_interactive(stat = "identity", position = "dodge", aes(tooltip=paste(cntry_name, indicator, round(value,2)))) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) + 
-  xlab("") + ylab("")
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5)) +
+  xlab("") + ylab("") + 
+  coord_flip()
 
 MyPrintInteractive(p, plot_interactive)
 ```
@@ -1790,7 +1845,7 @@ knitr::kable(indicator_table[idx_pct,], digits = 3)
 | UNHCR.Other.PCT      | Other population types together(% of population) - calculated                                 |    0.000|   6.276| UNHCR  | NA     | NA     |
 
 ``` r
-# save  a copies to be used by other scripts
+# save a copy to be used by other scripts
 
 saveRDS(indicator_table, file="indicator_table.rds")
 saveRDS(ds_ss_avg, file="ds_ss_avg.rds")
@@ -1833,7 +1888,7 @@ GetIndicatorPlotJs <- function(indicator_short, id, prefix) {
     "cntry_term = 'cntry_name',",
     "year_term = 'ess_year',",
     "txt_head = as.character(this_ind$name),",
-    "txt_subhead = indicator_short,",
+    "txt_subhead = '",indicator_short,"',",
     "txt_caption = paste(as.character(this_ind$source), '2002-2016'),",
     "show_summary = TRUE,",
     "plevel = p_val)",
@@ -1860,6 +1915,11 @@ if (params$explore_indicator_graphs){
 
 tmp_indicators_rmd <- "tmp_indicators.rmd"
 if (file.exists(tmp_indicators_rmd)) file.remove(tmp_indicators_rmd)
+```
+
+    ## [1] TRUE
+
+``` r
 fileConn<-file(tmp_indicators_rmd)
 writeLines(c(
   " ",
@@ -2116,6 +2176,11 @@ if (params$explore_country_graphs){
 
 tmp_countries_rmd <- "tmp_countries.rmd"
 if (file.exists(tmp_countries_rmd)) file.remove(tmp_countries_rmd)
+```
+
+    ## [1] TRUE
+
+``` r
 fileConn<-file(tmp_countries_rmd)
 writeLines(c(
   "",
@@ -2410,7 +2475,7 @@ GetModelCoeffs <- function(the_mod, pred_name){
     geom_bar(stat = "identity") +
     xlab("") + ylab("") +
     labs(title=txt_title,
-         subtitle=txt_title) +
+         subtitle=txt_subtitle) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5))
   return(list("plot"=p, "df"=df_set, "title"= txt_title, "subtitle"=txt_subtitle))
 }
@@ -2711,20 +2776,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
-| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.754|          |   0.005|         0.008|         0.012| negligible |   0.902|          |
-| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.866|          |  -0.017|         0.061|         0.065| negligible |   0.796|          |
-| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.004| \*\*     |   0.185|        -0.047|        -0.043| negligible |   0.002| \*\*     |
-| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.006| \*\*     |   0.181|        -0.057|        -0.053| negligible |   0.058| +        |
-| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.470|          |
-| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.114|          |
+| Spain          |  4.406|  4.376|  4.381|  -0.025|         0.008|         0.012| negligible |   0.770|          |   0.005|         0.008|         0.012| negligible |   0.924|          |
+| Sweden         |  6.012|  6.042|  6.025|   0.012|         0.061|         0.065| negligible |   0.808|          |  -0.017|         0.061|         0.065| negligible |   0.750|          |
+| Ireland        |  5.879|  5.861|  6.046|   0.167|        -0.047|        -0.043| negligible |   0.006| \*\*     |   0.185|        -0.047|        -0.043| negligible |   0.004| \*\*     |
+| Portugal       |  3.937|  4.011|  4.192|   0.255|        -0.057|        -0.053| negligible |   0.004| \*\*     |   0.181|        -0.057|        -0.053| negligible |   0.064| +        |
+| Belgium        |  4.392|  4.637|  4.683|   0.291|        -0.107|        -0.103| negligible |   0.000| \*\*\*   |   0.046|        -0.107|        -0.103| negligible |   0.560|          |
+| United Kingdom |  5.408|  5.849|  5.754|   0.346|         0.242|         0.246| small      |   0.000| \*\*\*   |  -0.094|         0.242|         0.246| small      |   0.110|          |
 | Finland        |  5.676|  5.933|  6.110|   0.434|        -0.191|        -0.187| negligible |   0.000| \*\*\*   |   0.178|        -0.191|        -0.187| negligible |   0.000| \*\*\*   |
-| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.026| \*       |
-| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.298|          |
+| France         |  4.345|  4.667|  4.807|   0.462|        -0.106|        -0.102| negligible |   0.000| \*\*\*   |   0.140|        -0.106|        -0.102| negligible |   0.048| \*       |
+| Switzerland    |  5.293|  5.684|  5.759|   0.466|        -0.167|        -0.163| negligible |   0.000| \*\*\*   |   0.075|        -0.167|        -0.163| negligible |   0.340|          |
 | Hungary        |  4.147|  4.368|  4.616|   0.469|        -0.085|        -0.081| negligible |   0.000| \*\*\*   |   0.248|        -0.085|        -0.081| negligible |   0.002| \*\*     |
-| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.044| \*       |
-| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.002| \*\*     |
-| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.058| +        |
-| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.042| \*       |
+| Netherlands    |  5.236|  5.593|  5.706|   0.470|        -0.132|        -0.128| negligible |   0.000| \*\*\*   |   0.114|        -0.132|        -0.128| negligible |   0.042| \*       |
+| Germany        |  4.801|  5.240|  5.424|   0.623|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |   0.184|        -0.130|        -0.127| negligible |   0.000| \*\*\*   |
+| Poland         |  3.163|  3.664|  3.830|   0.666|        -0.277|        -0.273| small      |   0.000| \*\*\*   |   0.165|        -0.277|        -0.273| small      |   0.042| \*       |
+| Slovenia       |  4.233|  4.967|  5.167|   0.934|        -0.362|        -0.357| small      |   0.000| \*\*\*   |   0.200|        -0.362|        -0.357| small      |   0.024| \*       |
 | Norway         |  6.013|  6.048|  6.984|   0.971|        -0.307|        -0.303| small      |   0.000| \*\*\*   |   0.936|        -0.307|        -0.303| small      |   0.000| \*\*\*   |
 
 #### Modeling
@@ -2879,19 +2944,19 @@ knitr::kable(ess_set$sig$table, digits = 3,
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.972|  5.369|  4.934|  -1.038|         0.422|         0.426| small      |   0.000| \*\*\*   |  -0.435|         0.422|         0.426| small      |   0.000| \*\*\*   |
 | Poland         |  5.634|  4.604|  4.909|  -0.725|         0.247|         0.252| small      |   0.000| \*\*\*   |   0.305|         0.247|         0.252| small      |   0.000| \*\*\*   |
-| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.044| \*       |
-| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.016| \*       |
-| Germany        |  5.170|  4.680|  4.812|  -0.358|         0.125|         0.128| negligible |   0.000| \*\*\*   |   0.132|         0.125|         0.128| negligible |   0.030| \*       |
-| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.038| \*       |  -0.096|         0.042|         0.046| negligible |   0.290|          |
-| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.102|          |   0.205|         0.047|         0.051| negligible |   0.004| \*\*     |
-| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   0.966|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
-| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.950|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
-| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.556|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
-| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.162|          |   0.125|        -0.032|        -0.028| negligible |   0.090| +        |
-| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.258|          |  -0.047|        -0.014|        -0.010| negligible |   0.542|          |
-| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.004| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.774|          |
-| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.008| \*\*     |
-| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.020| \*       |
+| Slovenia       |  4.876|  4.137|  4.337|  -0.539|         0.186|         0.191| negligible |   0.000| \*\*\*   |   0.200|         0.186|         0.191| negligible |   0.076| +        |
+| Sweden         |  6.603|  6.411|  6.242|  -0.361|         0.159|         0.164| negligible |   0.000| \*\*\*   |  -0.169|         0.159|         0.164| negligible |   0.010| \*\*     |
+| Germany        |  5.170|  4.680|  4.812|  -0.358|         0.125|         0.128| negligible |   0.000| \*\*\*   |   0.132|         0.125|         0.128| negligible |   0.050| \*       |
+| Switzerland    |  5.440|  5.363|  5.267|  -0.173|         0.042|         0.046| negligible |   0.024| \*       |  -0.096|         0.042|         0.046| negligible |   0.266|          |
+| Finland        |  6.462|  6.148|  6.353|  -0.109|         0.047|         0.051| negligible |   0.112|          |   0.205|         0.047|         0.051| negligible |   0.000| \*\*\*   |
+| Portugal       |  5.356|  4.815|  5.356|   0.000|         0.013|         0.018| negligible |   0.994|          |   0.541|         0.013|         0.018| negligible |   0.000| \*\*\*   |
+| Ireland        |  5.713|  5.445|  5.716|   0.003|        -0.017|        -0.013| negligible |   0.976|          |   0.271|        -0.017|        -0.013| negligible |   0.000| \*\*\*   |
+| United Kingdom |  5.317|  4.909|  5.360|   0.044|         0.282|         0.287| small      |   0.568|          |   0.452|         0.282|         0.287| small      |   0.000| \*\*\*   |
+| Norway         |  6.756|  6.723|  6.848|   0.092|        -0.032|        -0.028| negligible |   0.184|          |   0.125|        -0.032|        -0.028| negligible |   0.104|          |
+| Spain          |  4.661|  4.817|  4.771|   0.109|        -0.014|        -0.010| negligible |   0.236|          |  -0.047|        -0.014|        -0.010| negligible |   0.582|          |
+| Belgium        |  4.997|  5.199|  5.230|   0.233|        -0.099|        -0.095| negligible |   0.004| \*\*     |   0.031|        -0.099|        -0.095| negligible |   0.620|          |
+| Netherlands    |  5.470|  5.534|  5.732|   0.262|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |   0.198|        -0.064|        -0.059| negligible |   0.000| \*\*\*   |
+| France         |  4.569|  5.100|  4.921|   0.352|        -0.074|        -0.070| negligible |   0.000| \*\*\*   |  -0.179|        -0.074|        -0.070| negligible |   0.026| \*       |
 
 #### Modeling
 
@@ -3047,20 +3112,20 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | cntry name     |   2002|   2014|   2016|   d0216|  eff cil 0216|  eff ciu 0216| eff m 0216 |  p 0216| sig 0216 |   d1416|  eff cil 1416|  eff ciu 1416| eff m 1416 |  p 1416| sig 1416 |
 |:---------------|------:|------:|------:|-------:|-------------:|-------------:|:-----------|-------:|:---------|-------:|-------------:|-------------:|:-----------|-------:|:---------|
 | Hungary        |  5.625|  4.867|  4.367|  -1.258|         0.523|         0.528| medium     |   0.000| \*\*\*   |  -0.501|         0.523|         0.528| medium     |   0.000| \*\*\*   |
-| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.008| \*\*     |
+| Poland         |  4.741|  3.665|  3.927|  -0.815|         0.308|         0.312| small      |   0.000| \*\*\*   |   0.262|         0.308|         0.312| small      |   0.006| \*\*     |
 | Portugal       |  4.835|  3.501|  4.103|  -0.733|         0.145|         0.150| negligible |   0.000| \*\*\*   |   0.601|         0.145|         0.150| negligible |   0.000| \*\*\*   |
 | Slovenia       |  4.620|  3.389|  3.944|  -0.676|         0.248|         0.253| small      |   0.000| \*\*\*   |   0.555|         0.248|         0.253| small      |   0.000| \*\*\*   |
-| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.068| +        |
+| France         |  4.345|  3.948|  3.809|  -0.536|         0.130|         0.134| negligible |   0.000| \*\*\*   |  -0.140|         0.130|         0.134| negligible |   0.060| +        |
 | Spain          |  4.767|  3.886|  4.245|  -0.522|         0.177|         0.182| negligible |   0.000| \*\*\*   |   0.359|         0.177|         0.182| negligible |   0.000| \*\*\*   |
-| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.808|          |
-| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.010| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.016| \*       |
+| Switzerland    |  4.812|  4.525|  4.501|  -0.311|         0.084|         0.088| negligible |   0.000| \*\*\*   |  -0.024|         0.084|         0.088| negligible |   0.780|          |
+| Belgium        |  4.802|  4.808|  4.587|  -0.215|         0.043|         0.047| negligible |   0.004| \*\*     |  -0.221|         0.043|         0.047| negligible |   0.010| \*\*     |
 | Ireland        |  5.132|  4.626|  5.004|  -0.128|         0.022|         0.026| negligible |   0.076| +        |   0.378|         0.022|         0.026| negligible |   0.000| \*\*\*   |
-| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.046| \*       |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
-| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.148|          |   0.188|         0.033|         0.038| negligible |   0.014| \*       |
-| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.268|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
+| Germany        |  4.526|  4.079|  4.400|  -0.126|         0.060|         0.064| negligible |   0.066| +        |   0.321|         0.060|         0.064| negligible |   0.000| \*\*\*   |
+| Netherlands    |  4.777|  4.487|  4.675|  -0.101|         0.033|         0.038| negligible |   0.140|          |   0.188|         0.033|         0.038| negligible |   0.014| \*       |
+| United Kingdom |  3.692|  3.270|  3.776|   0.084|         0.201|         0.205| small      |   0.248|          |   0.507|         0.201|         0.205| small      |   0.000| \*\*\*   |
 | Finland        |  4.878|  4.673|  5.173|   0.295|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |   0.501|        -0.115|        -0.111| negligible |   0.000| \*\*\*   |
-| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.064| +        |
-| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.330|          |
+| Norway         |  4.706|  5.002|  5.151|   0.444|        -0.143|        -0.138| negligible |   0.000| \*\*\*   |   0.148|        -0.143|        -0.138| negligible |   0.092| +        |
+| Sweden         |  4.084|  4.765|  4.841|   0.757|        -0.126|        -0.121| negligible |   0.000| \*\*\*   |   0.076|        -0.126|        -0.121| negligible |   0.322|          |
 
 As can be seen above, the big positive changes in UK and Portugal as well as Finland and Slovenia from 2014 to 2016 were significant as per weighted t-test.
 
@@ -3224,9 +3289,9 @@ knitr::kable(ess_set$sig$table, digits = 3,
 | Belgium        |  2.482|  2.580|  2.293|  -0.189|         0.136|         0.140| negligible |   0.000| \*\*\*   |  -0.286|         0.136|         0.140| negligible |   0.000| \*\*\*   |
 | Netherlands    |  2.467|  2.505|  2.323|  -0.144|         0.095|         0.099| negligible |   0.000| \*\*\*   |  -0.182|         0.095|         0.099| negligible |   0.000| \*\*\*   |
 | Finland        |  2.603|  2.697|  2.511|  -0.092|         0.093|         0.097| negligible |   0.000| \*\*\*   |  -0.186|         0.093|         0.097| negligible |   0.000| \*\*\*   |
-| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.000| \*\*\*   |   0.039|         0.120|         0.124| negligible |   0.108|          |
-| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.486|          |  -0.041|        -0.025|        -0.020| negligible |   0.264|          |
-| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.122|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
+| Sweden         |  1.879|  1.763|  1.802|  -0.077|         0.120|         0.124| negligible |   0.002| \*\*     |   0.039|         0.120|         0.124| negligible |   0.114|          |
+| Slovenia       |  2.468|  2.531|  2.490|   0.022|        -0.025|        -0.020| negligible |   0.462|          |  -0.041|        -0.025|        -0.020| negligible |   0.282|          |
+| Ireland        |  2.297|  2.657|  2.332|   0.035|        -0.027|        -0.023| negligible |   0.178|          |  -0.325|        -0.027|        -0.023| negligible |   0.000| \*\*\*   |
 | Switzerland    |  2.218|  2.400|  2.283|   0.065|        -0.060|        -0.055| negligible |   0.020| \*       |  -0.117|        -0.060|        -0.055| negligible |   0.000| \*\*\*   |
 | Poland         |  2.409|  2.455|  2.591|   0.182|        -0.218|        -0.213| small      |   0.000| \*\*\*   |   0.135|        -0.218|        -0.213| small      |   0.000| \*\*\*   |
 | Hungary        |  3.101|  3.318|  3.558|   0.457|        -0.210|        -0.205| small      |   0.000| \*\*\*   |   0.240|        -0.210|        -0.205| small      |   0.000| \*\*\*   |
@@ -3858,15 +3923,8 @@ Caption and figure numbering is produced as described by Norbert Köhler in his 
 
 Top matter definitions
 
--   Azure - handles javascript, no problem with document size
-    -   output:
-        -   html\_document:
-            -   toc: yes
-            -   toc\_depth: 4
-    -   params:
-        -   html\_interactive: TRUE
-        -   explore\_indicator\_graphs: TRUE
-        -   explore\_country\_graphs: TRUE
+-   Azure - handles javascript, no problem with document size output: html\_document: theme: journal code\_folding: hide toc: yes toc\_depth: 4 always\_allow\_html: yes params: html\_interactive: TRUE explore\_indicator\_graphs: TRUE explore\_country\_graphs: TRUE
+
 -   RPubs - handles javascript, document size limitation
     -   output:
         -   html\_document:
@@ -3885,3 +3943,14 @@ Top matter definitions
         -   html\_interactive: FALSE
         -   explore\_indicator\_graphs: TRUE
         -   explore\_country\_graphs: TRUE
+
+Change Notes
+------------
+
+**2018-10-18** - started to update the look and feel
+
+-   improved visualizations and labeling of graphics
+-   changed document layout to better handle somewhat wide tables
+-   added option to show/hide code if needed - hiding it as default to help reading
+
+Partly done in the early sections of the report, hopefully will find time a bit later to revise the rest as well.
